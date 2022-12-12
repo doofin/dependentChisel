@@ -2,7 +2,7 @@
 use dependent types in Scala 3 to provide early error message for Chisel
 
 ## theories and related work
-related work : https://github.com/doofin/dependentChisel/resources.md
+related work : https://github.com/doofin/dependentChisel/blob/master/resources.md
 
 # compile and run
 This is a mill project for Scala 3
