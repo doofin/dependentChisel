@@ -10,7 +10,7 @@ object macros {
     if count == 0 then ""
     else s + repeat(s, count - 1)
 
-  inline def doSomething(inline mode: Boolean): Unit =
+  inline def doSomething(inline mode: Boolean): String =
     if mode then "" else ""
 
   val a: PlusTwo[4] = 6

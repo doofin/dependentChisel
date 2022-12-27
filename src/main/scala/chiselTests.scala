@@ -17,14 +17,17 @@ object chiselTests {
 
   def callWire[I <: Int]() = {
     // val wi = 1
-    val wi = Wire((new UIntFactory {}).apply(8.W))(UnlocatableSourceInfo, Strict)
+    val wiretype1 = (new UIntFactory {}).apply(8.W)
+    println(("wiretype1", wiretype1))
+    val wi = Wire(wiretype1)(UnlocatableSourceInfo, Strict)
     /* chiselException: Error: Not in a UserModule. Likely cause: Missed Module() wrap */
     wireTp[I, UInt](wi) // wireTp[Nothing, Int]
   }
 
   def run = {
 //   https://github.com/chipsalliance/chisel3/blob/7372c9e2eed082d35abbe55f856d03fda68dc0be/core/src/main/scala/chisel3/Aggregate.scala#L1292
-    println(callWire())
+    val w1 = callWire() // wireTp[Nothing, UInt]
+    println(w1)
     // val newValue = (new chisel3.stage.ChiselStage).emitFirrtl(new Blinky(1000))
     // println(newValue)
 
