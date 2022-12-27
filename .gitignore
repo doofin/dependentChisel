@@ -23,6 +23,7 @@ project/metals.sbt
 
 *.v
 *.fir
+*.anno.json
 .vscode
 .bsp
 

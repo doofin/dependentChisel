@@ -43,13 +43,12 @@ object depTypes {
     singV.add(2)
   }
 
-  case class wireTp[X <: Int](x: X)
-  inline def wireConn[X <: Int](x: wireTp[X], y: wireTp[X]) = {}
+  case class wireTp[I <: Int, X](x: X)
+  inline def wireConn[X <: Int](x: wireTp[X, Int], y: wireTp[X, Int]) = {}
 
-  inline def wireNew[X <: Int]
-      : wireTp[X + 2] = { // must use inline for  valueOf!
+  inline def wireNew[X <: Int]: wireTp[X + 2, Int] = { // must use inline for  valueOf!
     val singV = valueOf[X]
-    wireTp(singV.add(2))
+    wireTp(1) // singV.add(2)
   }
 
 // misc check

@@ -13,9 +13,14 @@ This is a mill project for Scala 3
 
 ### IDE support
 
-    [Metals](https://scalameta.org/metals/) with vscode
+[Metals](https://scalameta.org/metals/) with vscode : 
 
-    [IntelliJ](https://blog.jetbrains.com/scala/)
+When in a Mill workspace use the "Switch Build Server" command from Metals .
+then
+
+    mill mill.bsp.BSP/install
+
+[IntelliJ](https://blog.jetbrains.com/scala/)
 
 
 ### build setups in build.sc
