@@ -3,21 +3,34 @@ import scala.compiletime.ops.int.*
 import scala.compiletime.ops.int.S
 
 object depTypes {
-  sealed trait DTList[N <: Int]: // N is a singleton subtype of Int
-    inline def size: N = valueOf[N] // <2>
+  sealed trait DList[len <: Int]: // N is a singleton subtype of Int
+    inline def size: len = valueOf[len] // <2>
 
-    def +:[H <: Matchable](h: H): DTNonEmptyList[N, H, this.type] = // <3>
-      DTNonEmptyList(h, this)
+    def ::[T <: Matchable](h: T): DTCons[len, T, this.type] = // <3>
+      DTCons(h, this)
 
-  case object DTNil extends DTList[0] // <4>
+  case object DTNil extends DList[0] // <4>
 
-  case class DTNonEmptyList[N <: Int, H <: Matchable, T <: DTList[N]]( // <5>
-      head: H,
-      tail: T
-  ) extends DTList[S[N]]
+  case class DTCons[n <: Int, T <: Matchable, dList <: DList[n]]( // <5>
+      head: T,
+      tail: dList
+  ) extends DList[S[n]]
 
-// https://github.com/MaximeKjaer/tf-dotty/blob/master/modules/compiletime/src/main/scala/io/kjaer/compiletime/dependent.scala
+  /* fixed length lists */
+  sealed trait FixLenList[len <: Int, T <: Matchable]: // N is a singleton subtype of Int
+    inline def size: len = valueOf[len] // <2>
+
+    def ::(h: T): FixLenCons[len, T, this.type] = // <3>
+      FixLenCons(h, this)
+
+  case class FixLenNil[T <: Matchable]() extends FixLenList[0, T] // <4>
+
+  case class FixLenCons[n <: Int, T <: Matchable, dList <: FixLenList[n, T]]( // <5>
+      head: T,
+      tail: dList
+  ) extends FixLenList[S[n], T]
 // defines arithmetic on type
+// https://github.com/MaximeKjaer/tf-dotty/blob/master/modules/compiletime/src/main/scala/io/kjaer/compiletime/dependent.scala
   extension [X <: Int, Y <: Int](x: Int) {
     infix def add(y: Y): X + Y = (x + y).asInstanceOf[X + Y]
     infix def sub(y: Y): X - Y = (x - y).asInstanceOf[X - Y]
@@ -38,12 +51,13 @@ object depTypes {
   must use inline for  valueOf!
   without inline ,will be err :cannot reduce summonFrom
    */
+  case class wireTp[I <: Int, X](x: X)
+
   inline def wire[X <: Int]: X + 2 = {
     val singV = valueOf[X]
     singV.add(2)
   }
 
-  case class wireTp[I <: Int, X](x: X)
   inline def wireConn[X <: Int](x: wireTp[X, Int], y: wireTp[X, Int]) = {}
 
   inline def wireNew[X <: Int]: wireTp[X + 2, Int] = { // must use inline for  valueOf!
@@ -60,10 +74,11 @@ object depTypes {
 // def wire2[X <: Int] = { valueOf(X).add(2) }
 
   def run = {
-    val list = 1 +: 2.2 +: DTNil
+    val dlist1 = 1 :: 2.2 :: DTNil
+    val fixedList1 = 1 :: 2 :: 3 :: FixLenNil()
 
     // 1.add(2): 3
-    println(list)
+    println(dlist1)
     // wire(1) // val res0: Int + 2 = 3
     val dum1 = 1: Rank[1]
     val w0 = wire0: Rank[0]
