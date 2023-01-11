@@ -52,16 +52,17 @@ object depTypes {
   without inline ,will be err :cannot reduce summonFrom
    */
   case class wireTp[I <: Int, X](x: X)
+  // case class wireTp2[I <: Int, X](x: X)
 
   inline def wire[X <: Int]: X + 2 = {
     val singV = valueOf[X]
     singV.add(2)
   }
 
-  inline def wireConn[X <: Int](x: wireTp[X, Int], y: wireTp[X, Int]) = {}
+  inline def wireConn[n <: Int](x: wireTp[n, Int], y: wireTp[n, Int]) = {}
 
-  inline def wireNew[X <: Int]: wireTp[X + 2, Int] = { // must use inline for  valueOf!
-    val singV = valueOf[X]
+  inline def wireNew[n <: Int]: wireTp[n + 2, Int] = { // must use inline for  valueOf!
+    val singV = valueOf[n]
     wireTp(1) // singV.add(2)
   }
 

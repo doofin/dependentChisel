@@ -1,4 +1,4 @@
-import chisel3._
+import chisel3.*
 // import chisel3.util._
 
 import chisel3.ExplicitCompileOptions.Strict
@@ -7,7 +7,18 @@ import depTypes.*
 import chisel3.stage.ChiselGeneratorAnnotation
 import firrtl.AnnotationSeq
 
+/* what info   does chisel macro and plugin provide?
+ */
 object chiselTests {
+
+  class Adder extends Module {
+    val io = IO(new Bundle {
+      // val a = Input(new chisel3.UIntFactory()) // duplicate def from pkg obj and toplevel
+      // val b = Input(UInt(8.W))
+      // val y = Output(UInt(8.W))
+    })
+    // io.y := io.a + io.b
+  }
 
   def run = {
 // req compiler plugin:  https://github.com/chipsalliance/chisel3/blob/7372c9e2eed082d35abbe55f856d03fda68dc0be/core/src/main/scala/chisel3/Aggregate.scala#L1292

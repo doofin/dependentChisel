@@ -1,16 +1,20 @@
-import depTypes.*
 import firrtl.*
 import firrtl.ir.*
 import firrtl.passes._
 import firrtl.transforms._
-
+import depTypes.*
+import com.doofin.stdScalaJvm.*
+import com.doofin.stdScala.mainRunnable
+// import pprint.*
 /* directly work on firrtl instead of chisel layer
   try just use ADT. case class,etc
   https://github.com/chipsalliance/firrtl/wiki/Understanding-Firrtl-Intermediate-Representation
   https://github.com/chipsalliance/firrtl/wiki/Cookbook
  */
-object firrtlTests {
-  case class Mod()
+object firrtlTests extends mainRunnable {
+
+  override def main(args: Array[String]): Unit = Circuit1
+
   def run = {
     Module(NoInfo, "Adder", Seq(), Block(Seq()))
     // Circuit(NoInfo, Seq(Module(NoInfo, Seq(Port(NoInfo,null,null )), "Adder")
@@ -68,7 +72,7 @@ circuit tag_array_ext :
 
 // Parse the input
     val parsed: Circuit = firrtl.Parser.parse(input)
-
+    pp(parsed)
     val state = CircuitState(parsed, UnknownForm)
 
 // Designate a series of transforms to be run in this order

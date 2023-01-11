@@ -1,4 +1,54 @@
+import java.util.Random
+
 object scala3features {
+  import scala.quoted.* // imports Quotes, Expr
+
+//type class: https://docs.scala-lang.org/scala3/reference/contextual/type-classes.html#
+  trait Functor[F[_]] {
+    extension [A](x: F[A]) {
+      def map[B](f: A => B): F[B]
+    }
+  }
+
+  trait Monad[F[_]] extends Functor[F]:
+
+    /** The unit value for a monad */
+    def pure[A](x: A): F[A]
+
+    extension [A](x: F[A]) {
+
+      /** The fundamental composition operation */
+      def flatMap[B](f: A => F[B]): F[B]
+
+      /** The `map` operation can now be defined in terms of `flatMap` */
+      // def map[B](f: A => B) = x.flatMap(f.andThen(pure))
+    }
+  end Monad
+
+  given Functor[List] with {
+    extension [A](x: List[A]) { override def map[B](f: A => B): List[B] = x.map(f) }
+  }
+  given listMonad: Monad[List] with {
+
+    extension [A](x: List[A]) override def map[B](f: A => B): List[B] = ???
+
+    def pure[A](x: A): List[A] =
+      List(x)
+    extension [A](xs: List[A])
+      def flatMap[B](f: A => List[B]): List[B] =
+        xs.flatMap(f) // rely on the existing `flatMap` method of `List`
+  }
+
+  given exprMonad: Monad[Expr] with {
+
+    override def pure[A](x: A): Expr[A] = ???
+
+    extension [A](x: Expr[A]) {
+      override def map[B](f: A => B): Expr[B] = ???
+      override def flatMap[B](f: A => Expr[B]): Expr[B] = ???
+    }
+
+  }
 
   /** Enum Types: http://dotty.epfl.ch/docs/reference/enums/adts.html
     */
@@ -12,10 +62,12 @@ object scala3features {
     def surfaceGravity = G * mass / (radius * radius)
     def surfaceWeight(otherMass: Double) = otherMass * surfaceGravity
 
-    case Mercury extends Planet(3.303e+23, 2.4397e6)
-    case Venus extends Planet(4.869e+24, 6.0518e6)
     case Earth extends Planet(5.976e+24, 6.37814e6)
   }
+
+//poly function : https://docs.scala-lang.org/scala3/reference/new-types/polymorphic-function-types.html
+  val bar: [A] => List[A] => List[A] = [A] => (xs: List[A]) => xs
+
   def test1 = {
 
     if true then "true" else "false"
@@ -26,5 +78,11 @@ object scala3features {
     val tupTail = tup1.tail
     val toList = (1, 'a', 2).toList
     val natTrans = (1, 'a').map[[X] =>> Option[X]]([T] => (t: T) => Some(t))
+
+    val rand = new Random()
+
+    while true do
+      rand.nextFloat()
+      rand.nextBoolean()
   }
 }

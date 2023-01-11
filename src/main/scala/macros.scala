@@ -42,6 +42,7 @@ object macros {
     import quotes.reflect.*
     println(x.show) // ok
     println("inspectSimple1")
+    // x.asTer
     val tm = x.asTerm
     tm.show(using Printer.TreeStructure) // not printed
     println("inspectSimple1 end")
@@ -50,14 +51,30 @@ object macros {
 
   inline def inspect(inline x: Any): Any = ${ inspectSimple1('x) }
 
-  inline def inspectTyped[T](inline x: T) = ${ getASTinfoTuple('x) }
+  inline def inspectTyped[T](inline x: T) = ${ getASTinfoTuple('x) } //
+
+  def exprMonadTest(x: Expr[Int])(using Quotes) = {
+    import scala3features.exprMonad._
+    x.flatMap(y => Expr(y))
+    for {
+      i <- x
+      j <- x
+    } yield i + j
+  }
 
 // https://docs.scala-lang.org/scala3/guides/macros/reflection.html#to-symbol-and-back
   def getASTinfoTuple[T: Type](x: Expr[T])(using Quotes) = {
+
     import quotes.reflect.*
+
+    println("getASTinfoTuple")
     val tpe: TypeRepr = TypeRepr.of[T]
     val sybs: Symbol = tpe.typeSymbol
     println(sybs.fullName)
+    val pos = sybs.pos.get
+    val codeLine = pos.startLine.toString
+    // rust's dbg . https://blog.softwaremill.com/starting-with-scala-3-macros-a-short-tutorial-88e9d2b2584c
+    println(s"code position: ${pos.sourceFile.name} ln:" + codeLine)
     val decl = sybs.declarations
     // decl.foreach(s => println(s.show(using Printer.TreeStructure)))
     pprintln(decl)
@@ -70,6 +87,7 @@ object macros {
 
   def code(x: Expr[Int])(using Quotes) = {
     println(x.show)
+    List(1).map(x => x)
 
     '{ $x + 1 }
   }
@@ -88,4 +106,5 @@ object macros {
       case Expr(m) => // powCode(x, m) // it is a constant: unlift code n='{m} into number m
       case _       => // '{ power($x, $n) } // not known: call power at runtime
   }
+
 }
