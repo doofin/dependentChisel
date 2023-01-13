@@ -51,7 +51,7 @@ object macros {
 
   inline def inspect(inline x: Any): Any = ${ inspectSimple1('x) }
 
-  inline def inspectTyped[T](inline x: T) = ${ getASTinfoTuple('x) } //
+  inline def inspectClassTyped[T](inline x: T) = ${ getASTinfoTuple('x) } //
 
   def exprMonadTest(x: Expr[Int])(using Quotes) = {
     import scala3features.exprMonad._
@@ -74,15 +74,17 @@ object macros {
     val pos = sybs.pos.get
     val codeLine = pos.startLine.toString
     // rust's dbg . https://blog.softwaremill.com/starting-with-scala-3-macros-a-short-tutorial-88e9d2b2584c
-    println(s"code position: ${pos.sourceFile.name} ln:" + codeLine)
-    val decl = sybs.declarations
+    // println(s"code position: ${pos.sourceFile.name} ln:" + codeLine)
+    val decl: List[Symbol] = sybs.declarations
+    val decl1 = sybs.declaredMethods
     // decl.foreach(s => println(s.show(using Printer.TreeStructure)))
     pprintln(decl)
-    val sybsE = Expr(sybs.toString())
-    println("sybsE:" + sybsE)
-    val quo: Expr[(T, String)] = '{ ($x, $sybsE) }
-    println("quoted:" + quo.show)
-    quo
+    val retStr = sybs.toString() + "," + decl
+    val sybsE = Expr(retStr)
+    // println("sybsE:" + sybsE)
+    val resu: Expr[(T, String)] = '{ ($x, $sybsE) }
+    // println("quoted:" + resu.show)
+    resu
   }
 
   def code(x: Expr[Int])(using Quotes) = {

@@ -80,11 +80,11 @@ circuit tag_array_ext :
       Seq(ToWorkingIR, ResolveKinds, InferTypes, new InferWidths)
 
 // Run transforms and capture final state
-    val finalState = transforms.foldLeft(state) { (c: CircuitState, t: Transform) =>
-      t.runTransform(c)
-    }
-
 // Emit output
-    println(finalState.circuit.serialize)
+    // val finalState = transforms.foldLeft(state) { (c: CircuitState, t: Transform) =>
+    //   t.runTransform(c)
+
+    // }
+    // println(finalState.circuit.serialize)
   }
 }

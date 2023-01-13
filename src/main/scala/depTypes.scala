@@ -3,6 +3,27 @@ import scala.compiletime.ops.int.*
 import scala.compiletime.ops.int.S
 
 object depTypes {
+  def run = {
+    val dlist1 = 1 :: 2.2 :: DTNil
+    val fixedList1 = 1 :: 2 :: 3 :: FixLenNil()
+
+    // 1.add(2): 3
+    println(dlist1)
+    // wire(1) // val res0: Int + 2 = 3
+    val dum1 = 1: Rank[1]
+    val w0 = wire0: Rank[0]
+    val v2 = 2: S[1]
+    val s2 = (1 + 1): 2
+    val num7: 1 + 2 * 3 = 7
+    // val num72: 1 = 7
+    val sum: 2 + 2 = 4
+    wireId(2): 2
+    // wireId2(2): 2 //fail
+    wireAdd2[4]: 6 // ok
+    wireConn(wireNew[1], wireNew[1]) // ok
+    // wireConn(wireNew[1], wireNew[2]) // fail
+  }
+
   sealed trait DList[len <: Int]: // N is a singleton subtype of Int
     inline def size: len = valueOf[len] // <2>
 
@@ -54,7 +75,7 @@ object depTypes {
   case class wireTp[I <: Int, X](x: X)
   // case class wireTp2[I <: Int, X](x: X)
 
-  inline def wire[X <: Int]: X + 2 = {
+  inline def wireAdd2[X <: Int]: X + 2 = {
     val singV = valueOf[X]
     singV.add(2)
   }
@@ -73,26 +94,5 @@ object depTypes {
   // def wireSuc[X <: Int](x: X): S[X] = { x + 1 } //fail
   def wire0: Rank[0] = 0
 // def wire2[X <: Int] = { valueOf(X).add(2) }
-
-  def run = {
-    val dlist1 = 1 :: 2.2 :: DTNil
-    val fixedList1 = 1 :: 2 :: 3 :: FixLenNil()
-
-    // 1.add(2): 3
-    println(dlist1)
-    // wire(1) // val res0: Int + 2 = 3
-    val dum1 = 1: Rank[1]
-    val w0 = wire0: Rank[0]
-    val v2 = 2: S[1]
-    val s2 = (1 + 1): 2
-    val num7: 1 + 2 * 3 = 7
-    // val num72: 1 = 7
-    val sum: 2 + 2 = 4
-    wireId(2): 2
-    // wireId2(2): 2 //fail
-    wire[4]: 6 // ok
-    wireConn(wireNew[1], wireNew[1]) // ok
-    // wireConn(wireNew[1], wireNew[2]) // fail
-  }
 
 }

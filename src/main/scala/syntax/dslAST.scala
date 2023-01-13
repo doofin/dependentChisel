@@ -22,7 +22,7 @@ object dslAST {
   case class VarAssign[T](v: Var, value: Expr1) extends DslStoreA[Unit]
 
   case class NewVar(name: String = "") extends DslStoreA[Var] // DslStoreA[Var]
-  case class NewWire[t](name: String = "") extends DslStoreA[Var] // DslStoreA[Var]
+  // case class NewWire[t](name: String = "") extends DslStoreA[Var] // DslStoreA[Var]
   case class wireTp[n <: Int]() extends DslStoreA[wireTp[n]]
 
   case class If(cond: BoolExpr, s1: DslStore[Unit], s2: DslStore[Unit]) extends DslStoreA[Unit]
@@ -52,12 +52,7 @@ object dslAST {
 
   def newVar(name: String = "") = liftF(NewVar(name))
 
-  inline def wireNew[n <: Int]: wireTp[n] = { // must use inline for  valueOf!
-    // val singV = valueOf[n]
-    wireTp[n]() // singV.add(2)
-  }
-
-  inline def newWire[n <: Int](name: String = ""): Free[DslStoreA, wireTp[n]] = liftF(wireNew[n])
+  inline def newWire[n <: Int](name: String = ""): Free[DslStoreA, wireTp[n]] = liftF(wireTp[n]())
 
   inline def wireConn[n <: Int](x: wireTp[n], y: wireTp[n]) = {}
   def skip: Free[DslStoreA, Unit] = liftF(Skip)
@@ -74,7 +69,7 @@ object dslAST {
 
   def liftBool = liftF[DslStoreA, Boolean] _
   def liftBoolEx = liftF[DslStoreA, BoolExpr] _
-  def true__ = liftBool(True) // liftF[DslStoreA, Boolean](True)
+  def true_const = liftBool(True) // liftF[DslStoreA, Boolean](True)
 
   liftBoolEx(BoolExprWrp(BoolConst(true)))
 }

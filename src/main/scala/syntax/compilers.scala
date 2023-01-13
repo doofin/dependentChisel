@@ -17,9 +17,10 @@ object compilers {
     //      tr : current node to insert
     var currCtx: Option[String] = None
     var ln: Int = 0
+    def getResu() = kvs.toList.sortBy(_._1)
     override def apply[A](fa: DslStoreA[A]): Id[A] = {
 
-      println(s"fa : ${fa}")
+      println(s"stmt : ${fa}")
       currCtx match {
         case Some(str) => kvs.put(ln, s"($str)  ${fa.toString}")
         case None      => kvs.put(ln, fa.toString)
@@ -27,6 +28,8 @@ object compilers {
 
       ln += 1
       fa match {
+        // case NewWire(name) => ()
+        case x @ wireTp() => x
         case VarAssign(v, value) =>
           ()
         case NewVar(name) => Var(name)
@@ -83,7 +86,7 @@ object compilers {
             r
           case True => true
           case Skip => ()
-
+          case _    => ???
         }
       }
     }

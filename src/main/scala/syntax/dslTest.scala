@@ -17,31 +17,29 @@ import cats.arrow.FunctionK
 //import cuttingedge.progAnalysis.ast._
 object dslTest extends mainRunnable {
 
-  override def main(args: Array[String]): Unit = testDsl
-
-  type vals = Int
-//  type St   = Map[Expr, vals]
-//  type Epi  = (St, St) => Float
-
-  def testDsl = {
-    val compilerId = new impureCompilerCls // compilerToStr
-    // val compilerId = compilerToHvl
-    val r_notused = sgdProgram.foldMap(compilerId)
-    // compilerId.
-//    println(rImpure)
-    val resu = compilerId.kvs.toList.sortBy(_._1)
+  override def main(args: Array[String]): Unit = {
+    // val compiler1 = new impureCompilerCls // compilerToStr
+    // val r_notused = sgdProgram.foldMap(compiler1)
+    // val resu = compiler1.kvs.toList.sortBy(_._1)
     // dbg(resu)
-    pp(resu)
+    // pp(resu)
+
+    val compiler2 = new impureCompilerCls // compilerToStr
+    depChisel1.foldMap(compiler2)
+    dbg(compiler2.getResu())
 
   }
 
-  val annos = "invariant"
-  def depChis = {
+  def depChisel1 = {
     for {
+      in1 <- newVar("in1") // input
+      out1 <- newVar("out1") // output
       w1 <- newWire[1]()
-      w2 <- newWire[1]()
-      w3 <- newWire[2]()
-    } yield (wireConn(w1, w2)) // ok
+      w11 <- newWire[1]()
+      w2 <- newWire[2]()
+      r = wireConn(w1, w11)
+      // r2 = wireConn(w1, w2) // err!
+    } yield r // ok
   }
 
   def sgdProgram: DslStore[dslAST.Var] = {
@@ -49,7 +47,7 @@ object dslTest extends mainRunnable {
       w <- newVar("w")
       _ <- varAssign(w, LitNum(1))
       t <- newVar("t")
-      _ <- while__(true__, annos) {
+      _ <- while__(true_const, "invariant") {
         for {
           s <- newVar("s")
           _ <- varAssign(s, LitNum(1))
