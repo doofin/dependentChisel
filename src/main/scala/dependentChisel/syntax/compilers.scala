@@ -1,4 +1,5 @@
 // package precondition.syntax
+package dependentChisel.syntax
 
 import cats.{Id, ~>}
 import cats.data.State

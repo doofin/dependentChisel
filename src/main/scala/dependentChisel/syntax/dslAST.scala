@@ -1,4 +1,7 @@
 // package precondition.syntax
+package dependentChisel.syntax
+
+import scala.compiletime.*
 
 import cats.implicits._
 import cats.free.Free._
@@ -23,7 +26,9 @@ object dslAST {
 
   case class NewVar(name: String = "") extends DslStoreA[Var] // DslStoreA[Var]
   // case class NewWire[t](name: String = "") extends DslStoreA[Var] // DslStoreA[Var]
-  case class wireTp[n <: Int]() extends DslStoreA[wireTp[n]]
+  case class wireTp[n <: Int]() extends DslStoreA[wireTp[n]] { // support both dynamic and static check
+    inline def getVal = constValueOpt[n]
+  }
 
   case class If(cond: BoolExpr, s1: DslStore[Unit], s2: DslStore[Unit]) extends DslStoreA[Unit]
   case class While(
@@ -55,6 +60,9 @@ object dslAST {
   inline def newWire[n <: Int](name: String = ""): Free[DslStoreA, wireTp[n]] = liftF(wireTp[n]())
 
   inline def wireConn[n <: Int](x: wireTp[n], y: wireTp[n]) = {}
+
+  inline def wireConnOpt[n <: Int](x: Option[wireTp[n]], y: Option[wireTp[n]]) = {}
+
   def skip: Free[DslStoreA, Unit] = liftF(Skip)
 
   /** https://github.com/rtitle/free-control/blob/master/src/main/scala/control/free/ControlFlowInterpreter.scala

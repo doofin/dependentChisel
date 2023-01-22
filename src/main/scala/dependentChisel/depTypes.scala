@@ -1,6 +1,9 @@
+package dependentChisel
+
 /*partial DependentTypes via compile time inline and checks */
 import scala.compiletime.ops.int.*
 import scala.compiletime.ops.int.S
+import scala.compiletime.*
 
 object depTypes {
   def run = {
@@ -94,5 +97,10 @@ object depTypes {
   // def wireSuc[X <: Int](x: X): S[X] = { x + 1 } //fail
   def wire0: Rank[0] = 0
 // def wire2[X <: Int] = { valueOf(X).add(2) }
+
+  type Elem[X] = X match
+    case String      => Char
+    case Array[t]    => t
+    case Iterable[t] => t
 
 }

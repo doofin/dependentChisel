@@ -1,3 +1,5 @@
+package dependentChisel
+
 import java.util.Random
 
 object scala3features {

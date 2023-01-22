@@ -1,3 +1,6 @@
+package dependentChisel
+
+import dependentChisel.depTypes
 import firrtl.*
 import firrtl.ir.*
 import firrtl.passes._

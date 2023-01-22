@@ -1,3 +1,6 @@
+package dependentChisel
+
+import dependentChisel.chiselTests
 import chiselTests._
 object Main {
 

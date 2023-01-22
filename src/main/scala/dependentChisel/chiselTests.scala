@@ -1,3 +1,6 @@
+package dependentChisel
+
+import dependentChisel.depTypes
 import chisel3.*
 // import chisel3.util._
 
@@ -6,18 +9,21 @@ import chisel3.internal.sourceinfo.UnlocatableSourceInfo
 import depTypes.*
 import chisel3.stage.ChiselGeneratorAnnotation
 import firrtl.AnnotationSeq
-
+import com.doofin.stdScalaCross.*
+import com.doofin.stdScala.mainRunnable
 /* what info   does chisel macro and plugin provide?
  */
-object chiselTests {
-
+object chiselTests extends mainRunnable {
+  override def main(args: Array[String]): Unit = run
   class Adder extends Module {
     val io = IO(new Bundle {
       // val a = Input(new chisel3.UIntFactory()) // duplicate def from pkg obj and toplevel
       // val b = Input(UInt(8.W))
       // val y = Output(UInt(8.W))
     })
-    // io.y := io.a + io.b
+    def create() = {
+      // io.y := io.a + io.b
+    }
   }
 
   def run = {

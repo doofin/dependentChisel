@@ -1,4 +1,5 @@
 // package precondition.syntax
+package dependentChisel.syntax
 
 // import precondition._
 import cats.data._

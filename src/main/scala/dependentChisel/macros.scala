@@ -1,4 +1,6 @@
-/*  Quoting and splicing are combined with inline to cause this macro implementation
+package dependentChisel
+
+import dependentChisel.scala3features /*  Quoting and splicing are combined with inline to cause this macro implementation
 to do compile-time metaprogramming.
  */
 import pprint.*
