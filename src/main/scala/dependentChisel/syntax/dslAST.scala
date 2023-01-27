@@ -2,6 +2,7 @@
 package dependentChisel.syntax
 
 import scala.compiletime.*
+import scala.compiletime.ops.int.*
 
 import cats.implicits._
 import cats.free.Free._
@@ -30,6 +31,9 @@ object dslAST {
     inline def getVal = constValueOpt[n]
   }
 
+  inline def wireConcat[n <: Int, m <: Int](x: wireTp[n], y: wireTp[m]): wireTp[n + m] = {
+    wireTp[n + m]()
+  }
   case class If(cond: BoolExpr, s1: DslStore[Unit], s2: DslStore[Unit]) extends DslStoreA[Unit]
   case class While(
       cond: DslStore[Boolean],

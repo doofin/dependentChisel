@@ -76,6 +76,9 @@ object depTypes {
   without inline ,will be err :cannot reduce summonFrom
    */
   case class wireTp[I <: Int, X](x: X)
+  case class wireTp2[xy <: (Int, Int)]() {
+    inline def getVal = constValueOpt[xy]
+  }
   // case class wireTp2[I <: Int, X](x: X)
 
   inline def wireAdd2[X <: Int]: X + 2 = {
@@ -84,6 +87,9 @@ object depTypes {
   }
 
   inline def wireConn[n <: Int](x: wireTp[n, Int], y: wireTp[n, Int]) = {}
+  inline def wireConcat[n <: Int, m <: Int](x: wireTp[n, Int], y: wireTp[m, Int]): wireTp[n + m, Int] = {
+    wireTp[n + m, Int](1)
+  }
 
   inline def wireNew[n <: Int]: wireTp[n + 2, Int] = { // must use inline for  valueOf!
     val singV = valueOf[n]

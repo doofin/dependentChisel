@@ -13,7 +13,6 @@ import com.doofin.stdScalaJvm.*
 import dslAST._
 import com.doofin.stdScala.mainRunnable
 import cats.arrow.FunctionK
-
 //import cuttingedge.progAnalysis.ast.Expr.Var
 //import cuttingedge.progAnalysis.ast._
 object dslTest extends mainRunnable {
@@ -39,11 +38,15 @@ object dslTest extends mainRunnable {
       w11 <- newWire[1]()
       w2 <- newWire[2]()
       r = wireConn(w1, w11)
+      r2: wireTp[2] = wireConcat(w1, w11)
       // r2 = wireConn(w1, w2) // err!
     } yield r // ok
   }
 
-  def sgdProgram: DslStore[dslAST.Var] = {
+}
+
+/*
+def sgdProgram: DslStore[dslAST.Var] = {
     for {
       w <- newVar("w")
       _ <- varAssign(w, LitNum(1))
@@ -58,5 +61,4 @@ object dslTest extends mainRunnable {
       _ <- skip
     } yield { t }
   }
-
-}
+ */
