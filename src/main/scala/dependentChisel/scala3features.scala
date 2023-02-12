@@ -87,4 +87,29 @@ object scala3features {
       rand.nextFloat()
       rand.nextBoolean()
   }
+// https://www.baeldung.com/scala/structural-types
+  import reflect.Selectable.reflectiveSelectable
+  type Flyer = {
+    def fly(): Unit
+    val name: String
+  }
+  def callFly(thing: Flyer): Unit = thing.fly()
+
+// https://docs.scala-lang.org/scala3/book/types-structural.html
+  class Record(elems: (String, Any)*) extends Selectable:
+    private val fields = elems.toMap
+    def selectDynamic(name: String): Any = fields(name)
+
+  type Person = Record {
+    val name: String
+    val age: Int
+  }
+
+  val person = Record(
+    "name" -> "Emma",
+    "age" -> 42
+  ).asInstanceOf[Person]
+
+  person.age
+
 }

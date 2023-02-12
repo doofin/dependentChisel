@@ -30,7 +30,9 @@ object compilers {
       ln += 1
       fa match {
         // case NewWire(name) => ()
-        case x @ wireTp() => x
+        case x @ NewWire() =>
+          // x.type
+          x
         case VarAssign(v, value) =>
           ()
         case NewVar(name) => Var(name)

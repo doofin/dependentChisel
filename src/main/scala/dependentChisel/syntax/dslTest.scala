@@ -17,7 +17,7 @@ import cats.arrow.FunctionK
 //import cuttingedge.progAnalysis.ast._
 object dslTest extends mainRunnable {
 
-  override def main(args: Array[String]): Unit = {
+  override def main(args: Array[String] = Array()): Unit = {
     // val compiler1 = new impureCompilerCls // compilerToStr
     // val r_notused = sgdProgram.foldMap(compiler1)
     // val resu = compiler1.kvs.toList.sortBy(_._1)
@@ -26,11 +26,27 @@ object dslTest extends mainRunnable {
 
     val compiler2 = new impureCompilerCls // compilerToStr
     depChisel1.foldMap(compiler2)
-    dbg(compiler2.getResu())
+    // dbg(compiler2.getResu())
 
   }
 
   def depChisel1 = {
+    for {
+      in1 <- newVar("in1") // input
+      in2 <- newVar("in2") // input
+      out1 <- newVar("out1") // output
+      w1 <- newWire[1]()
+      w11 <- newWire[1]()
+      w2 <- newWire[2]()
+
+      // no effect below
+      r = wireConn(w1, w11)
+      r2: NewWire[2] = wireConcat(w1, w11)
+      // r2 = wireConn(w1, w2) // err!
+    } yield r // ok
+  }
+
+  def adder1 = {
     for {
       in1 <- newVar("in1") // input
       out1 <- newVar("out1") // output
@@ -38,11 +54,10 @@ object dslTest extends mainRunnable {
       w11 <- newWire[1]()
       w2 <- newWire[2]()
       r = wireConn(w1, w11)
-      r2: wireTp[2] = wireConcat(w1, w11)
+      r2: NewWire[2] = wireConcat(w1, w11)
       // r2 = wireConn(w1, w2) // err!
     } yield r // ok
   }
-
 }
 
 /*

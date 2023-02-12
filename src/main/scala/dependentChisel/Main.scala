@@ -1,13 +1,21 @@
 package dependentChisel
 
-import dependentChisel.chiselTests
-import chiselTests._
+import dependentChisel.chiselAdder
+import chiselAdder._
 object Main {
 
   def main(args: Array[String]): Unit = {
 
-    chiselTests.run
+    // chiselTests.main()
     // depTypes.run
   }
+
+  
+  val io = new {
+    val sw = 1
+    val led = 2
+
+  }
+  // io.sw
 
 }

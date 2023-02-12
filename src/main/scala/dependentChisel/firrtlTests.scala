@@ -23,54 +23,89 @@ object firrtlTests extends mainRunnable {
     // Circuit(NoInfo, Seq(Module(NoInfo, Seq(Port(NoInfo,null,null )), "Adder")
   }
 
+  def Chirrtl1 = {
+    /*
+  case class GCD() extends Module {
+  val io = IO(new Bundle {
+    val a = Input(UInt(32.W))
+    val b = Input(UInt(32.W))
+    val e = Input(Bool())
+    val z = Output(UInt(32.W))
+    val v = Output(Bool())
+  })
+  val x = Reg(UInt(32.W))
+  val y = Reg(UInt(32.W))
+
+//  use a override method?
+  when(x > y) {
+    x := x -% y
+  }
+    .otherwise {
+      y := y -% x
+    }
+  when(io.e) {
+    x := io.a;
+    y := io.b
+  }
+  io.z := x
+  io.v := y === 0.U
+}
+
+     */
+    """circuit GCD :
+  module GCD :
+    input clock : Clock
+    input reset : UInt<1>
+    output io : { flip a : UInt<32>, flip b : UInt<32>, flip e : UInt<1>, z : UInt<32>, v : UInt<1>}
+
+    reg x : UInt<32>, clock with :
+      reset => (UInt<1>("h0"), x) @[GCD.scala 19:14]
+    reg y : UInt<32>, clock with :
+      reset => (UInt<1>("h0"), y) @[GCD.scala 20:14]
+    node _T = gt(x, y) @[GCD.scala 23:10]
+    when _T : @[GCD.scala 23:15]
+      node _x_T = sub(x, y) @[GCD.scala 24:12]
+      node _x_T_1 = tail(_x_T, 1) @[GCD.scala 24:12]
+      x <= _x_T_1 @[GCD.scala 24:7]
+    else :
+      node _y_T = sub(y, x) @[GCD.scala 27:14]
+      node _y_T_1 = tail(_y_T, 1) @[GCD.scala 27:14]
+      y <= _y_T_1 @[GCD.scala 27:9]
+    when io.e : @[GCD.scala 29:14]
+      x <= io.a @[GCD.scala 30:7]
+      y <= io.b @[GCD.scala 31:7]
+    io.z <= x @[GCD.scala 33:8]
+    node _io_v_T = eq(y, UInt<1>("h0")) @[GCD.scala 34:13]
+    io.v <= _io_v_T @[GCD.scala 34:8]
+"""
+  }
   def Circuit1 = {
 
-    val input = """
-circuit tag_array_ext :
-  module tag_array_ext :
-    input RW0_clk : Clock
-    input RW0_addr : UInt<6>
-    input RW0_wdata : UInt<80>
-    output RW0_rdata : UInt<80>
-    input RW0_en : UInt<1>
-    input RW0_wmode : UInt<1>
-    input RW0_wmask : UInt<4>
-  
-    inst mem_0_0 of rawr
-    inst mem_0_1 of rawr
-    inst mem_0_2 of rawr
-    inst mem_0_3 of rawr
-    mem_0_0.clk <= RW0_clk
-    mem_0_0.addr <= RW0_addr
-    node RW0_rdata_0_0 = bits(mem_0_0.dout, 19, 0)
-    mem_0_0.din <= bits(RW0_wdata, 19, 0)
-    mem_0_0.write_en <= and(and(RW0_wmode, bits(RW0_wmask, 0, 0)), UInt<1>("h1"))
-    mem_0_1.clk <= RW0_clk
-    mem_0_1.addr <= RW0_addr
-    node RW0_rdata_0_1 = bits(mem_0_1.dout, 19, 0)
-    mem_0_1.din <= bits(RW0_wdata, 39, 20)
-    mem_0_1.write_en <= and(and(RW0_wmode, bits(RW0_wmask, 1, 1)), UInt<1>("h1"))
-    mem_0_2.clk <= RW0_clk
-    mem_0_2.addr <= RW0_addr
-    node RW0_rdata_0_2 = bits(mem_0_2.dout, 19, 0)
-    mem_0_2.din <= bits(RW0_wdata, 59, 40)
-    mem_0_2.write_en <= and(and(RW0_wmode, bits(RW0_wmask, 2, 2)), UInt<1>("h1"))
-    mem_0_3.clk <= RW0_clk
-    mem_0_3.addr <= RW0_addr
-    node RW0_rdata_0_3 = bits(mem_0_3.dout, 19, 0)
-    mem_0_3.din <= bits(RW0_wdata, 79, 60)
-    mem_0_3.write_en <= and(and(RW0_wmode, bits(RW0_wmask, 3, 3)), UInt<1>("h1"))
-    node RW0_rdata_0 = cat(RW0_rdata_0_3, cat(RW0_rdata_0_2, cat(RW0_rdata_0_1, RW0_rdata_0_0)))
-    RW0_rdata <= mux(UInt<1>("h1"), RW0_rdata_0, UInt<1>("h0"))
+    val input = """circuit GCD :
+  module GCD :
+    input clock : Clock
+    input reset : UInt<1>
+    output io : { flip a : UInt<32>, flip b : UInt<32>, flip e : UInt<1>, z : UInt<32>, v : UInt<1>}
 
-  extmodule rawr :
-    input clk : Clock
-    input addr : UInt<6>
-    input din : UInt<32>
-    output dout : UInt<32>
-    input write_en : UInt<1>
-  
-    defname = rawr
+    reg x : UInt<32>, clock with :
+      reset => (UInt<1>("h0"), x) @[GCD.scala 19:14]
+    reg y : UInt<32>, clock with :
+      reset => (UInt<1>("h0"), y) @[GCD.scala 20:14]
+    node _T = gt(x, y) @[GCD.scala 23:10]
+    when _T : @[GCD.scala 23:15]
+      node _x_T = sub(x, y) @[GCD.scala 24:12]
+      node _x_T_1 = tail(_x_T, 1) @[GCD.scala 24:12]
+      x <= _x_T_1 @[GCD.scala 24:7]
+    else :
+      node _y_T = sub(y, x) @[GCD.scala 27:14]
+      node _y_T_1 = tail(_y_T, 1) @[GCD.scala 27:14]
+      y <= _y_T_1 @[GCD.scala 27:9]
+    when io.e : @[GCD.scala 29:14]
+      x <= io.a @[GCD.scala 30:7]
+      y <= io.b @[GCD.scala 31:7]
+    io.z <= x @[GCD.scala 33:8]
+    node _io_v_T = eq(y, UInt<1>("h0")) @[GCD.scala 34:13]
+    io.v <= _io_v_T @[GCD.scala 34:8]
 """
 
 // Parse the input
@@ -90,4 +125,5 @@ circuit tag_array_ext :
     // }
     // println(finalState.circuit.serialize)
   }
+
 }

@@ -9,7 +9,7 @@ object macroCall extends mainRunnable {
 
   def run = {
     // print a class
-    println("inspectClass: " + inspectClassTyped(new c1(2))._2)
+    // println("inspectClass: " + getTypeTerm(new c1(2))._2)
   }
 
   class c1(param1: Int) {

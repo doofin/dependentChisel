@@ -1,36 +1,28 @@
 package dependentChisel
 
-import dependentChisel.depTypes
 import chisel3.*
 // import chisel3.util._
 
 import chisel3.ExplicitCompileOptions.Strict
 import chisel3.internal.sourceinfo.UnlocatableSourceInfo
-import depTypes.*
 import chisel3.stage.ChiselGeneratorAnnotation
+import chisel3.internal.sourceinfo.SourceInfo
 import firrtl.AnnotationSeq
+
+import depTypes.*
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 /* what info   does chisel macro and plugin provide?
  */
-object chiselTests extends mainRunnable {
-  override def main(args: Array[String]): Unit = run
-  class Adder extends Module {
-    val io = IO(new Bundle {
-      // val a = Input(new chisel3.UIntFactory()) // duplicate def from pkg obj and toplevel
-      // val b = Input(UInt(8.W))
-      // val y = Output(UInt(8.W))
-    })
-    def create() = {
-      // io.y := io.a + io.b
-    }
-  }
+object chiselBlinky extends mainRunnable {
+  implicit val srcIfo: SourceInfo = UnlocatableSourceInfo
+  implicit val compOpt: CompileOptions = Strict
 
-  def run = {
+  override def main(args: Array[String]): Unit = {
 // req compiler plugin:  https://github.com/chipsalliance/chisel3/blob/7372c9e2eed082d35abbe55f856d03fda68dc0be/core/src/main/scala/chisel3/Aggregate.scala#L1292
 
     val mod1 = new EmptyMod1()
-    val mod2 = new Blinky2()
+    // val mod2 = new Blinky2()
 
     // bug ! requirement failed: must be inside Builder context
     val fir = (new chisel3.stage.ChiselStage).emitVerilog({ new EmptyMod1() })
@@ -43,30 +35,26 @@ object chiselTests extends mainRunnable {
 
   }
 
-  class mBundle extends Bundle()(using Strict) {
-    // for chisel 3.5.5,try to bypass _usingPlugin check which is filled by scala 2 macros
-    override protected def _usingPlugin: Boolean = true
+  class bd1 extends Bundle { // err in
+    // https://github.com/chipsalliance/chisel3/blob/7372c9e2eed082d35abbe55f856d03fda68dc0be/core/src/main/scala/chisel3/Aggregate.scala#L1218
+    val led0 = Output((new BoolFactory {}).apply())
+  }
+// example from https://github.com/chipsalliance/chisel3#led-blink
+  case class Blinky2(freq: Int, startOn: Boolean = false) extends mModule { // null.asInstanceOf[CompileOptions]
+    import chisel3.util._
+    val io = IO(new bd1)
+    val led = RegInit(startOn.B)
+    val (_, counterWrap) = Counter(true.B, freq / 2)
+    when(counterWrap) {
+      // led := ~led //this uses macros which doesn't work
+      led := led.do_unary_~
+    }
+    io.led0 := led
   }
 
-  class mModule extends Module()(using Strict)
-
-  class EmptyMod1() extends mModule {} // null.asInstanceOf[CompileOptions]
-
-  class Blinky() extends mModule { // null.asInstanceOf[CompileOptions]
-    val io = IO(new mBundle { // err in
-      // https://github.com/chipsalliance/chisel3/blob/7372c9e2eed082d35abbe55f856d03fda68dc0be/core/src/main/scala/chisel3/Aggregate.scala#L1218
-      //   val led0 = Output(Bool.apply())
-    })
-  }
-
-  class Blinky2() extends mModule { // null.asInstanceOf[CompileOptions]
-    val io = IO(new Bundle { // err in
-      // https://github.com/chipsalliance/chisel3/blob/7372c9e2eed082d35abbe55f856d03fda68dc0be/core/src/main/scala/chisel3/Aggregate.scala#L1218
-      val led0 = Output((new BoolFactory {}).apply())
-    })
-  }
   def callWire[I <: Int]() = {
     // val wi = 1
+
     val wiretype1 = (new UIntFactory {}).apply(8.W)
     println(("wiretype1", wiretype1))
     val wi = new mModule { Wire(wiretype1)(UnlocatableSourceInfo, Strict) }
@@ -80,11 +68,48 @@ object chiselTests extends mainRunnable {
 
   }
 
+  class cBundle extends Bundle()(using Strict) {
+    // for chisel 3.5.5,try to bypass _usingPlugin check which is filled by scala 2 macros
+    override protected def _usingPlugin: Boolean = true
+  }
+
+  class mModule extends Module()(using Strict)
+
+  class EmptyMod1() extends mModule {} // null.asInstanceOf[CompileOptions]
+
   /*
   try just use ADT. case class,etc
   https://github.com/chipsalliance/firrtl/wiki/Understanding-Firrtl-Intermediate-Representation
    */
   case class Mod()
+
+  /*   case class GCD() extends Module {
+    implicit val srcIfo: SourceInfo = UnlocatableSourceInfo
+    val io = IO(new Bundle {
+      val a = Input(UInt(32.W))
+      val b = Input(UInt(32.W))
+      val e = Input(Bool())
+      val z = Output(UInt(32.W))
+      val v = Output(Bool())
+    })
+    val x = Reg(UInt(32.W))
+    val y = Reg(UInt(32.W))
+
+//  use a override method?
+    when(x > y) {
+      x := x -% y
+    }
+      .otherwise {
+        y := y -% x
+      }
+    when(io.e) {
+      x := io.a;
+      y := io.b
+    }
+    io.z := x
+    io.v := y === 0.U
+  } */
+
 }
 
 /* (new chisel3.stage.ChiselStage).execute(

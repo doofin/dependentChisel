@@ -27,12 +27,12 @@ object dslAST {
 
   case class NewVar(name: String = "") extends DslStoreA[Var] // DslStoreA[Var]
   // case class NewWire[t](name: String = "") extends DslStoreA[Var] // DslStoreA[Var]
-  case class wireTp[n <: Int]() extends DslStoreA[wireTp[n]] { // support both dynamic and static check
+  case class NewWire[n <: Int]() extends DslStoreA[NewWire[n]] { // support both dynamic and static check
     inline def getVal = constValueOpt[n]
   }
 
-  inline def wireConcat[n <: Int, m <: Int](x: wireTp[n], y: wireTp[m]): wireTp[n + m] = {
-    wireTp[n + m]()
+  inline def wireConcat[n <: Int, m <: Int](x: NewWire[n], y: NewWire[m]): NewWire[n + m] = {
+    NewWire[n + m]()
   }
   case class If(cond: BoolExpr, s1: DslStore[Unit], s2: DslStore[Unit]) extends DslStoreA[Unit]
   case class While(
@@ -61,11 +61,11 @@ object dslAST {
 
   def newVar(name: String = "") = liftF(NewVar(name))
 
-  inline def newWire[n <: Int](name: String = ""): Free[DslStoreA, wireTp[n]] = liftF(wireTp[n]())
+  inline def newWire[n <: Int](name: String = ""): Free[DslStoreA, NewWire[n]] = liftF(NewWire[n]())
 
-  inline def wireConn[n <: Int](x: wireTp[n], y: wireTp[n]) = {}
+  inline def wireConn[n <: Int](x: NewWire[n], y: NewWire[n]) = {}
 
-  inline def wireConnOpt[n <: Int](x: Option[wireTp[n]], y: Option[wireTp[n]]) = {}
+  inline def wireConnOpt[n <: Int](x: Option[NewWire[n]], y: Option[NewWire[n]]) = {}
 
   def skip: Free[DslStoreA, Unit] = liftF(Skip)
 

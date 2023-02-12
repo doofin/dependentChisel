@@ -109,4 +109,33 @@ object depTypes {
     case Array[t]    => t
     case Iterable[t] => t
 
+  enum Adt1 {
+    case High, Low
+  }
+
+  def add[t <: Adt1](x: t, y: t) = {}
+
+  add(Adt1.High, Adt1.Low)
+
+  case class Wrp[t <: Adt1](x: t)
+  def add[t <: Adt1](x: Wrp[t], y: Wrp[t]) = {}
+
+  add(Wrp(Adt1.High), Wrp(Adt1.Low)) // not work
+
+  enum Adt2[n <: Int] {
+    case High() extends Adt2[1]
+    case Low() extends Adt2[2]
+  }
+  def add[n <: Int, t <: Adt2[n]](x: t, y: t) = {}
+  add(Adt2.High(), Adt2.High())
+
+  Adt1.High
+  enum Adt3[n <: Adt1] {
+    case High() extends Adt3[Adt1.High.type]
+    case Low() extends Adt3[Adt1.Low.type]
+  }
+
+  def add3[n <: Adt1, t <: Adt3[n]](x: t, y: t) = {}
+  add3(Adt3.High(), Adt3.High())
+  // add3(Adt3.High(), Adt3.Low()) // fail,ok
 }
