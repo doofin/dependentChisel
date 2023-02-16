@@ -17,6 +17,10 @@ object macroCall extends mainRunnable {
     def method1() = {}
     def method2() = { val v2 = v1 }
   }
-  // repeat("hello", n) // ERROR!
 
+  val x2 = 1
+  getVarName(x2)
+  // repeat("hello", n) // ERROR!
+  newClass("")
+  // new abc()
 }

@@ -57,7 +57,7 @@ object chiselAdder extends mainRunnable {
 
   def toFir(bundle: MyBundle1) = {
     // def toFir[BundleTp <: MyBundle[_]](bd: BundleTp) // not work yet,need reify?
-    macros.toFir(bundle)
+    // macros.toFir(bundle)
 
   }
   // toFir(new MyBundle1())
@@ -69,7 +69,7 @@ object chiselAdder extends mainRunnable {
     val y = UIntDep[8]()
     // val v3 = List(1, 2, 3)
   }
-  macros.bundleEqu(MyBundle1(), MyBundle2())
+  // macros.bundleEqu(MyBundle1(), MyBundle2())
 
   case class MyBundle3() extends MyBundle[MyBundle1] {
     val a = UIntDep[8]()

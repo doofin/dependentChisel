@@ -42,17 +42,33 @@ object macros {
   /* prints the expression of the provided argument at compile-time
   this executes as normal code
    */
-  def inspectSimple1(x: Expr[Any])(using Quotes): Expr[Any] = {
+  def inspectSimple1(x: Expr[Any])(using Quotes): Expr[Any] = encloseDebug("inspectSimple1") {
     import quotes.reflect.*
     println(x.show) // ok
-    println("inspectSimple1")
     // x.asTer
-    val tm = x.asTerm
-    pp(tm)
-    tm.show(using Printer.TreeStructure) // not printed
-    println("inspectSimple1 end")
-    x
+    val tm: Term = x.asTerm
+    // pp(tm)
+    val tmShow = tm.show(using Printer.TreeStructure) // show mod.var
+    println(s"x.show: ${x.show},tm.show : ${tm.show},term:$tm , syb:${tm.symbol}") // no symbol
+
+    Expr(s"$tmShow , ${tm.symbol}")
   }
+
+  def getVarNameImpl[T: Type](x: Expr[T])(using Quotes) = {
+    import quotes.reflect.*
+    val tm = x.asTerm.symbol
+    val varNm = x.asTerm.show
+
+    val tpe: TypeRepr = TypeRepr.of[T]
+    println(s"type:${tpe.show}")
+    val typeSybs: Symbol = tpe.typeSymbol
+    // pp(typeSybs)
+
+    println(s"varNm:$varNm") // varname
+    Expr(varNm)
+  }
+
+  inline def getVarName[T](inline x: T) = ${ getVarNameImpl('x) }
 
   inline def inspect(inline x: Any): Any = ${ inspectSimple1('x) }
 
@@ -61,6 +77,15 @@ object macros {
   inline def getTypeInfo[T] = ${ getTypeImp } //
 
   inline def toFir[T](inline x: T) = ${ toFirImp('x) } //
+
+  inline def newClass[T](inline x: T) = ${ newClassImpl('x) } //
+
+  def newClassImpl[T: Type](x: Expr[T])(using Quotes) = encloseDebug("newClassImpl:") {
+    '{
+      class abc() { val abc = 1 }
+      // new abc()
+    }
+  }
 
   def toFirImp[T: Type](x: Expr[T])(using Quotes) = encloseDebug("toFir:") {
 

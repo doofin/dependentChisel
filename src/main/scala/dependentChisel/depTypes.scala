@@ -126,10 +126,10 @@ object depTypes {
     case High() extends Adt2[1]
     case Low() extends Adt2[2]
   }
-  def add[n <: Int, t <: Adt2[n]](x: t, y: t) = {}
-  add(Adt2.High(), Adt2.High())
+  def add2[n <: Int, t <: Adt2[n]](x: t, y: t) = {}
+  add2(Adt2.High(), Adt2.High())
+  // add2(Adt2.High(), Adt2.Low()) // fail,ok
 
-  Adt1.High
   enum Adt3[n <: Adt1] {
     case High() extends Adt3[Adt1.High.type]
     case Low() extends Adt3[Adt1.Low.type]
@@ -138,4 +138,8 @@ object depTypes {
   def add3[n <: Adt1, t <: Adt3[n]](x: t, y: t) = {}
   add3(Adt3.High(), Adt3.High())
   // add3(Adt3.High(), Adt3.Low()) // fail,ok
+
+  type Shape[width <: Int, bits <: Adt1]
+
+  def sp1(sp: Shape[1, Adt1.High.type]) = {}
 }
