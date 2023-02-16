@@ -96,16 +96,16 @@ object scala3features {
   def callFly(thing: Flyer): Unit = thing.fly()
 
 // https://docs.scala-lang.org/scala3/book/types-structural.html
-  class Record(elems: (String, Any)*) extends Selectable:
+  class RecordT(elems: (String, Any)*) extends Selectable:
     private val fields = elems.toMap
     def selectDynamic(name: String): Any = fields(name)
 
-  type Person = Record {
+  type Person = RecordT {
     val name: String
     val age: Int
   }
 
-  val person = Record(
+  val person = RecordT(
     "name" -> "Emma",
     "age" -> 42
   ).asInstanceOf[Person]
