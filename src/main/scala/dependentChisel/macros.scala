@@ -114,7 +114,7 @@ object macros {
   inline def bundleEqu[T, r](inline x: T, inline y: r) = ${ bundleEquImp('x, 'y) } //
 
   def exprMonadTest(x: Expr[Int])(using Quotes) = {
-    import scala3features.exprMonad._
+    import scala3features.exprMonad.*
     x.flatMap(y => Expr(y))
     for {
       i <- x
@@ -239,7 +239,7 @@ object macros {
 
   import scala.compiletime.erasedValue
 
-  inline def f[T](l: List[T]) = inline erasedValue[T] match {
+  inline def f[T <: Matchable](l: List[T]) = inline erasedValue[T] match {
     case _: Int    => println("int list")
     case _: String => println("string list")
     case _         => println("general list")

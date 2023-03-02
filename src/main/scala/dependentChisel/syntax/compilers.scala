@@ -4,7 +4,7 @@ package dependentChisel.syntax
 import cats.{Id, ~>}
 import cats.data.State
 
-import dslAST._
+import monadicAST.*
 // import precondition.sgdExampleTup._
 
 import scala.collection.mutable
@@ -45,8 +45,21 @@ object compilers {
           currCtx = None
           r
         case True => true
-        case Skip => ()
+        case Skip =>
 
+        case x: Input[n] =>
+          // println(x.toString() + ":" + x.getVal) // can't get int
+          x
+
+        case x: Output[n]    => x
+        case x: Assign[n] =>
+          // println("Assign:" + x.x.name)
+          // Assign[n](x.x, x.y)
+          x
+        case x: BinOp[n] => x
+        case x =>
+          println(x)
+          ???
       }
     }
   }
@@ -113,6 +126,7 @@ object compilers {
           val r: StState[Boolean] =
             State.inspect(_.getOrElse("", true).asInstanceOf[Boolean])
           r
+        case _ => ???
       }
     }
   }

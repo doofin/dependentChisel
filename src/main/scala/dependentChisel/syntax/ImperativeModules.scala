@@ -1,41 +1,83 @@
 package dependentChisel.syntax
 
 import scala.collection.mutable.ArrayBuffer
+import dependentChisel.syntax.naming.Counter
+import dependentChisel.syntax.tree.TopLevelCircuit
+import dependentChisel.chiselDataTypes.*
 
-/** imperative style for chisel */
+/** imperative style for chisel ,record info in mutable vars inside class */
 object ImperativeModules {
   case class DependenciesInfo(
       names: ArrayBuffer[String] = ArrayBuffer(),
-      modules: ArrayBuffer[UserModule] = ArrayBuffer()
+      modules: ArrayBuffer[Module] = ArrayBuffer(),
+      counter: Counter = new Counter()
   )
-  case class ModCircuits(
+  case class ModLocalInfo(
       classNm: String,
       io: ArrayBuffer[String] = ArrayBuffer(),
       commands: ArrayBuffer[String] = ArrayBuffer()
-  ) {
-    /* override def toString(): String = {
-      io.mkString("/n") ++
-        commands.mkString("/n")
-    } */
-  }
+  )
 
   trait Module { // extends Dependencies {
-
-    def name = this.getClass.getCanonicalName.split('.').last
+    val thisClassName = this.getClass.getCanonicalName.split('.').last.mkString
+    given modLocalInfo: ModLocalInfo = ModLocalInfo(classNm = thisClassName)
+    // def name = this.getClass.getCanonicalName.split('.').last
   }
 
-  class UserModule(using parent: DependenciesInfo) extends Module {
-    val thisClassName = this.getClass.getCanonicalName
-    parent.names prepend thisClassName
-    parent.modules.prepend(this)
-    given modCircuits: ModCircuits = ModCircuits(classNm = thisClassName) // .split('.').last.mkString
-    // implicit val clasNm: String = this.getClass.getCanonicalName
-    // given modInfo: ModInfo = ModInfo(thisClassName)
+  /* function style like when {} */
+  type Ctrl = String
+  trait UserModule(using parent: DependenciesInfo)
+      extends Module,
+        UserModuleOps {
+
+    def create: Unit
+
+    def pushF(ctr: Ctrl, uid: String, isStart: Boolean) = {
+      modLocalInfo.commands.append(s"$ctr$uid $isStart")
+    }
+
+    def pushBlk(ctr: Ctrl)(block: => Any) = {
+      val uid = parent.counter.getIdWithDash
+      pushF(ctr, uid, true)
+      block
+      pushF(ctr, uid, false)
+    }
+
+    add2parent(parent, this)
+
   }
 
-  def makeModule(f: DependenciesInfo => UserModule) = {
+  trait UserModuleOps { ut: UserModule =>
+    def If[w <: Int](b: Bool[w])(block: => Any) = pushBlk("if")(block)
+
+    def IfElse[w <: Int](b: Bool[w])(block: => Any)(block2: => Any) = {
+      If(b)(block)
+      pushBlk("else")(block2)
+    }
+  }
+
+  /* utils */
+  private def add2parent(parent: DependenciesInfo, u: UserModuleOld) = {
+    parent.names prepend u.thisClassName
+    parent.modules prepend u
+  }
+
+  private def add2parent(parent: DependenciesInfo, u: UserModule) = {
+    parent.names prepend u.thisClassName
+    parent.modules prepend u
+  }
+
+  def makeModule[M <: Module](f: DependenciesInfo => M) = {
     val di = DependenciesInfo()
-    f(di)
-    di
+    val r = f(di)
+    (r, di)
   }
+
+  /* scaloid style like new When{} */
+  trait UserModuleOld(using parent: DependenciesInfo) extends Module {
+
+    def create: TopLevelCircuit
+    add2parent(parent, this)
+  }
+
 }

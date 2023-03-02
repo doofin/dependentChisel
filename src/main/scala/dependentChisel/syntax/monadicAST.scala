@@ -4,11 +4,13 @@ package dependentChisel.syntax
 import scala.compiletime.*
 import scala.compiletime.ops.int.*
 
-import cats.implicits._
-import cats.free.Free._
+import cats.implicits.*
+import cats.free.Free.*
 import cats.free.Free
 
-object dslAST {
+import naming.*
+
+object monadicAST {
 
   sealed trait DslStoreA[A]
 
@@ -29,6 +31,27 @@ object dslAST {
   // case class NewWire[t](name: String = "") extends DslStoreA[Var] // DslStoreA[Var]
   case class NewWire[n <: Int]() extends DslStoreA[NewWire[n]] { // support both dynamic and static check
     inline def getVal = constValueOpt[n]
+  }
+
+  trait Vars[n <: Int](name: String)
+  trait Exprs[n <: Int]
+
+  case class BinOp[w <: Int](a: Exprs[w], b: Exprs[w], nm: String) extends DslStoreA[Exprs[w]], Exprs[w] {
+    override def toString(): String = s"${a} ${nm} ${b}"
+  }
+  /* case class BinOp[n <: Int](name: String = "") extends DslStoreA[In[n]], Vars[n](name), Exprs[n](name) { // support both dynamic and static check
+    inline def getVal = constValueOpt[n]
+  } */
+
+  case class Input[n <: Int](name: String = "") extends DslStoreA[Input[n]], Vars[n](name), Exprs[n] { // support both dynamic and static check
+    inline def getVal = constValueOpt[n]
+  }
+
+  case class Output[n <: Int](name: String = "") extends DslStoreA[Output[n]], Vars[n](name), Exprs[n] { // support both dynamic and static check
+    inline def getVal = constValueOpt[n]
+  }
+  case class Assign[n <: Int](x: Vars[n], y: Exprs[n]) extends DslStoreA[Assign[n]] {
+    override def toString(): String = s"${x} := ${y}"
   }
 
   inline def wireConcat[n <: Int, m <: Int](x: NewWire[n], y: NewWire[m]): NewWire[n + m] = {
@@ -62,6 +85,19 @@ object dslAST {
   def newVar(name: String = "") = liftF(NewVar(name))
 
   inline def newWire[n <: Int](name: String = ""): Free[DslStoreA, NewWire[n]] = liftF(NewWire[n]())
+  inline def newIn[n <: Int](name: String = "")(using Counter) = liftF(Input[n](name + summon.getIdWithDash))
+  inline def newOut[n <: Int](name: String = "")(using Counter) = liftF(Output[n](name + summon.getIdWithDash))
+
+  inline def assign[n <: Int](x: Vars[n], y: Exprs[n]) = liftF(Assign(x, y))
+
+  extension [n <: Int](x: Vars[n]) {
+    inline def :=(y: Exprs[n]) = assign(x, y)
+  }
+
+  extension [n <: Int](x: Exprs[n]) {
+
+    def +(y: Exprs[n]) = BinOp(x, y, "+") // liftF(BinOp(x, y, "+"))
+  }
 
   inline def wireConn[n <: Int](x: NewWire[n], y: NewWire[n]) = {}
 
@@ -79,8 +115,8 @@ object dslAST {
   def if_(cond: BoolExpr, s1: DslStore[Unit], s2: DslStore[Unit]) =
     liftF[DslStoreA, Unit](If(cond, s1, s2))
 
-  def liftBool = liftF[DslStoreA, Boolean] _
-  def liftBoolEx = liftF[DslStoreA, BoolExpr] _
+  def liftBool = liftF[DslStoreA, Boolean]
+  def liftBoolEx = liftF[DslStoreA, BoolExpr]
   def true_const = liftBool(True) // liftF[DslStoreA, Boolean](True)
 
   liftBoolEx(BoolExprWrp(BoolConst(true)))

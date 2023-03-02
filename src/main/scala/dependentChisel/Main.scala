@@ -1,7 +1,7 @@
 package dependentChisel
 
-import dependentChisel.chiselAdder
-import chiselAdder._
+import dependentChisel.misc.chiselAdder
+import chiselAdder.*
 object Main {
 
   def main(args: Array[String]): Unit = {
@@ -10,7 +10,6 @@ object Main {
     // depTypes.run
   }
 
-  
   val io = new {
     val sw = 1
     val led = 2

@@ -1,6 +1,6 @@
 import dependentChisel.macros // call macros here
 import scala.quoted.*
-import macros._
+import macros.*
 import com.doofin.stdScala.mainRunnable
 
 object macroCall extends mainRunnable {

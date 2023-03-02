@@ -112,4 +112,8 @@ object scala3features {
 
   person.age
 
+  //   https://stackoverflow.com/questions/69145604/what-is-the-meaning-of-in-scala-3
+  def imp(f: Int ?=> Unit) = {}
+//   imp { ct => newIn[1] }
+
 }

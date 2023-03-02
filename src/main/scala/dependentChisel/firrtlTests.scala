@@ -3,8 +3,8 @@ package dependentChisel
 import dependentChisel.depTypes
 import firrtl.*
 import firrtl.ir.*
-import firrtl.passes._
-import firrtl.transforms._
+import firrtl.passes.*
+import firrtl.transforms.*
 import depTypes.*
 import com.doofin.stdScalaJvm.*
 import com.doofin.stdScala.mainRunnable

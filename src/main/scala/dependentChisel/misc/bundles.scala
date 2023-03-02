@@ -1,15 +1,16 @@
-package dependentChisel.syntax
+package dependentChisel.misc
 
 import scala.compiletime.ops.int.*
 import scala.compiletime.*
 
 import com.doofin.stdScalaJvm.*
 
-import dependentChisel.syntax.dslAST.NewWire
+import dependentChisel.syntax.monadicAST.NewWire
 import dependentChisel.macros.getTypeTerm
 import dependentChisel.macros.getTypeInfo
 import dependentChisel.macros
 
+import dependentChisel.syntax.monadicAST
 object bundles {
 //similar to modules in chisel
   trait Mod1[bund, circ] {

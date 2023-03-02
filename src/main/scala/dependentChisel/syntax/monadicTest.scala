@@ -2,20 +2,20 @@
 package dependentChisel.syntax
 
 // import precondition._
-import cats.data._
-import cats.implicits._
-import cats.free.Free._
+import cats.data.*
+import cats.implicits.*
+import cats.free.Free.*
 import cats.free.Free
 import cats.{Id, ~>}
-import compilers._
+import compilers.*
 // import precondition.syntax.dslAST
 import com.doofin.stdScalaJvm.*
-import dslAST._
+import monadicAST.*
 import com.doofin.stdScala.mainRunnable
 import cats.arrow.FunctionK
 //import cuttingedge.progAnalysis.ast.Expr.Var
 //import cuttingedge.progAnalysis.ast._
-object dslTest extends mainRunnable {
+object monadicTest extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
     // val compiler1 = new impureCompilerCls // compilerToStr
@@ -46,18 +46,18 @@ object dslTest extends mainRunnable {
     } yield r // ok
   }
 
-  def adder1 = {
+  /*   def adder1 = {
     for {
-      in1 <- newVar("in1") // input
-      out1 <- newVar("out1") // output
-      w1 <- newWire[1]()
-      w11 <- newWire[1]()
-      w2 <- newWire[2]()
-      r = wireConn(w1, w11)
-      r2: NewWire[2] = wireConcat(w1, w11)
+      a <- newIn[2]("a") // input
+      b <- newIn[2]("b") // output
+      y <- newOut[2]("y")
+      y2 <- newOut[2]("y2")
+      _ <- y := a
+      _ <- assign(if (1 to 2).sum == 3 then y else y2, a)
+      _ <- (if (1 to 2).sum == 1 then y else y2) := a
       // r2 = wireConn(w1, w2) // err!
-    } yield r // ok
-  }
+    } yield ()
+  } */
 }
 
 /*

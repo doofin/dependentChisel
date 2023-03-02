@@ -41,7 +41,7 @@ object chiselBlinky extends mainRunnable {
   }
 // example from https://github.com/chipsalliance/chisel3#led-blink
   case class Blinky2(freq: Int, startOn: Boolean = false) extends mModule { // null.asInstanceOf[CompileOptions]
-    import chisel3.util._
+    import chisel3.util.*
     val io = IO(new bd1)
     val led = RegInit(startOn.B)
     val (_, counterWrap) = Counter(true.B, freq / 2)

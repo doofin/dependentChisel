@@ -5,11 +5,12 @@ import scala.compiletime.*
 
 import com.doofin.stdScalaJvm.*
 
-import dependentChisel.syntax.dslAST.NewWire
+import dependentChisel.syntax.monadicAST.NewWire
 import dependentChisel.macros.inspect
 import dependentChisel.macros.getTypeTerm
 import dependentChisel.macros.getTypeInfo
 
+import dependentChisel.syntax.monadicAST
 object bundlesAsTuple {
 //similar to modules in chisel
   trait Mod1[bund, circ] {

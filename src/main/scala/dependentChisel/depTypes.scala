@@ -142,4 +142,13 @@ object depTypes {
   type Shape[width <: Int, bits <: Adt1]
 
   def sp1(sp: Shape[1, Adt1.High.type]) = {}
+
+// Only allowed values are Min <= N <= Max.
+  type Bounded[MIN <: Int, MAX <: Int] <: Int = MAX match
+    case MIN => MIN
+    case _   => MAX | Bounded[MIN, MAX - 1]
+
+  // val zero15: Bounded[1, 5] = 0 // ERROR
+  val one15: Bounded[1, 5] = 1
+  val two15: Bounded[1, 5] = 2
 }

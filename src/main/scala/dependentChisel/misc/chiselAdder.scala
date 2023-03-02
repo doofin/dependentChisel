@@ -1,4 +1,4 @@
-package dependentChisel
+package dependentChisel.misc
 
 import chisel3.*
 // import chisel3.util._
@@ -9,13 +9,14 @@ import chisel3.stage.ChiselGeneratorAnnotation
 import chisel3.internal.sourceinfo.SourceInfo
 import firrtl.AnnotationSeq
 
+import dependentChisel.*
 import depTypes.*
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
-import syntax.bundles.*
+import bundles.*
 
-import dependentChisel.syntax.bundles
+import dependentChisel.misc.bundles
 object chiselAdder extends mainRunnable {
   implicit val srcIfo: SourceInfo = UnlocatableSourceInfo
   implicit val compOpt: CompileOptions = Strict
