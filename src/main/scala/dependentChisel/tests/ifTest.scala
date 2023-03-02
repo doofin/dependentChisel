@@ -20,7 +20,7 @@ object ifTest extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
     val (mod, depInfo: DependenciesInfo) = makeModule { implicit p =>
-      new IfElse1
+      new IfModNested
     }
     // mod.create
 
@@ -46,7 +46,7 @@ object ifTest extends mainRunnable {
     create
   }
 
-  class IfMod2(using parent: DependenciesInfo) extends UserModule {
+  class IfMod(using parent: DependenciesInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
     val y = newOutput[16]("y")
@@ -62,20 +62,21 @@ object ifTest extends mainRunnable {
     create
   }
 
-  class UserMod1(using parent: DependenciesInfo) extends UserModule {
-// parent contains global info
-
-    val a: Input[2] = newInput[2]("a")
-    val b = newInput[2]("b")
-    val y = newOutput[2]("y")
+  class IfModNested(using parent: DependenciesInfo) extends UserModule {
+    val a = newInput[16]("a")
+    val b = newInput[16]("b")
+    val c = newInput[16]("b")
+    val y = newOutput[16]("y")
 
     override def create = {
       y :== a - b
-      /*       If(a === b) {
+      If(a === b) {
         y :== a + b
+        If(a === c) {
+          y :== a * b
+        }
       }
-       */
     }
+    create
   }
-
 }

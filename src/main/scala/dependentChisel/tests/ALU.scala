@@ -14,22 +14,9 @@ import dependentChisel.syntax.tree
 
 object ALU extends mainRunnable {
 
-  override def main(args: Array[String] = Array()): Unit = {
-    val d = makeModule { implicit p => new ALU }
-    val tp = d._1.create
-    val thisTr = tree.tp2tr(tp.pr.toList)
-    pp(thisTr)
+  override def main(args: Array[String] = Array()): Unit = {}
 
-    // pp(d.names.toList)
-    // val outInfo = d.modules.toList.map(x => (x.name, x.modCircuits))
-    // pp(outInfo)
-
-  }
-  /*   def circuit1(x: Input[_], y: Input[_]) = {
-    new TopLevel { new When { x := y }.here }
-  } */
-
-  class ALU(using parent: DependenciesInfo) extends UserModuleOld {
+  class ALU(using parent: DependenciesInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
     val fn = newInput[2]("fn")
@@ -40,22 +27,7 @@ object ALU extends mainRunnable {
     // stmt no effect there!see scaloid
     // new When("w1") {
     // y :=== a + b|
-    override def create: TopLevelCircuit = {
-      new TopLevelCircuit {
-        new When("w1") {
-          y := a + b
-          y := a - b
-          new When("w1-1") {}.here
-          new When("w1-2") {}.here
-          new When("w2") {
-            new When("w2-1") {
-              z := a + b
-            }.here
-            new When("w2-2") {}.here
-          }.here
-        }.here
-      }
-    }
+    override def create = {}
 
     switch(fn)(
       // Lit(1) -> (y := a + b), // can't infer,bug?

@@ -48,7 +48,7 @@ object ImperativeModules {
   }
 
   trait UserModuleOps { ut: UserModule =>
-    def If[w <: Int](b: Bool[w])(block: => Any) = pushBlk("if")(block)
+    def If[w <: Int](b: Bool[w])(block: => Any) = pushBlk(s"if")(block) //  $b
 
     def IfElse[w <: Int](b: Bool[w])(block: => Any)(block2: => Any) = {
       If(b)(block)
@@ -57,10 +57,6 @@ object ImperativeModules {
   }
 
   /* utils */
-  private def add2parent(parent: DependenciesInfo, u: UserModuleOld) = {
-    parent.names prepend u.thisClassName
-    parent.modules prepend u
-  }
 
   private def add2parent(parent: DependenciesInfo, u: UserModule) = {
     parent.names prepend u.thisClassName
@@ -74,10 +70,5 @@ object ImperativeModules {
   }
 
   /* scaloid style like new When{} */
-  trait UserModuleOld(using parent: DependenciesInfo) extends Module {
-
-    def create: TopLevelCircuit
-    add2parent(parent, this)
-  }
 
 }

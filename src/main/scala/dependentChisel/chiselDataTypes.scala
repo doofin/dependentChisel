@@ -27,6 +27,7 @@ represent a vector of bits */
 
   trait Expr[w <: Int] {
     def +(oth: Expr[w]) = BinOp(this, oth, "+")
+    def *(oth: Expr[w]) = BinOp(this, oth, "+")
     def -(oth: Expr[w]) = BinOp(this, oth, "-")
     def |(oth: Expr[w]) = BinOp(this, oth, "|")
     def &(oth: Expr[w]) = BinOp(this, oth, "&")

@@ -1,4 +1,4 @@
-package dependentChisel.syntax
+package dependentChisel.misc
 
 import scala.compiletime.ops.int.*
 import scala.compiletime.*
