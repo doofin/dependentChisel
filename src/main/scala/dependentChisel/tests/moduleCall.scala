@@ -31,8 +31,7 @@ object moduleCall extends mainRunnable {
     val b = newInput[2]("b")
     val y = newOutput[2]("y")
     // create
-    override def create = { y :== a + b }
-    create
+    y :== a + b
   }
 
   class UserMod2(using parent: DependenciesInfo) extends UserModule {
@@ -42,11 +41,8 @@ object moduleCall extends mainRunnable {
     val m1 = new UserMod1 // gen some uuid?
     val m2 = new UserMod1
 
-    override def create = {
-      val port = if (1 to 2).sum == 4 then m1.y else m2.y
-      port :== a + b // will only show as port,
-    }
-    create
+    val port = if (1 to 2).sum == 4 then m1.y else m2.y
+    port :== a + b // will only show as port,
   }
 
 }

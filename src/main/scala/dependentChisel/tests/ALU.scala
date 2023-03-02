@@ -27,7 +27,6 @@ object ALU extends mainRunnable {
     // stmt no effect there!see scaloid
     // new When("w1") {
     // y :=== a + b|
-    override def create = {}
 
     switch(fn)(
       // Lit(1) -> (y := a + b), // can't infer,bug?

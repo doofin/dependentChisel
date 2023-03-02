@@ -22,7 +22,6 @@ object ifTest extends mainRunnable {
     val (mod, depInfo: DependenciesInfo) = makeModule { implicit p =>
       new IfModNested
     }
-    // mod.create
 
     pp(mod.modLocalInfo)
   }
@@ -33,17 +32,14 @@ object ifTest extends mainRunnable {
     val y = newOutput[16]("y")
     val y2 = newOutput[16]("y2")
 
-    override def create = {
+    y :== a - b
+    IfElse(a === b) {
+      y :== a + b
+      y2 :== a - b
+    } {
       y :== a - b
-      IfElse(a === b) {
-        y :== a + b
-        y2 :== a - b
-      } {
-        y :== a - b
-        y2 :== a + b
-      }
+      y2 :== a + b
     }
-    create
   }
 
   class IfMod(using parent: DependenciesInfo) extends UserModule {
@@ -52,14 +48,11 @@ object ifTest extends mainRunnable {
     val y = newOutput[16]("y")
     val y2 = newOutput[16]("y2")
 
-    override def create = {
-      y :== a - b
-      If(a === b) {
-        y :== a + b
-        y2 :== a - b
-      }
+    y :== a - b
+    If(a === b) {
+      y :== a + b
+      y2 :== a - b
     }
-    create
   }
 
   class IfModNested(using parent: DependenciesInfo) extends UserModule {
@@ -68,15 +61,12 @@ object ifTest extends mainRunnable {
     val c = newInput[16]("b")
     val y = newOutput[16]("y")
 
-    override def create = {
-      y :== a - b
-      If(a === b) {
-        y :== a + b
-        If(a === c) {
-          y :== a * b
-        }
+    y :== a - b
+    If(a === b) {
+      y :== a + b
+      If(a === c) {
+        y :== a * b
       }
     }
-    create
   }
 }

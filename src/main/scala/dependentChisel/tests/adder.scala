@@ -34,9 +34,7 @@ object adder extends mainRunnable {
     val b = newInput[2]("b")
     val y = newOutput[2]("y")
 
-    override def create = {
-      y :== a - b
-    }
+    y :== a - b
   }
 
 }

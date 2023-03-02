@@ -9,7 +9,7 @@ import dependentChisel.chiselDataTypes.*
 object ImperativeModules {
   case class DependenciesInfo(
       names: ArrayBuffer[String] = ArrayBuffer(),
-      modules: ArrayBuffer[Module] = ArrayBuffer(),
+      modules: ArrayBuffer[UserModule] = ArrayBuffer(),
       counter: Counter = new Counter()
   )
   case class ModLocalInfo(
@@ -30,7 +30,7 @@ object ImperativeModules {
       extends Module,
         UserModuleOps {
 
-    def create: Unit
+    // def create: Unit
 
     def pushF(ctr: Ctrl, uid: String, isStart: Boolean) = {
       modLocalInfo.commands.append(s"$ctr$uid $isStart")
