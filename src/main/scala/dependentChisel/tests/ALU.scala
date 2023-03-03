@@ -3,12 +3,11 @@ package dependentChisel.tests
 /* imperativeStyle dependent chisel */
 import dependentChisel.syntax.ImperativeModules.*
 import dependentChisel.*
-import chiselDataTypes.*
 
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
-import dependentChisel.chiselDataTypes
+import dependentChisel.typesAndSyntax.all.*
 import syntax.tree.*
 import dependentChisel.syntax.tree
 

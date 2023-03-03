@@ -2,12 +2,11 @@ package dependentChisel.syntax
 
 import scala.collection.mutable.ArrayBuffer
 import dependentChisel.*
-import chiselDataTypes.*
 
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
-import dependentChisel.chiselDataTypes
+import dependentChisel.typesAndSyntax.all.*
 
 /*inspired by scaloid
 view:Elem

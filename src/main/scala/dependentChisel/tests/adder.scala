@@ -4,7 +4,6 @@ package dependentChisel.tests
 import dependentChisel.syntax.ImperativeModules.*
 import dependentChisel.*
 
-import chiselDataTypes.*
 // import datatypes.basicTypes.*
 // import datatypes.statements.*
 
@@ -15,7 +14,7 @@ import com.doofin.stdScala.mainRunnable
 import dependentChisel.syntax.tree.TopLevelCircuit
 import dependentChisel.syntax.tree
 
-import dependentChisel.chiselDataTypes
+import dependentChisel.typesAndSyntax.all.*
 object adder extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {

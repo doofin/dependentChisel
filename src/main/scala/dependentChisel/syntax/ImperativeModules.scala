@@ -3,7 +3,8 @@ package dependentChisel.syntax
 import scala.collection.mutable.ArrayBuffer
 import dependentChisel.syntax.naming.Counter
 import dependentChisel.syntax.tree.TopLevelCircuit
-import dependentChisel.chiselDataTypes.*
+
+import dependentChisel.typesAndSyntax.all.*
 
 /** imperative style for chisel ,record info in mutable vars inside class */
 object ImperativeModules {
