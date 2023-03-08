@@ -41,7 +41,10 @@ object depTypes {
   ) extends DList[S[n]]
 
   /* fixed length lists */
-  sealed trait FixLenList[len <: Int, T <: Matchable]: // N is a singleton subtype of Int
+  sealed trait FixLenList[
+      len <: Int,
+      T <: Matchable
+  ]: // N is a singleton subtype of Int
     inline def size: len = valueOf[len] // <2>
 
     def ::(h: T): FixLenCons[len, T, this.type] = // <3>
@@ -87,11 +90,15 @@ object depTypes {
   }
 
   inline def wireConn[n <: Int](x: wireTp[n, Int], y: wireTp[n, Int]) = {}
-  inline def wireConcat[n <: Int, m <: Int](x: wireTp[n, Int], y: wireTp[m, Int]): wireTp[n + m, Int] = {
+  inline def wireConcat[n <: Int, m <: Int](
+      x: wireTp[n, Int],
+      y: wireTp[m, Int]
+  ): wireTp[n + m, Int] = {
     wireTp[n + m, Int](1)
   }
 
-  inline def wireNew[n <: Int]: wireTp[n + 2, Int] = { // must use inline for  valueOf!
+  inline def wireNew[n <: Int]
+      : wireTp[n + 2, Int] = { // must use inline for  valueOf!
     val singV = valueOf[n]
     wireTp(1) // singV.add(2)
   }

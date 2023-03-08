@@ -7,6 +7,7 @@ import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
 import dependentChisel.typesAndSyntax.all.*
+import dependentChisel.codegen.firAST.Cmds
 
 /*inspired by scaloid
 view:Elem
@@ -19,7 +20,7 @@ object tree extends mainRunnable {
   override def main(args: Array[String]): Unit = run
 
   type ChildrenList = ArrayBuffer[Item]
-  type BlockLocalInfo = ArrayBuffer[String]
+  type BlockLocalInfo = ArrayBuffer[Cmds]
 
   sealed trait ItemOrBox
 

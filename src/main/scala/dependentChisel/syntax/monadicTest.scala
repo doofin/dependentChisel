@@ -60,20 +60,18 @@ object monadicTest extends mainRunnable {
   } */
 }
 
-/*
-def sgdProgram: DslStore[dslAST.Var] = {
-    for {
-      w <- newVar("w")
-      _ <- varAssign(w, LitNum(1))
-      t <- newVar("t")
-      _ <- while__(true_const, "invariant") {
-        for {
-          s <- newVar("s")
-          _ <- varAssign(s, LitNum(1))
-          _ <- varAssign(w, w)
-        } yield s
-      }
-      _ <- skip
-    } yield { t }
-  }
- */
+/* def sgdProgram: DslStore[monadicAST.Var] = {
+  for {
+    w <- newVar("w")
+    _ <- varAssign(w, LitNum(1))
+    t <- newVar("t")
+    _ <- while__(true_const, "invariant") {
+      for {
+        s <- newVar("s")
+        _ <- varAssign(s, LitNum(1))
+        _ <- varAssign(w, w)
+      } yield s
+    }
+    _ <- skip
+  } yield { t }
+} */

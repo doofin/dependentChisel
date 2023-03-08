@@ -9,8 +9,9 @@ import syntax.ImperativeModules.*
 import dependentChisel.macros.getVarName
 import syntax.tree.*
 import depTypes.*
-
 import basicTypes.*
+
+import codegen.firAST.*
 
 object statements {
   enum Stmt {
@@ -20,32 +21,19 @@ object statements {
   // InputB(BitsType.Bits()) + InputB(BitsType.UInt()) // fail,ok
   // InputB(BitsType.Bits()) + InputB(BitsType.Bits())
 
-  extension [w <: Int, modTp <: Var[w]](v: modTp) {
+  extension [w <: Int, V <: Var[w]](v: V) {
 
-    inline def :=(using BlockLocalInfo)(oth: Expr[w]) = {
+    inline def :=(using ml: ModLocalInfo)(oth: Expr[w]) = {
       val name = v.getname
-      summon += s"${name} := ${oth},width=${constValueOpt[w]}"
-      Stmt.StmtNoOp
-    }
-
-    inline def :==(using ModLocalInfo)(oth: Expr[w]) = {
-      val name = v.getname
-      summon.commands += s"${name} := ${oth},width=${constValueOpt[w]}"
+      ml.commands += FirStmt(name, ":=", oth)
       Stmt.StmtNoOp
     }
 
   }
 
-  /** w:width */
-  /* case class UIntDep[w <: Int]() extends Bits[w] {
-    inline def valu = constValueOpt[w]
-  } */
-
-  case class Input[w <: Int](name: String) extends Var[w](name), Expr[w] {}
-
   case class InputB[w <: Int, b <: BitsType[w]](x: b) extends ExprB[w, b] {}
 
-  inline def newInput[w <: Int](using m: ModLocalInfo, dp: DependenciesInfo)(
+  inline def newInput[w <: Int](using m: ModLocalInfo, dp: globalInfo)(
       givenName: String = ""
   ) = {
     val name = s"${m.classNm}.$givenName${dp.counter.getIdWithDash}"
@@ -55,11 +43,7 @@ object statements {
 
 // varW <: Int
 
-  case class Output[w <: Int](name: String = "")(using ModLocalInfo)
-      extends Var[w](name),
-        Expr[w] {}
-
-  inline def newOutput[w <: Int](using m: ModLocalInfo, dp: DependenciesInfo)(
+  inline def newOutput[w <: Int](using m: ModLocalInfo, dp: globalInfo)(
       givenName: String = ""
   ) = {
     val name = s"${m.classNm}.$givenName${dp.counter.getIdWithDash}"

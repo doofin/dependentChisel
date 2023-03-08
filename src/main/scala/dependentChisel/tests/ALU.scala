@@ -15,7 +15,7 @@ object ALU extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {}
 
-  class ALU(using parent: DependenciesInfo) extends UserModule {
+  class ALU(using parent: globalInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
     val fn = newInput[2]("fn")
@@ -25,11 +25,11 @@ object ALU extends mainRunnable {
 
     // stmt no effect there!see scaloid
     // new When("w1") {
-    // y :=== a + b|
+    // y :== a + b|
 
     switch(fn)(
       // Lit(1) -> (y := a + b), // can't infer,bug?
-      Lit[2](1) -> (y :== a + b) // ok
+      // Lit[2](1) -> (y := a + b) // ok
       // Lit(1) -> (y := a - b),
       // Lit[2](2) -> (y := a + b)
     )

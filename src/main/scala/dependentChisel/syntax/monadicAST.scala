@@ -33,38 +33,52 @@ object monadicAST {
     inline def getVal = constValueOpt[n]
   }
 
-  trait Vars[n <: Int](name: String)
-  trait Exprs[n <: Int]
+  sealed trait Vars[n <: Int](name: String)
+  sealed trait Exprs[n <: Int]
 
-  case class BinOp[w <: Int](a: Exprs[w], b: Exprs[w], nm: String) extends DslStoreA[Exprs[w]], Exprs[w] {
-    override def toString(): String = s"${a} ${nm} ${b}"
+  case class BinOp[w <: Int](a: Exprs[w], b: Exprs[w], opName: String)
+      extends DslStoreA[Exprs[w]],
+        Exprs[w] {
+    override def toString(): String = s"${a} ${opName} ${b}"
   }
   /* case class BinOp[n <: Int](name: String = "") extends DslStoreA[In[n]], Vars[n](name), Exprs[n](name) { // support both dynamic and static check
     inline def getVal = constValueOpt[n]
   } */
 
-  case class Input[n <: Int](name: String = "") extends DslStoreA[Input[n]], Vars[n](name), Exprs[n] { // support both dynamic and static check
+  case class Input[n <: Int](name: String = "")
+      extends DslStoreA[Input[n]],
+        Vars[n](name),
+        Exprs[n] { // support both dynamic and static check
     inline def getVal = constValueOpt[n]
   }
 
-  case class Output[n <: Int](name: String = "") extends DslStoreA[Output[n]], Vars[n](name), Exprs[n] { // support both dynamic and static check
+  case class Output[n <: Int](name: String = "")
+      extends DslStoreA[Output[n]],
+        Vars[n](name),
+        Exprs[n] { // support both dynamic and static check
     inline def getVal = constValueOpt[n]
   }
-  case class Assign[n <: Int](x: Vars[n], y: Exprs[n]) extends DslStoreA[Assign[n]] {
+  case class Assign[n <: Int](x: Vars[n], y: Exprs[n])
+      extends DslStoreA[Assign[n]] {
     override def toString(): String = s"${x} := ${y}"
   }
 
-  inline def wireConcat[n <: Int, m <: Int](x: NewWire[n], y: NewWire[m]): NewWire[n + m] = {
+  inline def wireConcat[n <: Int, m <: Int](
+      x: NewWire[n],
+      y: NewWire[m]
+  ): NewWire[n + m] = {
     NewWire[n + m]()
   }
-  case class If(cond: BoolExpr, s1: DslStore[Unit], s2: DslStore[Unit]) extends DslStoreA[Unit]
+  case class If(cond: BoolExpr, s1: DslStore[Unit], s2: DslStore[Unit])
+      extends DslStoreA[Unit]
   case class While(
       cond: DslStore[Boolean],
       annotation: String,
       body: DslStore[Unit]
   ) extends DslStoreA[Unit]
 
-  case object True extends DslStoreA[Boolean] // only give value while write compilers!
+  case object True
+      extends DslStoreA[Boolean] // only give value while write compilers!
 
   case object Skip extends DslStoreA[Unit]
 
@@ -84,9 +98,14 @@ object monadicAST {
 
   def newVar(name: String = "") = liftF(NewVar(name))
 
-  inline def newWire[n <: Int](name: String = ""): Free[DslStoreA, NewWire[n]] = liftF(NewWire[n]())
-  inline def newIn[n <: Int](name: String = "")(using Counter) = liftF(Input[n](name + summon.getIdWithDash))
-  inline def newOut[n <: Int](name: String = "")(using Counter) = liftF(Output[n](name + summon.getIdWithDash))
+  inline def newWire[n <: Int](name: String = ""): Free[DslStoreA, NewWire[n]] =
+    liftF(NewWire[n]())
+  inline def newIn[n <: Int](name: String = "")(using Counter) = liftF(
+    Input[n](name + summon.getIdWithDash)
+  )
+  inline def newOut[n <: Int](name: String = "")(using Counter) = liftF(
+    Output[n](name + summon.getIdWithDash)
+  )
 
   inline def assign[n <: Int](x: Vars[n], y: Exprs[n]) = liftF(Assign(x, y))
 
@@ -101,7 +120,10 @@ object monadicAST {
 
   inline def wireConn[n <: Int](x: NewWire[n], y: NewWire[n]) = {}
 
-  inline def wireConnOpt[n <: Int](x: Option[NewWire[n]], y: Option[NewWire[n]]) = {}
+  inline def wireConnOpt[n <: Int](
+      x: Option[NewWire[n]],
+      y: Option[NewWire[n]]
+  ) = {}
 
   def skip: Free[DslStoreA, Unit] = liftF(Skip)
 

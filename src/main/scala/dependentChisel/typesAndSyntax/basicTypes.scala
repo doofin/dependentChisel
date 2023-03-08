@@ -25,13 +25,14 @@ represent a vector of bits */
   }
   trait Var[w <: Int](name: String) {
     def getname = name
-    inline def getLit(i: Bounded[0, w]) = { toLit[w](i) }
+    // inline def getLit(i: Bounded[0, w]) = { toLit[w](i) }
     // def getLit = LitFromVar(1, this)
 
     /* inline def :=(using ModCircuits)(oth: Expr[w]) = {
       summon.commands += s"${getVarName(this)} := ${oth},width=${constValueOpt[w]}"
     } */
   }
+  case class VarLit[w <: Int](name: String) extends Expr[w]
   // add(BitsType.UInt(), BitsType.SInt()) // fail,ok
   def add[idx <: Int, b <: BitsType[idx]](x: b, y: b) = {}
 
@@ -43,19 +44,38 @@ represent a vector of bits */
   case class Bool[w <: Int](a: Expr[w], b: Expr[w]) extends Expr[1] {
     override def toString(): String = s"${a} == ${b}"
   }
-  trait Expr[w <: Int] {
+
+  sealed trait Expr[w <: Int]
+
+  extension [w <: Int](x: Expr[w]) {
+    def +(oth: Expr[w]) = BinOp(x, oth, "+")
+    def *(oth: Expr[w]) = BinOp(x, oth, "*")
+    def -(oth: Expr[w]) = BinOp(x, oth, "-")
+    def |(oth: Expr[w]) = BinOp(x, oth, "|")
+    def &(oth: Expr[w]) = BinOp(x, oth, "&")
+    def ===(oth: Expr[w]) = Bool(x, oth)
+  }
+
+  case class Input[w <: Int](name: String) extends Var[w](name), Expr[w] {}
+
+  case class Output[w <: Int](name: String = "")(using ModLocalInfo)
+      extends Var[w](name),
+        Expr[w] {}
+  /* sealed trait Expr[w <: Int] {
     def +(oth: Expr[w]) = BinOp(this, oth, "+")
-    def *(oth: Expr[w]) = BinOp(this, oth, "+")
+    def *(oth: Expr[w]) = BinOp(this, oth, "*")
     def -(oth: Expr[w]) = BinOp(this, oth, "-")
     def |(oth: Expr[w]) = BinOp(this, oth, "|")
     def &(oth: Expr[w]) = BinOp(this, oth, "&")
     def ===(oth: Expr[w]) = Bool(this, oth)
-  }
+  } */
+
+  // future
   trait ExprB[w <: Int, b <: BitsType[w]] {
     def +(oth: ExprB[w, b]) = { "ok!!" }
   }
-
-  // case class Lit[w <: Int](i: Int) extends Expr[w] {}
+  case class Lit[w <: Int](i: w) extends Expr[w] {}
+  /*
   case class Lit[w <: Int](i: Bounded[0, w]) extends Expr[w] {}
   // Lit[5](1)
 
@@ -77,5 +97,5 @@ represent a vector of bits */
   extension [w <: Int](i: Bounded[0, w]) {
     def asLit = toLit[w](i)
   }
-
+   */
 }

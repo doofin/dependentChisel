@@ -5,10 +5,12 @@ import dependentChisel.syntax.naming.Counter
 import dependentChisel.syntax.tree.TopLevelCircuit
 
 import dependentChisel.typesAndSyntax.all.*
+import dependentChisel.codegen.firAST.Cmds
+import dependentChisel.codegen.firAST.*
 
 /** imperative style for chisel ,record info in mutable vars inside class */
 object ImperativeModules {
-  case class DependenciesInfo(
+  case class globalInfo(
       names: ArrayBuffer[String] = ArrayBuffer(),
       modules: ArrayBuffer[UserModule] = ArrayBuffer(),
       counter: Counter = new Counter()
@@ -16,7 +18,7 @@ object ImperativeModules {
   case class ModLocalInfo(
       classNm: String,
       io: ArrayBuffer[String] = ArrayBuffer(),
-      commands: ArrayBuffer[String] = ArrayBuffer()
+      commands: ArrayBuffer[Cmds] = ArrayBuffer()
   )
 
   trait Module { // extends Dependencies {
@@ -27,14 +29,13 @@ object ImperativeModules {
 
   /* function style like when {} */
   type Ctrl = String
-  trait UserModule(using parent: DependenciesInfo)
-      extends Module,
-        UserModuleOps {
+  trait UserModule(using parent: globalInfo) extends Module, UserModuleOps {
 
     // def create: Unit
 
     def pushF(ctr: Ctrl, uid: String, isStart: Boolean) = {
-      modLocalInfo.commands.append(s"$ctr$uid $isStart")
+      // modLocalInfo.commands.append(s"$ctr$uid $isStart")
+      modLocalInfo.commands.append(Block(s"$ctr$uid $isStart"))
     }
 
     def pushBlk(ctr: Ctrl)(block: => Any) = {
@@ -59,13 +60,13 @@ object ImperativeModules {
 
   /* utils */
 
-  private def add2parent(parent: DependenciesInfo, u: UserModule) = {
+  private def add2parent(parent: globalInfo, u: UserModule) = {
     parent.names prepend u.thisClassName
     parent.modules prepend u
   }
 
-  def makeModule[M <: Module](f: DependenciesInfo => M) = {
-    val di = DependenciesInfo()
+  def makeModule[M <: Module](f: globalInfo => M) = {
+    val di = globalInfo()
     val r = f(di)
     (r, di)
   }
