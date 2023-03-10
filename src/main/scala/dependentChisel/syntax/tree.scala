@@ -7,7 +7,8 @@ import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
 import dependentChisel.typesAndSyntax.all.*
-import dependentChisel.codegen.firAST.Cmds
+// import dependentChisel.codegen.firAST.Cmds
+import dependentChisel.codegen.seqCmds.Cmds
 
 /*inspired by scaloid
 view:Elem

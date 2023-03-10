@@ -1,14 +1,15 @@
 package dependentChisel.typesAndSyntax
-import dependentChisel.*
 
 import scala.compiletime.ops.int.*
 import scala.compiletime.*
+
+import dependentChisel.*
 
 import com.doofin.stdScalaJvm.*
 import syntax.ImperativeModules.*
 import dependentChisel.macros.getVarName
 import syntax.tree.*
-import depTypes.*
+// import depTypes.*
 
 object basicTypes {
 // https://github.com/MaximeKjaer/tf-dotty/blob/master/modules/compiletime/src/main/scala/io/kjaer/compiletime/Shape.scala
@@ -23,29 +24,24 @@ represent a vector of bits */
     case Bits() extends BitsType[2]
     // inline def valu = constValueOpt[width]
   }
-  trait Var[w <: Int](name: String) {
-    def getname = name
-    // inline def getLit(i: Bounded[0, w]) = { toLit[w](i) }
-    // def getLit = LitFromVar(1, this)
 
-    /* inline def :=(using ModCircuits)(oth: Expr[w]) = {
-      summon.commands += s"${getVarName(this)} := ${oth},width=${constValueOpt[w]}"
-    } */
+  /* mutable vars in lhs */
+  sealed trait Var[w <: Int](name: String) {
+    def getname = name
   }
-  case class VarLit[w <: Int](name: String) extends Expr[w]
+
+  case class VarLit[w <: Int](name: String) extends Expr[w] with Var[w](name)
   // add(BitsType.UInt(), BitsType.SInt()) // fail,ok
   def add[idx <: Int, b <: BitsType[idx]](x: b, y: b) = {}
 
-  case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String)
-      extends Expr[w] {
-    override def toString(): String = s"${a} ${nm} ${b}"
-  }
-
-  case class Bool[w <: Int](a: Expr[w], b: Expr[w]) extends Expr[1] {
-    override def toString(): String = s"${a} == ${b}"
-  }
-
   sealed trait Expr[w <: Int]
+  case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
+
+  /* case class Bool[w <: Int](a: Expr[w], b: Expr[w]) extends Expr[w] {
+    override def toString(): String = s"${a} == ${b}"
+  } */
+
+  case class Bool[w <: Int]() extends Expr[w]
 
   extension [w <: Int](x: Expr[w]) {
     def +(oth: Expr[w]) = BinOp(x, oth, "+")
@@ -53,7 +49,8 @@ represent a vector of bits */
     def -(oth: Expr[w]) = BinOp(x, oth, "-")
     def |(oth: Expr[w]) = BinOp(x, oth, "|")
     def &(oth: Expr[w]) = BinOp(x, oth, "&")
-    def ===(oth: Expr[w]) = Bool(x, oth)
+    // def ===(oth: Expr[w]) = Bool(x, oth)
+    def ===(oth: Expr[w]) = Bool()
   }
 
   case class Input[w <: Int](name: String) extends Var[w](name), Expr[w] {}

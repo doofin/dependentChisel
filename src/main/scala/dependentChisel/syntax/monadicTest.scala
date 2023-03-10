@@ -60,6 +60,7 @@ object monadicTest extends mainRunnable {
   } */
 }
 
+// stochastic gradient descent
 /* def sgdProgram: DslStore[monadicAST.Var] = {
   for {
     w <- newVar("w")
@@ -74,4 +75,5 @@ object monadicTest extends mainRunnable {
     }
     _ <- skip
   } yield { t }
-} */
+}
+ */

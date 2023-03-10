@@ -25,7 +25,7 @@ object ifTest extends mainRunnable {
 
     pp(mod.modLocalInfo)
     val cmds = mod.modLocalInfo.commands
-    println(codegen.firAST.gen(cmds.toList))
+    println(codegen.firAST.genFirrtlStr(cmds.toList))
 
   }
 

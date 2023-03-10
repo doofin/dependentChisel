@@ -11,6 +11,7 @@ import syntax.tree.*
 import depTypes.*
 import basicTypes.*
 
+import dependentChisel.codegen.seqCmds.FirStmt
 import codegen.firAST.*
 
 object statements {
@@ -25,7 +26,7 @@ object statements {
 
     inline def :=(using ml: ModLocalInfo)(oth: Expr[w]) = {
       val name = v.getname
-      ml.commands += FirStmt(name, ":=", oth)
+      ml.commands += FirStmt(v, ":=", oth)
       Stmt.StmtNoOp
     }
 

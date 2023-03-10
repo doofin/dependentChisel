@@ -13,7 +13,6 @@ import com.doofin.stdScala.mainRunnable
 // import dependentChisel.imperativeDataTypes
 import dependentChisel.syntax.tree.TopLevelCircuit
 import dependentChisel.syntax.tree
-
 import dependentChisel.typesAndSyntax.all.*
 object adder extends mainRunnable {
 
@@ -21,13 +20,12 @@ object adder extends mainRunnable {
     val (mod, depInfo: globalInfo) = makeModule { implicit p =>
       new Adder1
     }
-    // mod.create
-
     pp(mod.modLocalInfo)
     val cmds = mod.modLocalInfo.commands
-    println(codegen.firAST.gen(cmds.toList))
+    println(codegen.firAST.genFirrtlStr(cmds.toList))
   }
 
+  def run = {}
   class Adder1(using parent: globalInfo) extends UserModule {
 // parent contains global info
 

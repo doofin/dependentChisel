@@ -5,8 +5,9 @@ import dependentChisel.syntax.naming.Counter
 import dependentChisel.syntax.tree.TopLevelCircuit
 
 import dependentChisel.typesAndSyntax.all.*
-import dependentChisel.codegen.firAST.Cmds
 import dependentChisel.codegen.firAST.*
+import dependentChisel.codegen.seqCmds.*
+import dependentChisel.typesAndSyntax.control.*
 
 /** imperative style for chisel ,record info in mutable vars inside class */
 object ImperativeModules {
@@ -47,15 +48,6 @@ object ImperativeModules {
 
     add2parent(parent, this)
 
-  }
-
-  trait UserModuleOps { ut: UserModule =>
-    def If[w <: Int](b: Bool[w])(block: => Any) = pushBlk(s"if")(block) //  $b
-
-    def IfElse[w <: Int](b: Bool[w])(block: => Any)(block2: => Any) = {
-      If(b)(block)
-      pushBlk("else")(block2)
-    }
   }
 
   /* utils */

@@ -3,8 +3,18 @@ package dependentChisel.typesAndSyntax
 import dependentChisel.syntax.ImperativeModules.ModLocalInfo
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
+import dependentChisel.syntax.ImperativeModules.*
 /* control structures like switch */
 object control {
+  trait UserModuleOps { ut: UserModule =>
+    def If[w <: Int](b: Bool[w])(block: => Any) = pushBlk(s"if")(block) //  $b
+
+    def IfElse[w <: Int](b: Bool[w])(block: => Any)(block2: => Any) = {
+      If(b)(block)
+      pushBlk("else")(block2)
+    }
+  }
+
   def switch[condW <: Int](using
       m: ModLocalInfo
   )(cond: Var[condW])(cases: (Expr[condW], Stmt)*) = {
