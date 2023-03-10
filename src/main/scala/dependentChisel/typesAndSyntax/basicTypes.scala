@@ -44,13 +44,13 @@ represent a vector of bits */
   case class Bool[w <: Int]() extends Expr[w]
 
   extension [w <: Int](x: Expr[w]) {
-    def +(oth: Expr[w]) = BinOp(x, oth, "+")
-    def *(oth: Expr[w]) = BinOp(x, oth, "*")
-    def -(oth: Expr[w]) = BinOp(x, oth, "-")
-    def |(oth: Expr[w]) = BinOp(x, oth, "|")
-    def &(oth: Expr[w]) = BinOp(x, oth, "&")
+    def +(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "+")
+    def *(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "*")
+    def -(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "-")
+    def |(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "|")
+    def &(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "&")
     // def ===(oth: Expr[w]) = Bool(x, oth)
-    def ===(oth: Expr[w]) = Bool()
+    def ===(oth: Expr[w]): Bool[w] = Bool()
   }
 
   case class Input[w <: Int](name: String) extends Var[w](name), Expr[w] {}
