@@ -4,9 +4,12 @@ object naming {
   class Counter() {
     var n: Int = 0
     def getIdWithDash = {
-      val id = n
+      "_" + getIntId
+    }
+
+    def getIntId = {
       n += 1
-      "_" + n.toString()
+      n
     }
   }
 }

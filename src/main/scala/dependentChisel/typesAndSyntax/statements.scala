@@ -15,9 +15,6 @@ import dependentChisel.codegen.seqCmds.FirStmt
 import codegen.firAST.*
 
 object statements {
-  enum Stmt {
-    case StmtNoOp
-  }
 
   // InputB(BitsType.Bits()) + InputB(BitsType.UInt()) // fail,ok
   // InputB(BitsType.Bits()) + InputB(BitsType.Bits())
@@ -27,7 +24,6 @@ object statements {
     inline def :=(using ml: ModLocalInfo)(oth: Expr[w]) = {
       val name = v.getname
       ml.commands += FirStmt(v, ":=", oth)
-      Stmt.StmtNoOp
     }
 
   }

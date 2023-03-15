@@ -10,22 +10,21 @@ import dependentChisel.*
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
-// import dependentChisel.imperativeDataTypes
-import dependentChisel.syntax.tree.TopLevelCircuit
-import dependentChisel.syntax.tree
-
 import dependentChisel.typesAndSyntax.all.*
 object ifTest extends mainRunnable {
   // var globalDepInfo
 
-  override def main(args: Array[String] = Array()): Unit = {
+  override def main(args: Array[String] = Array()): Unit = run
+
+  def run = {
     val (mod, depInfo: globalInfo) = makeModule { implicit p =>
       new IfModNested
     }
 
-    pp(mod.modLocalInfo)
+    // pp(mod.modLocalInfo)
     val cmds = mod.modLocalInfo.commands
-    println(codegen.firAST.genFirrtlStr(cmds.toList))
+    pp(cmds)
+    // println(codegen.firAST.genFirrtlStr(cmds.toList))
 
   }
 
@@ -48,9 +47,14 @@ object ifTest extends mainRunnable {
     val y2 = newOutput[16]("y2")
 
     y := a - b
+    /* should require initialized y2:=0
+within firrtl or before firrtl
+maybe static analysis
+     */
     If(a === b) {
       y := a + b
       y2 := a - b
+
     }
   }
 

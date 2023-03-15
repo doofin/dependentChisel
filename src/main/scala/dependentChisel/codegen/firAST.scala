@@ -50,7 +50,7 @@ object firAST {
   case class fCircuits(mod: List[fModule], mainMod: String)
 
   /** convert expr to stmt bind: turn a+b into gen_ = a+b */
-  def expr2stmtBind(a: BinOp[?]) = {
+  def expr2stmtBind(a: Expr[?]) = {
     val newValue = "gen_" + global.getUid
     FirStmt(VarLit(newValue), ":=", a, prefix = "node ")
   }
@@ -117,8 +117,8 @@ object firAST {
   }
 
   /* list of stmt-> toANF->genFirrtlStmt tree or dag?->firrtl str */
-  def genFirrtlStmt(x: List[Cmds], indent: String = "") = {
-    val stmtList = x flatMap {
+  def genFirrtlStmt(x: List[Cmds], indent: String = ""): List[Cmds] = {
+    val stmtList: List[Cmds] = x flatMap {
       case stmt @ FirStmt(lhs, op, rhs, prefix) =>
         // rhs is sure to be binOp now after ANF
         // dbg(lhs, rhs)
@@ -153,7 +153,7 @@ object firAST {
           case _ => List(stmt)
         }
 
-      case x: Block => List(x)
+      case x => List(x)
     }
     stmtList
   }
@@ -177,7 +177,7 @@ object firAST {
         }
         s" $prefix ${lhs_f} $op ${rhsNm}"
 
-      case x: Block => x.s
+      case x => x.toString()
     }
 
     strList.mkString("\n")

@@ -27,12 +27,12 @@ object ALU extends mainRunnable {
     // new When("w1") {
     // y :== a + b|
 
-    switch(fn)(
+    /* switch(fn)(
       // Lit(1) -> (y := a + b), // can't infer,bug?
       // Lit[2](1) -> (y := a + b) // ok
       // Lit(1) -> (y := a - b),
       // Lit[2](2) -> (y := a + b)
-    )
+    ) */
     // a.getLit(1)
   }
 

@@ -28,6 +28,7 @@ represent a vector of bits */
   /* mutable vars in lhs */
   sealed trait Var[w <: Int](name: String) {
     def getname = name
+    override def toString(): String = { getname }
   }
 
   case class VarLit[w <: Int](name: String) extends Expr[w] with Var[w](name)
@@ -35,13 +36,16 @@ represent a vector of bits */
   def add[idx <: Int, b <: BitsType[idx]](x: b, y: b) = {}
 
   sealed trait Expr[w <: Int]
-  case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
+  case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String)
+      extends Expr[w] {
+    override def toString(): String = { a.toString() + nm + b.toString() }
+  }
 
   /* case class Bool[w <: Int](a: Expr[w], b: Expr[w]) extends Expr[w] {
     override def toString(): String = s"${a} == ${b}"
   } */
 
-  case class Bool[w <: Int]() extends Expr[w]
+  case class Bool[w <: Int](expr: Expr[w]) extends Expr[w]
 
   extension [w <: Int](x: Expr[w]) {
     def +(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "+")
@@ -50,7 +54,7 @@ represent a vector of bits */
     def |(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "|")
     def &(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "&")
     // def ===(oth: Expr[w]) = Bool(x, oth)
-    def ===(oth: Expr[w]): Bool[w] = Bool()
+    def ===(oth: Expr[w]): Bool[w] = Bool(BinOp(x, oth, "=="))
   }
 
   case class Input[w <: Int](name: String) extends Var[w](name), Expr[w] {}

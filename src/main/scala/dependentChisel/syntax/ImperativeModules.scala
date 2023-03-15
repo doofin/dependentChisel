@@ -8,6 +8,7 @@ import dependentChisel.typesAndSyntax.all.*
 import dependentChisel.codegen.firAST.*
 import dependentChisel.codegen.seqCmds.*
 import dependentChisel.typesAndSyntax.control.*
+import dependentChisel.codegen.seqCmds
 
 /** imperative style for chisel ,record info in mutable vars inside class */
 object ImperativeModules {
@@ -19,7 +20,7 @@ object ImperativeModules {
   case class ModLocalInfo(
       classNm: String,
       io: ArrayBuffer[String] = ArrayBuffer(),
-      commands: ArrayBuffer[Cmds] = ArrayBuffer()
+      commands: ArrayBuffer[Cmds] = ArrayBuffer() // list of seq cmds
   )
 
   trait Module { // extends Dependencies {
@@ -29,21 +30,22 @@ object ImperativeModules {
   }
 
   /* function style like when {} */
-  type Ctrl = String
+  // type Ctrl = String
   trait UserModule(using parent: globalInfo) extends Module, UserModuleOps {
 
     // def create: Unit
 
-    def pushF(ctr: Ctrl, uid: String, isStart: Boolean) = {
+    def pushF(cmd: Cmds) = {
       // modLocalInfo.commands.append(s"$ctr$uid $isStart")
-      modLocalInfo.commands.append(Block(s"$ctr$uid $isStart"))
+      // modLocalInfo.commands.append(Block(s"$ctr$uid $isStart"))
+      modLocalInfo.commands.append(cmd)
     }
 
     def pushBlk(ctr: Ctrl)(block: => Any) = {
-      val uid = parent.counter.getIdWithDash
-      pushF(ctr, uid, true)
+      val uid = parent.counter.getIntId
+      pushF(seqCmds.Start(ctr, uid))
       block
-      pushF(ctr, uid, false)
+      pushF(seqCmds.End(ctr, uid))
     }
 
     add2parent(parent, this)
@@ -63,6 +65,14 @@ object ImperativeModules {
     (r, di)
   }
 
+  import scala.reflect.ClassTag
+  def makeModule2[M <: Module: ClassTag](f: globalInfo => M) = {
+    val di = globalInfo()
+    // new M.getClass
+    // new M()
+    val r = f(di)
+    (r, di)
+  }
   /* scaloid style like new When{} */
 
 }

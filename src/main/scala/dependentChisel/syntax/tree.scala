@@ -57,7 +57,7 @@ object tree extends mainRunnable {
 
   }
 
-  case class IfElse[w <: Int](bool: Bool[w])(elseBranch: List[Stmt])(using
+  case class IfElse[w <: Int](bool: Bool[w])(elseBranch: List[Unit])(using
       cl: ChildrenList
   ) extends Box("If") {
 
