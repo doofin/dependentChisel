@@ -4,7 +4,9 @@ import scala.collection.mutable.ArrayBuffer
 import dependentChisel.syntax.naming.Counter
 import dependentChisel.syntax.tree.TopLevelCircuit
 
-import dependentChisel.typesAndSyntax.all.*
+import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.statements.*
+import dependentChisel.typesAndSyntax.control.*
 import dependentChisel.codegen.firAST.*
 import dependentChisel.codegen.seqCmds.*
 import dependentChisel.typesAndSyntax.control.*
