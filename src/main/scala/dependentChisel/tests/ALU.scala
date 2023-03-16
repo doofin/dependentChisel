@@ -7,7 +7,9 @@ import dependentChisel.*
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
-import dependentChisel.typesAndSyntax.all.*
+import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.statements.*
+import dependentChisel.typesAndSyntax.control.*
 import syntax.tree.*
 import dependentChisel.syntax.tree
 

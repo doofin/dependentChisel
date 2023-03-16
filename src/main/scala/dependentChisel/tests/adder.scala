@@ -13,7 +13,9 @@ import com.doofin.stdScala.mainRunnable
 // import dependentChisel.imperativeDataTypes
 import dependentChisel.syntax.tree.TopLevelCircuit
 import dependentChisel.syntax.tree
-import dependentChisel.typesAndSyntax.all.*
+import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.statements.*
+import dependentChisel.typesAndSyntax.control.*
 object adder extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
