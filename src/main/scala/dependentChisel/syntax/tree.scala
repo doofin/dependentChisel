@@ -52,14 +52,14 @@ object tree extends mainRunnable {
     }
   }
 
-  case class If[w <: Int](bool: Bool[w])(using cl: ChildrenList)
+  case class If[w <: Int](bool: BoolExpr[w])(using cl: ChildrenList)
       extends Box("If") {
 
     cl += this
 
   }
 
-  case class IfElse[w <: Int](bool: Bool[w])(elseBranch: List[Unit])(using
+  case class IfElse[w <: Int](bool: BoolExpr[w])(elseBranch: List[Unit])(using
       cl: ChildrenList
   ) extends Box("If") {
 

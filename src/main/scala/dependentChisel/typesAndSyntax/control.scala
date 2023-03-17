@@ -1,17 +1,19 @@
 package dependentChisel.typesAndSyntax
 
-import dependentChisel.syntax.ImperativeModules.ModLocalInfo
+import dependentChisel.syntax.imperativeModules.ModLocalInfo
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
-import dependentChisel.syntax.ImperativeModules.*
+import dependentChisel.syntax.imperativeModules.*
 import dependentChisel.codegen.seqCmds.Ctrl
 /* control structures like switch */
 object control {
   trait UserModuleOps { ut: UserModule =>
-    def If[w <: Int](b: Bool[w])(block: => Any): Unit =
+    def If[w <: Int](b: BoolEx[w])(block: => Any): Unit =
       pushBlk(Ctrl.If(b))(block) //  $b
 
-    def IfElse[w <: Int](b: Bool[w])(block: => Any)(block2: => Any): Unit = {
+    def IfElse[w <: Int](
+        b: BoolEx[w]
+    )(block: => Any)(block2: => Any): Unit = {
       pushBlk(Ctrl.If(b))(block)
       pushBlk(Ctrl.Else())(block2)
     }

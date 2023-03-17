@@ -1,29 +1,45 @@
 package dependentChisel.algo
-import dependentChisel.codegen.seqCmds.*
-import dependentChisel.*
 
-import Tree.*
 import scala.util.*
-import codegen.firAST.*
-import dependentChisel.typesAndSyntax.basicTypes.Bool
+import Tree.*
+import com.doofin.stdScalaCross.*
 
+import dependentChisel.codegen.seqCmds.*
+
+import dependentChisel.codegen.compiler.*
+import dependentChisel.typesAndSyntax.basicTypes.*
+
+/** sequential commands to AST */
 object seqCmd2tree {
-
   type AST = TreeNode[FirStmt | Ctrl]
 
-  def cmd2ANF(cmdList: List[Cmds]): List[Cmds] = {
+  def cmdListToSingleAssign(cmdList: List[Cmds]): List[Cmds] = {
     cmdList flatMap {
-      case x: FirStmt => toANF(x)
-      case x @ Start(ctrl, uid) =>
+      case x: FirStmt =>
+        x.lhs.match {
+          case VarLit(name) =>
+          case Input(name)  =>
+          case Output(name) =>
+        }
+
+        val fir = stmtToSingleAssign(x)
+        dbg(fir)
+        fir
+      case orig @ Start(ctrl, uid) =>
         val r: List[Cmds] = ctrl match {
-          case Ctrl.If(b: Bool[Int]) => toANF(expr2stmtBind(b))
+          case ctrlIf @ Ctrl.If(b: BoolExpr[Int]) =>
+            val anf_stmts = stmtToSingleAssign(expr2stmtBind(b))
+            // dbg(anf)
+            anf_stmts :+ orig.copy(ctrl =
+              ctrlIf.copy(cond = anf_stmts.last.lhs)
+            )
           // case Ctrl.Else()           =>
           // case Ctrl.Top()            =>
           case _ => List()
         }
 
         // List(x)
-        r :+ x
+        r
       case x => List(x)
     }
   }
@@ -52,19 +68,4 @@ object seqCmd2tree {
     parents.pop() // .cld.toList
   }
 
-  def tree2str(tr: AST, indent: String = ""): String = {
-    val valStr: String = tr.value match {
-      case x: Ctrl =>
-        x match {
-          case Ctrl.If(b)  => "when " + b.expr.toString()
-          case Ctrl.Else() => "else "
-          case Ctrl.Top()  => ""
-        }
-      case stmt @ FirStmt(lhs, op, rhs, prefix) => stmt.toString()
-    }
-
-    indent + valStr + (tr.cld map (cld =>
-      "\n" + tree2str(cld, indent + "  ")
-    )).mkString // ("\n")
-  }
 }

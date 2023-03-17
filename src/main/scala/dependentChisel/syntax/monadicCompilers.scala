@@ -11,7 +11,7 @@ import scala.collection.mutable
 
 // import precondition.syntax.smtAST._
 
-object compilers {
+object monadicCompilers {
   class impureCompilerCls extends (DslStoreA ~> Id) {
     //      val kvs                     = mutable.Map.empty[String, Any]
     val kvs = mutable.Map.empty[Int, String]
@@ -51,7 +51,7 @@ object compilers {
           // println(x.toString() + ":" + x.getVal) // can't get int
           x
 
-        case x: Output[n]    => x
+        case x: Output[n] => x
         case x: Assign[n] =>
           // println("Assign:" + x.x.name)
           // Assign[n](x.x, x.y)
@@ -66,11 +66,12 @@ object compilers {
 
   (new impureCompilerCls).kvs
 
-  /** natural transformation between type containers. need two lang,dsl->ast, can also translate into tree
+  /** natural transformation between type containers. need two lang,dsl->ast,
+    * can also translate into tree
     */
 
-  /** read values after invoke natural transformation between type containers. need two lang,dsl->ast, can
-    * also translate into tree
+  /** read values after invoke natural transformation between type containers.
+    * need two lang,dsl->ast, can also translate into tree
     */
   def compilerToStr: DslStoreA ~> Id =
     new (DslStoreA ~> Id) {

@@ -1,7 +1,7 @@
 package dependentChisel.misc
 
 import dependentChisel.syntax.*
-import compilers.*
+import monadicCompilers.*
 import monadicAST.*
 // import precondition.syntax.dslAST
 import com.doofin.stdScalaJvm.*

@@ -1,20 +1,23 @@
-val scala3Version = "3.2.2"
-
 resolvers ++= Seq(
   Resolver.bintrayRepo("veinhorn", "maven"),
   Resolver.jcenterRepo,
   "jitpack" at "https://jitpack.io",
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 )
+val mScala3Version = "3.2.2" // "3.3.1-RC1-bin-SNAPSHOT" 3.3.0-RC3
 
+/* To print the code as it is transformed through the compiler, use the compiler flag -Xprint:all
+trace the code that generated the error by adding the -Ydebug-error compiler flag,
+ */
+val mScalacOptions = Seq("-source", "future") // "-Ydebug-error"
 val catsV = "2.9.0"
 lazy val root = project
   .in(file("."))
   .settings(
     name := "dependentChisel",
     version := "0.1.0-SNAPSHOT",
-    scalaVersion := scala3Version,
-    scalacOptions ++= Seq("-source", "future"),
+    scalaVersion := mScala3Version,
+    scalacOptions ++= mScalacOptions,
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "pprint" % "0.8.1", // print,debug
       "io.bullet" %% "macrolizer" % "0.6.2" % "compile-internal", // print,debug

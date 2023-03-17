@@ -101,10 +101,10 @@ object monadicAST {
   inline def newWire[n <: Int](name: String = ""): Free[DslStoreA, NewWire[n]] =
     liftF(NewWire[n]())
   inline def newIn[n <: Int](name: String = "")(using Counter) = liftF(
-    Input[n](name + summon.getIdWithDash)
+    Input[n](name + summon[Counter].getIdWithDash)
   )
   inline def newOut[n <: Int](name: String = "")(using Counter) = liftF(
-    Output[n](name + summon.getIdWithDash)
+    Output[n](name + summon[Counter].getIdWithDash)
   )
 
   inline def assign[n <: Int](x: Vars[n], y: Exprs[n]) = liftF(Assign(x, y))

@@ -1,19 +1,22 @@
 package dependentChisel.syntax
 
 import scala.collection.mutable.ArrayBuffer
+
 import dependentChisel.syntax.naming.Counter
 import dependentChisel.syntax.tree.TopLevelCircuit
 
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
-import dependentChisel.codegen.firAST.*
+
+import dependentChisel.codegen.firrtlTypes.*
 import dependentChisel.codegen.seqCmds.*
-import dependentChisel.typesAndSyntax.control.*
 import dependentChisel.codegen.seqCmds
 
-/** imperative style for chisel ,record info in mutable vars inside class */
-object ImperativeModules {
+/** imperative style for chisel ,record info in mutable vars inside class
+  * chiselModules
+  */
+object imperativeModules {
   case class globalInfo(
       names: ArrayBuffer[String] = ArrayBuffer(),
       modules: ArrayBuffer[UserModule] = ArrayBuffer(),
@@ -21,7 +24,7 @@ object ImperativeModules {
   )
   case class ModLocalInfo(
       classNm: String,
-      io: ArrayBuffer[String] = ArrayBuffer(),
+      io: ArrayBuffer[IOdef] = ArrayBuffer(),
       commands: ArrayBuffer[Cmds] = ArrayBuffer() // list of seq cmds
   )
 

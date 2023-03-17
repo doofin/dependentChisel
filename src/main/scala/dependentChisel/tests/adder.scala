@@ -1,7 +1,7 @@
 package dependentChisel.tests
 
 /* imperativeStyle dependent chisel */
-import dependentChisel.syntax.ImperativeModules.*
+import dependentChisel.syntax.imperativeModules.*
 import dependentChisel.*
 
 // import datatypes.basicTypes.*
@@ -24,7 +24,7 @@ object adder extends mainRunnable {
     }
     pp(mod.modLocalInfo)
     val cmds = mod.modLocalInfo.commands
-    println(codegen.firAST.genFirrtlStr(cmds.toList))
+    // println(codegen.firAST.genFirrtlStr(cmds.toList))
   }
 
   def run = {}

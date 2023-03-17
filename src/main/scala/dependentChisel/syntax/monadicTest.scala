@@ -7,7 +7,7 @@ import cats.implicits.*
 import cats.free.Free.*
 import cats.free.Free
 import cats.{Id, ~>}
-import compilers.*
+import monadicCompilers.*
 // import precondition.syntax.dslAST
 import com.doofin.stdScalaJvm.*
 import monadicAST.*

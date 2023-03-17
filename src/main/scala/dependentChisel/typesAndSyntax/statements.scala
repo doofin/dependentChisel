@@ -5,14 +5,15 @@ import scala.compiletime.ops.int.*
 import scala.compiletime.*
 
 import com.doofin.stdScalaJvm.*
-import syntax.ImperativeModules.*
+import syntax.imperativeModules.*
 import dependentChisel.macros.getVarName
 import syntax.tree.*
 import depTypes.*
 import basicTypes.*
 
 import dependentChisel.codegen.seqCmds.FirStmt
-import codegen.firAST.*
+// import codegen.Compiler.*
+import codegen.firrtlTypes.*
 
 object statements {
 
@@ -34,7 +35,8 @@ object statements {
       givenName: String = ""
   ) = {
     val name = s"${m.classNm}.$givenName${dp.counter.getIdWithDash}"
-    m.io.prepend(s"input ${name}[${constValueOpt[w]}]")
+    // io : type,name,width
+    m.io.prepend(IOdef(name, "input", constValueOpt[w]))
     Input[w](name)
   }
 
@@ -44,7 +46,8 @@ object statements {
       givenName: String = ""
   ) = {
     val name = s"${m.classNm}.$givenName${dp.counter.getIdWithDash}"
-    m.io.prepend(s"input ${name}[${constValueOpt[w]}]")
+    m.io.prepend(IOdef(name, "output", constValueOpt[w]))
     Output[w](name)
   }
+
 }

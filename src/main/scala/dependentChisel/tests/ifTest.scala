@@ -1,11 +1,8 @@
 package dependentChisel.tests
 
 /* imperativeStyle dependent chisel */
-import dependentChisel.syntax.ImperativeModules.*
+import dependentChisel.syntax.imperativeModules.*
 import dependentChisel.*
-
-// import datatypes.basicTypes.*
-// import datatypes.statements.*
 
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
@@ -13,20 +10,32 @@ import com.doofin.stdScala.mainRunnable
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
+
+import dependentChisel.codegen.compiler.*
+import tests.ifTest.*
+
+import algo.seqCmd2tree.*
+
 object ifTest extends mainRunnable {
   // var globalDepInfo
 
   override def main(args: Array[String] = Array()): Unit = run
 
   def run = {
-    val (mod, depInfo: globalInfo) = makeModule { implicit p =>
-      new IfModNested
+    val (mod, depInfo) = makeModule { implicit p =>
+//   new IfElse1
+      new IfModNested // ok
     }
 
-    // pp(mod.modLocalInfo)
+// pp(mod.modLocalInfo)
     val cmds = mod.modLocalInfo.commands
-    pp(cmds)
-    // println(codegen.firAST.genFirrtlStr(cmds.toList))
+    // pp(cmds)
+    val anf = cmdListToSingleAssign(cmds.toList)
+    // pp(anf)
+    val tree = list2tree(anf)
+    // pp(tree)
+
+    pp(tree2firrtlStr(tree))
 
   }
 
@@ -61,6 +70,8 @@ maybe static analysis
   }
 
 // UserModuleTop contains global info
+  /* deterministic global naming
+  check if name is unique */
   class IfModNested(using parent: globalInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
@@ -68,6 +79,7 @@ maybe static analysis
     val y = newOutput[16]("y")
 
     y := a - b
+    // val aa: n + 2 = n + 2
     If(a === b) {
       y := a + b
       If(a === c) {
@@ -76,3 +88,23 @@ maybe static analysis
     }
   }
 }
+
+/*
+module IfNested :
+  input clock : Clock
+  input reset : UInt<1>
+  output io : { flip a : UInt<16>, flip b : UInt<16>, flip c : UInt<16>, y : UInt<16>}
+
+  node _io_y_T = sub(io.a, io.b) @[IfNested.scala 26:16]
+  node _io_y_T_1 = tail(_io_y_T, 1) @[IfNested.scala 26:16]
+  io.y <= _io_y_T_1 @[IfNested.scala 26:8]
+  node _T = eq(io.a, io.b) @[IfNested.scala 27:13]
+  when _T : @[IfNested.scala 27:23]
+    node _io_y_T_2 = add(io.a, io.b) @[IfNested.scala 28:18]
+    node _io_y_T_3 = tail(_io_y_T_2, 1) @[IfNested.scala 28:18]
+    io.y <= _io_y_T_3 @[IfNested.scala 28:10]
+    node _T_1 = eq(io.a, io.c) @[IfNested.scala 29:15]
+    when _T_1 : @[IfNested.scala 29:25]
+      node _io_y_T_4 = mul(io.a, io.b) @[IfNested.scala 30:20]
+      io.y <= _io_y_T_4 @[IfNested.scala 30:12]
+ */

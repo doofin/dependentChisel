@@ -6,7 +6,7 @@ import scala.compiletime.*
 import dependentChisel.*
 
 import com.doofin.stdScalaJvm.*
-import syntax.ImperativeModules.*
+import syntax.imperativeModules.*
 import dependentChisel.macros.getVarName
 import syntax.tree.*
 // import depTypes.*
@@ -26,12 +26,13 @@ represent a vector of bits */
   }
 
   /* mutable vars in lhs */
-  sealed trait Var[w <: Int](name: String) {
+  sealed trait Var[w <: Int](name: String) extends Expr[w], BoolEx[w] {
     def getname = name
     override def toString(): String = { getname }
   }
 
-  case class VarLit[w <: Int](name: String) extends Expr[w] with Var[w](name)
+  case class VarLit[w <: Int](name: String) extends Expr[w], Var[w](name)
+
   // add(BitsType.UInt(), BitsType.SInt()) // fail,ok
   def add[idx <: Int, b <: BitsType[idx]](x: b, y: b) = {}
 
@@ -40,12 +41,10 @@ represent a vector of bits */
       extends Expr[w] {
     override def toString(): String = { a.toString() + nm + b.toString() }
   }
-
-  /* case class Bool[w <: Int](a: Expr[w], b: Expr[w]) extends Expr[w] {
-    override def toString(): String = s"${a} == ${b}"
-  } */
-
-  case class Bool[w <: Int](expr: Expr[w]) extends Expr[w]
+  trait BoolEx[w <: Int] extends Expr[w]
+  case class BoolExpr[w <: Int](expr: Expr[w]) extends BoolEx[w] {
+    override def toString(): String = expr.toString()
+  }
 
   extension [w <: Int](x: Expr[w]) {
     def +(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "+")
@@ -54,7 +53,7 @@ represent a vector of bits */
     def |(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "|")
     def &(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "&")
     // def ===(oth: Expr[w]) = Bool(x, oth)
-    def ===(oth: Expr[w]): Bool[w] = Bool(BinOp(x, oth, "=="))
+    def ===(oth: Expr[w]): BoolExpr[w] = BoolExpr(BinOp(x, oth, "=="))
   }
 
   case class Input[w <: Int](name: String) extends Var[w](name), Expr[w] {}

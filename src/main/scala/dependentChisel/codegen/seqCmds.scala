@@ -5,15 +5,19 @@ import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
 
+/** sequential commands as in chisel UserModule */
 object seqCmds {
   type Uid = Int
+
+  /** control structures like if */
   enum Ctrl {
-    case If[w <: Int](b: Bool[w])
+    case If(cond: BoolEx[?])
     // case IfElse[w <: Int](b: Bool[w])
     case Else[w <: Int]()
     case Top()
   }
 
+  /** sequential commands type as in chisel UserModule */
   sealed trait Cmds
   case class Start[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
   case class End[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
@@ -21,18 +25,9 @@ object seqCmds {
       lhs: Var[?],
       op: String,
       rhs: Expr[?],
-      prefix: String = ""
+      prefix: String = "" // prefix can be node
   ) extends Cmds {
-    override def toString(): String = { lhs.getname + op + rhs }
-  } // prefix can be node
-
-  /*
-  // cmdname,uid,cond
-
-  enum SeqCmds {
-    case Start[CT <: Ctrl](ctrl: CT, uid: Uid)
-    // case Item(item: FirStmt)
+    override def toString(): String = { prefix + lhs.getname + s" $op $rhs" }
   }
 
-   */
 }
