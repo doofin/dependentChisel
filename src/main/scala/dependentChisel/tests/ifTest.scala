@@ -1,7 +1,6 @@
 package dependentChisel.tests
 
 /* imperativeStyle dependent chisel */
-import dependentChisel.syntax.imperativeModules.*
 import dependentChisel.*
 
 import com.doofin.stdScalaCross.*
@@ -15,6 +14,8 @@ import dependentChisel.codegen.compiler.*
 import tests.ifTest.*
 
 import algo.seqCmd2tree.*
+
+import dependentChisel.typesAndSyntax.chiselModules.*
 
 object ifTest extends mainRunnable {
   // var globalDepInfo

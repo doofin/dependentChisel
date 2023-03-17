@@ -6,10 +6,8 @@ import scala.compiletime.*
 import dependentChisel.*
 
 import com.doofin.stdScalaJvm.*
-import syntax.imperativeModules.*
+import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.macros.getVarName
-import syntax.tree.*
-// import depTypes.*
 
 object basicTypes {
 // https://github.com/MaximeKjaer/tf-dotty/blob/master/modules/compiletime/src/main/scala/io/kjaer/compiletime/Shape.scala

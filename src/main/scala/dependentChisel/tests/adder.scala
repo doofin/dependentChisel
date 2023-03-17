@@ -1,21 +1,15 @@
 package dependentChisel.tests
 
-/* imperativeStyle dependent chisel */
-import dependentChisel.syntax.imperativeModules.*
+import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.*
-
-// import datatypes.basicTypes.*
-// import datatypes.statements.*
 
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
-// import dependentChisel.imperativeDataTypes
-import dependentChisel.syntax.tree.TopLevelCircuit
-import dependentChisel.syntax.tree
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
+
 object adder extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
@@ -27,7 +21,6 @@ object adder extends mainRunnable {
     // println(codegen.firAST.genFirrtlStr(cmds.toList))
   }
 
-  def run = {}
   class Adder1(using parent: globalInfo) extends UserModule {
 // parent contains global info
 

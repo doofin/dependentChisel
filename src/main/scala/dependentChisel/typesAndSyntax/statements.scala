@@ -5,9 +5,9 @@ import scala.compiletime.ops.int.*
 import scala.compiletime.*
 
 import com.doofin.stdScalaJvm.*
-import syntax.imperativeModules.*
+import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.macros.getVarName
-import syntax.tree.*
+// import syntax.tree.*
 import depTypes.*
 import basicTypes.*
 

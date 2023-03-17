@@ -1,7 +1,6 @@
 package dependentChisel.tests
 
 /* imperativeStyle dependent chisel */
-import dependentChisel.syntax.imperativeModules.*
 import dependentChisel.*
 
 import com.doofin.stdScalaCross.*
@@ -10,8 +9,8 @@ import com.doofin.stdScala.mainRunnable
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
-import syntax.tree.*
-import dependentChisel.syntax.tree
+
+import dependentChisel.typesAndSyntax.chiselModules.*
 
 object ALU extends mainRunnable {
 

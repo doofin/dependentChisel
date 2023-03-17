@@ -1,7 +1,7 @@
 package dependentChisel.tests
 
 /* imperativeStyle dependent chisel */
-import dependentChisel.syntax.imperativeModules.*
+import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.*
 
 import com.doofin.stdScalaCross.*

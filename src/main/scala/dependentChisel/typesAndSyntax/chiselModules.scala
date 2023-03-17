@@ -1,9 +1,9 @@
-package dependentChisel.syntax
+package dependentChisel.typesAndSyntax
 
 import scala.collection.mutable.ArrayBuffer
 
 import dependentChisel.syntax.naming.Counter
-import dependentChisel.syntax.tree.TopLevelCircuit
+// import dependentChisel.syntax.tree.TopLevelCircuit
 
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
@@ -12,11 +12,12 @@ import dependentChisel.typesAndSyntax.control.*
 import dependentChisel.codegen.firrtlTypes.*
 import dependentChisel.codegen.seqCmds.*
 import dependentChisel.codegen.seqCmds
+import scala.reflect.ClassTag
 
 /** imperative style for chisel ,record info in mutable vars inside class
   * chiselModules
   */
-object imperativeModules {
+object chiselModules {
   case class globalInfo(
       names: ArrayBuffer[String] = ArrayBuffer(),
       modules: ArrayBuffer[UserModule] = ArrayBuffer(),
@@ -70,7 +71,6 @@ object imperativeModules {
     (r, di)
   }
 
-  import scala.reflect.ClassTag
   def makeModule2[M <: Module: ClassTag](f: globalInfo => M) = {
     val di = globalInfo()
     // new M.getClass

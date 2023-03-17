@@ -1,10 +1,12 @@
 package dependentChisel.typesAndSyntax
 
-import dependentChisel.syntax.imperativeModules.ModLocalInfo
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
-import dependentChisel.syntax.imperativeModules.*
+
 import dependentChisel.codegen.seqCmds.Ctrl
+
+import dependentChisel.typesAndSyntax.chiselModules.*
+
 /* control structures like switch */
 object control {
   trait UserModuleOps { ut: UserModule =>

@@ -7,7 +7,7 @@ import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
 
 import seqCmds.*
-import dependentChisel.syntax.imperativeModules.*
+import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.algo.seqCmd2tree.*
 
 import firrtlTypes.*
