@@ -6,8 +6,8 @@ import com.doofin.stdScalaCross.*
 import tests.ifTest.*
 
 import algo.seqCmd2tree.*
-
-import dependentChisel.syntax.imperativeModules.*
+import dependentChisel.codegen.firrtlTypes.*
+import dependentChisel.typesAndSyntax.chiselModules.*
 /*
 implicit def str2lit(s: String): VarLit[Nothing] = VarLit(s)
 // ok
@@ -20,7 +20,7 @@ val r2 = toANF(FirStmt("y", ":=", Lit(1) + Lit(2) + Lit(3) + Lit(4)))
 pp(r2)
  */
 
-tests.ifTest.run
+// tests.ifTest.run
 
 val (mod, depInfo) = makeModule { implicit p =>
 //   new IfElse1
@@ -29,6 +29,10 @@ val (mod, depInfo) = makeModule { implicit p =>
 
 val fMod = chiselMod2firrtlModule(mod)
 val firrtlStr = firrtlModule2str(fMod)
+val firCirc = firrtlCircuits2str(FirrtlCircuit(fMod.name, List(fMod)))
+println(firCirc)
+
+firrtlUtils.firrtl2verilog(firCirc)
 println(firrtlStr)
 // need to deal with io names
 /* ok for IfModNested
@@ -61,3 +65,5 @@ module IfNested :
  */
 
 // println(modIOstr)
+
+firrtlOpMap.toList

@@ -6,7 +6,7 @@ import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
 
 /** sequential commands as in chisel UserModule */
-object seqCmds {
+object seqCmdTypes {
   type Uid = Int
 
   /** control structures like if */
@@ -26,8 +26,6 @@ object seqCmds {
       op: String,
       rhs: Expr[?],
       prefix: String = "" // prefix can be node
-  ) extends Cmds {
-    override def toString(): String = { prefix + lhs.getname + s" $op $rhs" }
-  }
-
+  ) extends Cmds
+  case class newInst(instNm: String, modNm: String) extends Cmds
 }

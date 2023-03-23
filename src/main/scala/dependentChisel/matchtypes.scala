@@ -17,6 +17,15 @@ isSingleton False = List Nat
     case Option[t]   => ElemR[t]
     case AnyVal      => X
 
+  type IntO[n <: Int] = n match {
+    case Int => Int
+    case _   => Nothing
+  }
+
+  def intx[n <: Int](i: n): IntO[n] = {
+    ???
+  }
+  val r1 = intx(1)
   /*
 mkSingle : (x : Bool) -> isSingleton x
 mkSingle True = 0

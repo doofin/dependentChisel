@@ -10,7 +10,7 @@ import chisel3.internal.sourceinfo.SourceInfo
 import firrtl.AnnotationSeq
 
 import depTypes.*
-import com.doofin.stdScalaCross.*
+import com.doofin.stdScalaJvm.*
 import com.doofin.stdScala.mainRunnable
 /* what info   does chisel macro and plugin provide?
  */

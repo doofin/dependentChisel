@@ -4,6 +4,7 @@ package dependentChisel.tests
 import dependentChisel.*
 
 import com.doofin.stdScalaCross.*
+import com.doofin.stdScalaCross
 import com.doofin.stdScala.mainRunnable
 
 import dependentChisel.typesAndSyntax.basicTypes.*
@@ -16,31 +17,46 @@ import tests.ifTest.*
 import algo.seqCmd2tree.*
 
 import dependentChisel.typesAndSyntax.chiselModules.*
+import dependentChisel.codegen.firrtlTypes.FirrtlCircuit
 
 object ifTest extends mainRunnable {
   // var globalDepInfo
-
+// stdScalaCross.
   override def main(args: Array[String] = Array()): Unit = run
 
   def run = {
-    val (mod, depInfo) = makeModule { implicit p =>
+    // (1, 2, 3).mapConst((x: Int) => x * 2)
+    val (mod, globalCircuit) = makeModule { implicit p =>
 //   new IfElse1
       new IfModNested // ok
     }
 
-// pp(mod.modLocalInfo)
-    val cmds = mod.modLocalInfo.commands
-    // pp(cmds)
-    val anf = cmdListToSingleAssign(cmds.toList)
-    // pp(anf)
-    val tree = list2tree(anf)
-    // pp(tree)
-
-    pp(tree2firrtlStr(tree))
+    val fMod = chiselMod2firrtlCircuits(mod)
+    val firCirc = firrtlCircuits2str(fMod)
+    println(firCirc)
+    firrtlUtils.firrtl2verilog(firCirc)
 
   }
 
-  class IfElse1(using parent: globalInfo) extends UserModule {
+  /* module contains nested if */
+  class IfModNested(using parent: GlobalInfo) extends UserModule {
+    val a = newInput[16]("a")
+    val b = newInput[16]("b")
+    val c = newInput[16]("c")
+    val y = newOutput[16]("y")
+
+    dbg(y)
+    y := a - b
+    // val aa: n + 2 = n + 2
+    If(a === b) {
+      y := a + b
+      If(a === c) {
+        y := a * b
+      }
+    }
+  }
+
+  class IfElse1(using parent: GlobalInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
     val y = newOutput[16]("y")
@@ -52,7 +68,7 @@ object ifTest extends mainRunnable {
     }
   }
 
-  class IfMod(using parent: globalInfo) extends UserModule {
+  class IfMod(using parent: GlobalInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
     val y = newOutput[16]("y")
@@ -70,24 +86,6 @@ maybe static analysis
     }
   }
 
-// UserModuleTop contains global info
-  /* deterministic global naming
-  check if name is unique */
-  class IfModNested(using parent: globalInfo) extends UserModule {
-    val a = newInput[16]("a")
-    val b = newInput[16]("b")
-    val c = newInput[16]("b")
-    val y = newOutput[16]("y")
-
-    y := a - b
-    // val aa: n + 2 = n + 2
-    If(a === b) {
-      y := a + b
-      If(a === c) {
-        y := a * b
-      }
-    }
-  }
 }
 
 /*

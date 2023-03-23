@@ -1,22 +1,16 @@
 package dependentChisel
 
-import dependentChisel.depTypes
 import firrtl.*
 import firrtl.ir.*
 import firrtl.passes.*
 import firrtl.transforms.*
-import depTypes.*
+
 import com.doofin.stdScalaJvm.*
 import com.doofin.stdScala.mainRunnable
-// import pprint.*
-/* directly work on firrtl instead of chisel layer
-  try just use ADT. case class,etc
-  https://github.com/chipsalliance/firrtl/wiki/Understanding-Firrtl-Intermediate-Representation
-  https://github.com/chipsalliance/firrtl/wiki/Cookbook
- */
+
 object firrtlTests extends mainRunnable {
 
-  override def main(args: Array[String]): Unit = Circuit1
+  override def main(args: Array[String]): Unit = {}
 
   def run = {
     Module(NoInfo, "Adder", Seq(), Block(Seq()))
@@ -79,9 +73,8 @@ object firrtlTests extends mainRunnable {
     io.v <= _io_v_T @[GCD.scala 34:8]
 """
   }
-  def Circuit1 = {
 
-    val input = """circuit GCD :
+  def circuit1 = """circuit GCD :
   module GCD :
     input clock : Clock
     input reset : UInt<1>
@@ -107,9 +100,10 @@ object firrtlTests extends mainRunnable {
     node _io_v_T = eq(y, UInt<1>("h0")) @[GCD.scala 34:13]
     io.v <= _io_v_T @[GCD.scala 34:8]
 """
+  def Circuit1r = {
 
 // Parse the input
-    val parsed: Circuit = firrtl.Parser.parse(input)
+    val parsed: Circuit = firrtl.Parser.parse(circuit1)
     pp(parsed)
     val state = CircuitState(parsed, UnknownForm)
 

@@ -20,18 +20,31 @@ object depTypes {
     val num7: 1 + 2 * 3 = 7
     // val num72: 1 = 7
     val sum: 2 + 2 = 4
+    inline val ii = 1
+    // constValueOpt[ii]
+
     wireId(2): 2
     // wireId2(2): 2 //fail
     wireAdd2[4]: 6 // ok
     wireConn(wireNew[1], wireNew[1]) // ok
-    // wireConn(wireNew[1], wireNew[2]) // fail
+    // wireConn(wireNew[1], wireNew[2]) // will fail,nice
+    // wireConnInt(wireTpInt(1), wireTpInt(2)) // will pass,not ok
+    val w1 = 1
+    val w2 = 1
+    // wireConn(wireNew[w2.type], wireNew[w1.type]) // will fail,nice
+  }
+  case class Input1[wid <: Int](w: wid)
+
+  case class param(i: Int) {
+    val w = Input1(i)
   }
 
-  sealed trait DList[len <: Int]: // N is a singleton subtype of Int
+  sealed trait DList[len <: Int] { // N is a singleton subtype of Int
     inline def size: len = valueOf[len] // <2>
 
     def ::[T <: Matchable](h: T): DTCons[len, T, this.type] = // <3>
       DTCons(h, this)
+  }
 
   case object DTNil extends DList[0] // <4>
 
@@ -79,6 +92,9 @@ object depTypes {
   without inline ,will be err :cannot reduce summonFrom
    */
   case class wireTp[I <: Int, X](x: X)
+  case class wireTpInt[I <: Int](x: I)
+  inline def wireConnInt[n <: Int](x: wireTpInt[n], y: wireTpInt[n]) = {}
+
   case class wireTp2[xy <: (Int, Int)]() {
     inline def getVal = constValueOpt[xy]
   }

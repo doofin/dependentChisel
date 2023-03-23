@@ -16,7 +16,7 @@ object ALU extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {}
 
-  class ALU(using parent: globalInfo) extends UserModule {
+  class ALU(using parent: GlobalInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
     val fn = newInput[2]("fn")

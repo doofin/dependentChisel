@@ -26,7 +26,7 @@ object moduleCall extends mainRunnable {
     // pp(dep)
   }
 
-  class UserMod1(using parent: globalInfo) extends UserModule {
+  class UserMod1(using parent: GlobalInfo) extends UserModule {
 // parent contains global info
     val a = newInput[2]("a") // ModCircuits is a implicit in this class
     val b = newInput[2]("b")
@@ -35,7 +35,7 @@ object moduleCall extends mainRunnable {
     y := a + b
   }
 
-  class UserMod2(using parent: globalInfo) extends UserModule {
+  class UserMod2(using parent: GlobalInfo) extends UserModule {
     val a = newInput[2]("a")
     val b = newInput[2]("b")
     val y = newOutput[2]("y")
@@ -48,7 +48,7 @@ object moduleCall extends mainRunnable {
     m1.y := a + b
   }
 
-  class UserMod3(using parent: globalInfo)(val a: Input[2]) extends UserModule {
+  class UserMod3(using parent: GlobalInfo)(val a: Input[2]) extends UserModule {
     // val a = newInput[2]("a")
     val b = newInput[2]("b")
     val y = newOutput[2]("y")

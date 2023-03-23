@@ -4,10 +4,12 @@ import scala.util.*
 import Tree.*
 import com.doofin.stdScalaCross.*
 
-import dependentChisel.codegen.seqCmds.*
+import dependentChisel.codegen.seqCmdTypes.*
 
 import dependentChisel.codegen.compiler.*
 import dependentChisel.typesAndSyntax.basicTypes.*
+
+import dependentChisel.codegen.seqCmdTypes
 
 /** sequential commands to AST */
 object seqCmd2tree {
@@ -16,14 +18,8 @@ object seqCmd2tree {
   def cmdListToSingleAssign(cmdList: List[Cmds]): List[Cmds] = {
     cmdList flatMap {
       case x: FirStmt =>
-        x.lhs.match {
-          case VarLit(name) =>
-          case Input(name)  =>
-          case Output(name) =>
-        }
-
         val fir = stmtToSingleAssign(x)
-        dbg(fir)
+        // dbg(fir)
         fir
       case orig @ Start(ctrl, uid) =>
         val r: List[Cmds] = ctrl match {
