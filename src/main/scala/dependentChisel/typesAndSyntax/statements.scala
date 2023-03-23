@@ -14,6 +14,7 @@ import basicTypes.*
 import dependentChisel.codegen.seqCmdTypes.*
 // import codegen.Compiler.*
 import codegen.firrtlTypes.*
+import dependentChisel.syntax.naming
 
 object statements {
 
@@ -31,11 +32,11 @@ object statements {
 
   // case class InputB[w <: Int, b <: BitsType[w]](x: b) extends ExprB[w, b] {}
 
-  inline def newInput[w <: Int](using m: ModLocalInfo, dp: GlobalInfo)(
+  inline def newInput[w <: Int](using m: ModLocalInfo)(
       givenName: String = ""
   ) = {
     val name =
-      s"${m.classNm}.${if givenName.isEmpty() then "i" else givenName}${dp.counter.getIdWithDash}"
+      s"${m.classNm}.${if givenName.isEmpty() then "i" else givenName}${naming.getIdWithDash}"
     // io : type,name,width
     m.io.prepend(IOdef(m.instNm, name, "input", constValueOpt[w]))
     Input[w](name)
@@ -43,11 +44,11 @@ object statements {
 
 // varW <: Int
 
-  inline def newOutput[w <: Int](using m: ModLocalInfo, dp: GlobalInfo)(
+  inline def newOutput[w <: Int](using m: ModLocalInfo)(
       givenName: String = ""
   ) = {
     val name =
-      s"${m.classNm}.${if givenName.isEmpty() then "i" else givenName}${dp.counter.getIdWithDash}"
+      s"${m.classNm}.${if givenName.isEmpty() then "i" else givenName}${naming.getIdWithDash}"
 
     m.io.prepend(IOdef(m.instNm, name, "output", constValueOpt[w]))
     Output[w](name)

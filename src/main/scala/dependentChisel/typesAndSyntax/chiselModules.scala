@@ -2,8 +2,6 @@ package dependentChisel.typesAndSyntax
 
 import scala.collection.mutable.ArrayBuffer
 
-import dependentChisel.syntax.naming.Counter
-
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
@@ -14,6 +12,7 @@ import dependentChisel.codegen.seqCmdTypes
 
 import scala.reflect.ClassTag
 import dependentChisel.global.getUid
+import dependentChisel.syntax.naming
 
 /** imperative style for chisel ,record info in mutable vars inside class
   * chiselModules
@@ -21,8 +20,7 @@ import dependentChisel.global.getUid
 object chiselModules {
   case class GlobalInfo(
       names: ArrayBuffer[String] = ArrayBuffer(),
-      modules: ArrayBuffer[UserModule] = ArrayBuffer(),
-      counter: Counter = new Counter()
+      modules: ArrayBuffer[UserModule] = ArrayBuffer()
   )
   case class ModLocalInfo(
       classNm: String,
@@ -48,7 +46,7 @@ object chiselModules {
     }
 
     def pushBlk(ctr: Ctrl)(block: => Any) = {
-      val uid = parent.counter.getIntId
+      val uid = naming.getIntId
       pushCmd(seqCmdTypes.Start(ctr, uid))
       block
       pushCmd(seqCmdTypes.End(ctr, uid))
