@@ -21,13 +21,16 @@ object adder extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
     val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
-      new AdderDouble
+      new DoubleAdder
+    // new DoubleAdder3(2)
     }
     val fMod = chiselMod2firrtlCircuits(mod)
+    pp(fMod.modules map (_.modInfo))
     val firCirc = firrtlCircuits2str(fMod)
     println(firCirc)
 
-    // firrtlUtils.firrtl2verilog(firCirc)
+    val verilog = firrtlUtils.firrtl2verilog(firCirc)
+    // println(verilog)
   }
 
   class Adder1(using parent: GlobalInfo) extends UserModule {
@@ -39,16 +42,51 @@ object adder extends mainRunnable {
 
     y := a - b
   }
+  class DoubleAdder2[I <: Int](using parent: GlobalInfo) extends UserModule {
+// parent contains global info
 
-  class AdderDouble(using parent: GlobalInfo) extends UserModule {
+    val a = newInput[I]("a")
+    val b = newInput[I]("b")
+    // val c = newInput[2]("c")
+    // val d = newInput[2]("d")
+    val y = newOutput[I]("y")
+
+    // val m1 = newMod(new Adder1) // might be able to rm this
+    // m1.y := a - b // will both err
+    y := a + b
+  }
+
+  class DoubleAdder3(val size: Int)(using parent: GlobalInfo)
+      extends UserModule {
+// parent contains global info
+
+    val a = newInput[size.type]("a") // val a = newInput[size.type]("a",size)
+    val b = newInput[size.type]("b")
+    // val s2 = ""
+    // newInput[s2.type]("b")
+    // val c = newInput[2]("c")
+    // val d = newInput[2]("d")
+    val y = newOutput[size.type]("y")
+
+    // val m1 = newMod(new Adder1) // might be able to rm this
+    // m1.y := a - b // will both err
+    y := a + b
+  }
+
+  class DoubleAdder(using parent: GlobalInfo) extends UserModule {
 // parent contains global info
 
     val a = newInput[2]("a")
     val b = newInput[2]("b")
+    // val c = newInput[2]("c")
+    // val d = newInput[2]("d")
     val y = newOutput[2]("y")
 
-    val m1 = new Adder1 // need to gen inst of
-    m1.y := a - b
+    val m1 = newMod(new Adder1) // might be able to rm this
+    // m1.y := a - b // will both err
+    m1.a := a
+    m1.b := b
+    y := m1.y
   }
 
 }

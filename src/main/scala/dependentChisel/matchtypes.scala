@@ -1,6 +1,8 @@
 // https://github.com/deanwampler/programming-scala-book-code-examples/blob/66afb28cdeb12734c999eaeb8ecc84535528aa88/src/script/scala/progscala3/typesystem/matchtypes/DepTypedMethods.scala
 
 import compiletime.asMatchable // <3>
+import scala.compiletime.ops.int.*
+import scala.compiletime.*
 
 object matchtypes {
   /*
@@ -52,4 +54,30 @@ mkSingle False = []
     // first(O)// err
     first(C("Dean"))
   }
+
+  type ExprM[t <: Int] = t match {
+    case 0    => Int
+    case S[n] => Int
+    // case _    => Boolean
+  }
+  // val dn = (1 to 10).sum
+  // type em1 = ExprM[dn.type]
+// val s1: em1 = false
+
+  /* def matchInt[I <: Int](x: I): ExprM[I] = {
+    x match {
+      case x: 0    => 1
+      case x: S[_] => 2
+      // case x: AnyVal => true
+    }
+  } */
+
+  /* the type test for compiletime.ops.int.S[n] @n cannot be checked at runtime because it refers to an abstract type member or type parameter */
+  /* inline def matchInt2[I <: Int](inline x: Int): ExprM[x.type] = {
+    x match {
+      case x: 0      => 1
+      case x: S[n]   => 2
+      case x: AnyVal => true
+    }
+  } */
 }

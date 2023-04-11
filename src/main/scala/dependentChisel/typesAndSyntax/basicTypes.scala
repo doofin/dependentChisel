@@ -7,6 +7,7 @@ import com.doofin.stdScalaJvm.*
 
 import dependentChisel.*
 import dependentChisel.macros.getVarName
+import scala.quoted.ExprMap
 // import dependentChisel.typesAndSyntax.chiselModules.*
 
 /*
@@ -42,6 +43,7 @@ represent a vector of bits */
 
   case class VarLit[w <: Int](name: String) extends Var[w](name, false)
 
+
   sealed trait Expr[w <: Int]
   case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
   sealed trait BoolEx[w <: Int] extends Expr[w]
@@ -57,9 +59,11 @@ represent a vector of bits */
     def ===(oth: Expr[w]): BoolExpr[w] = BoolExpr(BinOp(x, oth, "=="))
   }
 
-  case class Input[w <: Int](name: String) extends Var[w](name, true)
+  case class Input[w <: Int](instName: String, name: String)
+      extends Var[w](instName + "." + name, true)
 
-  case class Output[w <: Int](name: String = "") extends Var[w](name, true)
+  case class Output[w <: Int](instName: String, name: String)
+      extends Var[w](instName + "." + name, true)
   /* sealed trait Expr[w <: Int] {
     def +(oth: Expr[w]) = BinOp(this, oth, "+")
     def *(oth: Expr[w]) = BinOp(this, oth, "*")

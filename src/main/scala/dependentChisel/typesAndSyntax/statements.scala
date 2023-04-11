@@ -23,16 +23,23 @@ object statements {
 
   extension [w <: Int, V <: Var[w]](v: V) {
 
-    inline def :=(using ml: ModLocalInfo)(oth: Expr[w]) = {
+    inline def :=(using mli: ModLocalInfo)(oth: Expr[w]) = {
       val name = v.getname
-      ml.commands += FirStmt(v, ":=", oth)
+
+      /* v match {
+        case VarLit(name) =>
+        case Input(name)  =>
+        case Output(name) =>
+      } */
+
+      mli.commands += FirStmt(v, ":=", oth)
     }
 
   }
 
   // case class InputB[w <: Int, b <: BitsType[w]](x: b) extends ExprB[w, b] {}
 
-  inline def newInput[w <: Int](using m: ModLocalInfo)(
+  /* inline def newInput[w <: Int](using m: ModLocalInfo)(
       givenName: String = ""
   ) = {
     val name =
@@ -40,11 +47,11 @@ object statements {
     // io : type,name,width
     m.io.prepend(IOdef(m.instNm, name, "input", constValueOpt[w]))
     Input[w](name)
-  }
+  } */
 
 // varW <: Int
 
-  inline def newOutput[w <: Int](using m: ModLocalInfo)(
+  /* inline def newOutput[w <: Int](using m: ModLocalInfo)(
       givenName: String = ""
   ) = {
     val name =
@@ -52,6 +59,6 @@ object statements {
 
     m.io.prepend(IOdef(m.instNm, name, "output", constValueOpt[w]))
     Output[w](name)
-  }
+  } */
 
 }

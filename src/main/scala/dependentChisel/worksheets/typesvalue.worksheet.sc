@@ -1,5 +1,6 @@
 import com.doofin.stdScalaJvm.*
 import scala.compiletime.*
+import scala.compiletime.ops.int.*
 
 // import dependentChisel.syntax.dslAST.wireTp
 import dependentChisel.depTypes.*
@@ -23,3 +24,9 @@ constValueOpt[n4.type]
 
 wireTp2[(1, n4.type)]().getVal
 wireTp2[(1, 2)]().getVal
+
+inline val size = 1
+
+constValueOpt[size.type]
+
+// em1 =:= em1

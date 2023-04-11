@@ -11,5 +11,7 @@ object naming {
     n
   }
 
+  def mkUidFrom(s: String) = s + getIdWithDash
+
   // class Counter() {}
 }

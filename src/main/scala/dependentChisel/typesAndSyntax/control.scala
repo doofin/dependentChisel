@@ -1,11 +1,17 @@
 package dependentChisel.typesAndSyntax
 
+import com.doofin.stdScalaCross.*
+
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
 
 import dependentChisel.codegen.seqCmdTypes.*
 
 import dependentChisel.typesAndSyntax.chiselModules.*
+import dependentChisel.syntax.naming
+import dependentChisel.codegen.firrtlTypes.IOdef
+
+import scala.compiletime.*
 
 /* control structures like switch
 use a different trait to split
@@ -22,8 +28,37 @@ object control {
       pushBlk(Ctrl.Else())(block2)
     }
 
-    def newMod(newM: UserModule) = {
-      pushCmd(newInst("", newM.thisClassName))
+    def newMod[M <: UserModule](newMod: M) = {
+      /*     m1.clock <= clock
+    m1.reset <= reset */
+      pushCmd(NewInstStmt(newMod.thisInstanceName, newMod.thisClassName))
+      newMod
+    }
+
+    inline def newInput[w <: Int](
+        givenName: String = ""
+    ) = {
+      val m = modLocalInfo
+      val genName =
+        s"${if givenName.isEmpty() then "i" else givenName}${naming.getIdWithDash}"
+      val instNm = ut.thisInstanceName
+      val r = Input[w](instNm, genName)
+      m.io.prepend(IOdef(r.instName, r.name, "input", constValueOpt[w]))
+      dbg(r)
+      r
+    }
+
+    inline def newOutput[w <: Int](
+        givenName: String = ""
+    ) = {
+      val m = modLocalInfo
+
+      val genName =
+        s"${if givenName.isEmpty() then "i" else givenName}${naming.getIdWithDash}"
+      val instNm = ut.thisInstanceName
+      val r = Output[w](instNm, genName)
+      m.io.prepend(IOdef(r.instName, r.name, "output", constValueOpt[w]))
+      r
     }
   }
 

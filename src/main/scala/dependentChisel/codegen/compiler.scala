@@ -19,19 +19,20 @@ object compiler {
   def chiselMod2firrtlCircuits(chiselMod: UserModule) = {
     val modInfo = chiselMod.modLocalInfo
     val glob = chiselMod.globalInfo
-    val mainModuleName = modInfo.classNm
+    val mainModuleName = modInfo.className
 
     FirrtlCircuit(mainModuleName, glob.modules.toList map chiselMod2firrtlMod)
   }
 
   def chiselMod2firrtlMod(chiselMod: UserModule): FirrtlModule = {
-    val modInfo = chiselMod.modLocalInfo
-    val cmds = modInfo.commands
-    val anf = cmdListToSingleAssign(cmds.toList)
-    val tree: AST = list2tree(anf)
-    FirrtlModule(modInfo.classNm, modInfo.io.toList, tree)
+    val modInfo: ModLocalInfo = chiselMod.modLocalInfo
+    val anf = cmdListToSingleAssign(modInfo.commands.toList)
+    val ioNameChanged = cmdsTransform(modInfo.instName, anf)
+    val tree: AST = list2tree(ioNameChanged)
+    FirrtlModule(modInfo, modInfo.io.toList, tree)
   }
 
+  /** firrtl Circuit AST to serialized str format */
   def firrtlCircuits2str(fCircuits: FirrtlCircuit): String = {
     val modStr = fCircuits.modules map (m => firrtlModule2str(m, " "))
     s"circuit ${fCircuits.mainModuleName} : \n" + modStr.mkString("\n")
@@ -39,13 +40,16 @@ object compiler {
 
   def firrtlModule2str(fMod: FirrtlModule, indent: String = ""): String = {
     val circuitStr = tree2firrtlStr(fMod.ast, indent)
+    val instName: String = fMod.modInfo.instName // name changes for io
     val ioInfoStr = fMod.io.reverse // looks better
       .map { (x: IOdef) =>
         val prefix = x.tpe match {
           case "input"  => "flip"
           case "output" => ""
         }
-        val name = fullName2IOName(x.name) // rm module name
+        // dbg(x.name)
+        val name = x.name // fullName2IOName(instName, x.name) // rm module name
+        // pt(instName, x.name, name)
         s"$prefix $name : UInt<${x.width.getOrElse(-1)}>"
       }
       .mkString(", ")
@@ -53,32 +57,53 @@ object compiler {
     val modIOstr =
       s"${indent}output io : { ${ioInfoStr}}\n"
 
-    s"""${indent}module ${fMod.name} :
+    s"""${indent}module ${fMod.modInfo.className} :
   ${indent}input clock : Clock
   ${indent}input reset : UInt<1>\n  """ +
       modIOstr + circuitStr
+  }
+
+  def splitName(fullName: String) = {
+    val instName :: name :: Nil = fullName.split('.').toList: @unchecked
+    (instName, name)
   }
 
   /** print AST to indent firrtl */
   def tree2firrtlStr(tr: AST, indent: String = ""): String = {
     val nodeStr: String = tr.value match {
       case x: Ctrl =>
-        x match {
+        indent + (x match {
           case Ctrl.If(b)  => s"when ${expr2firrtlStr(b)} :"
           case Ctrl.Else() => "else "
           case Ctrl.Top()  => ""
-        }
-      case stmt: FirStmt => stmt2firrtlStr(stmt)
+        })
+      case stmt: FirStmt     => indent + stmt2firrtlStr(stmt)
+      case stmt: NewInstStmt => newInstStmt2firrtlStr(indent, stmt)
     }
 
-    indent + nodeStr + (tr.cld map (cld =>
+    nodeStr + (tr.cld map (cld =>
       "\n" + tree2firrtlStr(cld, indent + "  ")
     )).mkString
   }
 
-  /** rm module names from io name */
-  def fullName2IOName(ioName: String, withIOprefix: Boolean = false): String = {
-    (if withIOprefix then "io." else "") + ioName.split('.').last
+  /** rm module or instance names from io name, for usage in gen firrtl io
+    * section
+    */
+  def fullName2IOName(
+      instName: String,
+      fullName: String
+      // withIOprefix: Boolean = false
+  ): String = {
+    /*     if fullName.contains(".")
+    then (if withIOprefix then "io." else "") + fullName.split('.').last
+    else fullName
+     */
+
+    if fullName.contains(".") then
+      val (instNameSplit, name) = splitName(fullName)
+      if instNameSplit == instName then "io." + name
+      else fullName
+    else fullName
   }
 
   def expr2firrtlStr(expr: Expr[?]): String = {
@@ -88,15 +113,29 @@ object compiler {
         s"$opName(${expr2firrtlStr(a)},${expr2firrtlStr(b)})" // here it's SSA form
 
       case x: Var[?] =>
-        fullName2IOName(x.getname, withIOprefix = x.getIsIO)
+        // fullName2IOName(x.getname, withIOprefix = x.getIsIO)
+        // ioTransformOrSkip(x).getname
+        x.getname
       case Lit(i)         => i.toString()
       case BoolExpr(expr) => expr2firrtlStr(expr)
     }
   }
+
   def stmt2firrtlStr(stmt: FirStmt) = {
     val FirStmt(lhs, op, rhs, prefix) = stmt
     val opName = firrtlOpMap.find(_._1 == op).map(_._2).getOrElse(op)
     prefix + expr2firrtlStr(lhs) + s" $opName ${expr2firrtlStr(rhs)}"
+  }
+
+  def newInstStmt2firrtlStr(indent: String, stmt: NewInstStmt) = {
+    /*     m1.clock <= clock
+    m1.reset <= reset */
+    Seq(
+      s"inst ${stmt.instNm} of ${stmt.modNm}",
+      s"${stmt.instNm}.clock <= clock",
+      s"${stmt.instNm}.reset <= reset"
+    ).map(x => indent + x)
+      .mkString("\n")
   }
 
   /** convert expr to stmt bind: turn a+b into gen_ = a+b */
@@ -144,9 +183,9 @@ object compiler {
         // println(x)
         val genStmt = expr2stmtBind(rhs)
         val stmtNew = lhs match {
-          case Input(name) =>
+          case x: Input[?] =>
             List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
-          case Output(name) =>
+          case x: Output[?] =>
             List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
           case VarLit(name) => List(stmt)
         }
@@ -166,4 +205,60 @@ object compiler {
       |    io.y <= _io_y_T @[adder.scala 12:8]
       |""".stripMargin
    */
+
+  def treeTransform(ast: AST): AST = {
+    ast.value match {
+      case x: Ctrl        =>
+      case x: FirStmt     =>
+      case x: NewInstStmt =>
+    }
+
+    ast
+  }
+
+  /** var to var Transform: modify names for io
+    */
+  def varTransform(thisInstName: String, v: Var[?]): Var[?] = {
+    v match {
+      case x @ VarLit(name) => x
+      case x @ Input(instName, name) =>
+        val pfx =
+          if thisInstName == instName then "io" else s"$instName.io"
+        x.copy(instName = pfx)
+
+      case x @ Output(instName, name) =>
+        val pfx =
+          if thisInstName == instName then "io" else s"$instName.io"
+        x.copy(instName = pfx)
+    }
+  }
+
+  /** expr to expr Transform: */
+  def exprTransform(thisInstName: String, e: Expr[?]): Expr[?] = {
+    e match {
+      case v: Var[?] => varTransform(thisInstName, v)
+      case x: BinOp[w] =>
+        BinOp(
+          exprTransform(thisInstName, x.a).asInstanceOf[Expr[Nothing]],
+          exprTransform(thisInstName, x.b).asInstanceOf[Expr[Nothing]],
+          x.nm
+        )
+      case x => x
+    }
+  }
+
+  /** modify names for io after cmdListToSingleAssign
+    */
+  def cmdsTransform(thisInstName: String, cmdList: List[Cmds]): List[Cmds] = {
+    cmdList map {
+      case x @ FirStmt(lhs, op, rhs, prefix) =>
+        val newStmt = x.copy(
+          lhs = varTransform(thisInstName, lhs),
+          rhs = exprTransform(thisInstName, rhs)
+        )
+        dbg(newStmt)
+        newStmt
+      case x => x
+    }
+  }
 }

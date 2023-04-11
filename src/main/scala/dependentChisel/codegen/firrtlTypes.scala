@@ -2,6 +2,7 @@ package dependentChisel.codegen
 
 import dependentChisel.algo.seqCmd2tree.AST
 import com.doofin.stdScalaCross.*
+import dependentChisel.typesAndSyntax.chiselModules.ModLocalInfo
 
 object firrtlTypes {
 
@@ -14,7 +15,7 @@ object firrtlTypes {
   )
 
   /** one firrtl module */
-  case class FirrtlModule(name: String, io: List[IOdef], ast: AST)
+  case class FirrtlModule(modInfo: ModLocalInfo, io: List[IOdef], ast: AST)
 
   /** the whole circuit with multiple modules */
   case class FirrtlCircuit(mainModuleName: String, modules: List[FirrtlModule])

@@ -23,8 +23,8 @@ object chiselModules {
       modules: ArrayBuffer[UserModule] = ArrayBuffer()
   )
   case class ModLocalInfo(
-      classNm: String,
-      instNm: String,
+      className: String,
+      instName: String,
       io: ArrayBuffer[IOdef] = ArrayBuffer(),
       commands: ArrayBuffer[Cmds] = ArrayBuffer() // list of seq cmds
   )
@@ -34,10 +34,11 @@ object chiselModules {
   /* function style UserModule ,for example: when {} else {} */
   trait UserModule(using parent: GlobalInfo) extends UserModuleOps {
     val thisClassName = this.getClass.getCanonicalName.split('.').last.mkString
-    val thisInstanceName = ""
+    val thisInstanceName = naming.mkUidFrom(thisClassName)
+    println(s"new inst $thisInstanceName for $thisClassName")
 
     given modLocalInfo: ModLocalInfo =
-      ModLocalInfo(classNm = thisClassName, instNm = thisClassName + getUid)
+      ModLocalInfo(className = thisClassName, instName = thisInstanceName)
     // def name = this.getClass.getCanonicalName.split('.').last
     val globalInfo = parent
 
