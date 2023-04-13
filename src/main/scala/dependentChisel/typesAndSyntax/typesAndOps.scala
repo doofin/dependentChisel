@@ -38,14 +38,12 @@ represent a vector of bits */
   add2(u1[1](), u1[1]())
 
   /* mutable vars which can be mutated in lhs, incl input,output */
-  sealed trait Var[w <: Int](name: String, isIO: Boolean)
-      extends Expr[w],
-        BoolEx[w] {
+  sealed trait Var[w <: Int](name: String) extends Expr[w], BoolEx[w] {
     def getname = name
     // def getIsIO = isIO
   }
 
-  case class VarLit[w <: Int](name: String) extends Var[w](name, false)
+  case class VarLit[w <: Int](name: String) extends Var[w](name)
 
   sealed trait Expr[w <: Int]
   case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
@@ -63,19 +61,19 @@ represent a vector of bits */
   }
 
   case class Input[w <: Int](instName: String, name: String)
-      extends Var[w](instName + "." + name, true)
+      extends Var[w](instName + "." + name)
 
   // case class Input[w <: Int](name: String) extends Var[w](name, true)
 
   case class Output[w <: Int](instName: String, name: String)
-      extends Var[w](instName + "." + name, true)
+      extends Var[w](instName + "." + name)
 
   /** Wire, Reg, and IO */
   enum VarDeclTp { case Input, Output, Reg, Wire }
 
   /** untyped API for Wire, Reg, and IO */
   case class VarDymTyped(width: Int, tp: VarDeclTp, name: String = "")
-      extends Var[Nothing](name, true)
+      extends Var[Nothing](name)
 
   /* sealed trait Expr[w <: Int] {
     def +(oth: Expr[w]) = BinOp(this, oth, "+")
