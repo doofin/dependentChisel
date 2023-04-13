@@ -13,7 +13,7 @@ import dependentChisel.codegen.seqCommands
 
 /** sequential commands to AST */
 object seqCmd2tree {
-  type AST = TreeNode[NewInstStmt | FirStmt | Ctrl]
+  type AST = TreeNode[NewInstStmt | FirStmt | Ctrl | VarDecls]
 
   def cmdListToSingleAssign(cmdList: List[Cmds]): List[Cmds] = {
     cmdList flatMap {
@@ -56,7 +56,7 @@ object seqCmd2tree {
         case End(ctrl, uid) =>
           // end of block, pop out one parent
           parents.pop()
-        case stmt: (FirStmt | NewInstStmt) =>
+        case stmt: (FirStmt | NewInstStmt | VarDecls) =>
           val newNd: AST = TreeNode(stmt)
           Try(parents.top).foreach(p => p.cld += newNd)
       }

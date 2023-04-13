@@ -87,6 +87,8 @@ object compiler {
         })
       case stmt: FirStmt     => indent + stmt2firrtlStr(stmt)
       case stmt: NewInstStmt => newInstStmt2firrtlStr(indent, stmt)
+      case stmt: VarDecls =>
+        indent + varDecl2firrtlStr(stmt)
     }
 
     nodeStr + (tr.cld map (cld =>
@@ -146,6 +148,24 @@ object compiler {
       .mkString("\n")
   }
 
+  def varDecl2firrtlStr(stmt: VarDecls) = {
+    val VarDymTyped(width: Int, tp: VarDeclTp, name: String) = stmt.v
+    tp match {
+      case VarDeclTp.Reg =>
+        /* reg mReg : UInt<16>, clock with :
+      reset => (reset, UInt<16>("h0")) @[regWire.scala 13:21] */
+
+        s"""reg ${name} : UInt<${width}>, clock with : reset => (reset, UInt<${width}>("h0"))"""
+      case VarDeclTp.Wire =>
+        /* wire wire1 : UInt<16> @[regWire.scala 18:19] */
+        s"wire $name : UInt<$width>"
+
+      // io is only put in header section like output io : { flip a : UInt<16>, flip b : UInt<16>, y : UInt<16>}
+      case VarDeclTp.Input  => ""
+      case VarDeclTp.Output => ""
+    }
+  }
+
   /** convert expr to stmt bind: turn a+b into gen_ = a+b */
   def expr2stmtBind(a: Expr[?]) = {
     val newValue = "g_" + global.getUid
@@ -195,7 +215,7 @@ object compiler {
             List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
           case x: Output[?] =>
             List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
-          case VarLit(name) => List(stmt)
+          case _ => List(stmt)
         }
         stmtNew ++ resList
     }
@@ -214,7 +234,7 @@ object compiler {
       |""".stripMargin
    */
 
-  def treeTransform(ast: AST): AST = {
+  /* def treeTransform(ast: AST): AST = {
     ast.value match {
       case x: Ctrl        =>
       case x: FirStmt     =>
@@ -222,29 +242,37 @@ object compiler {
     }
 
     ast
+  } */
+
+  /** var to var Transform (for io): modify names for io
+    */
+  def varNameTransform(thisInstName: String, v: Var[?]): Var[?] = {
+    v match {
+      case x @ VarLit(name)                 => x
+      case x @ VarDymTyped(width, tp, name) => x
+      case x: Input[?] =>
+        x.copy(name = ioNameTransform(thisInstName, x.name))
+
+      case x: Output[?] =>
+        x.copy(name = ioNameTransform(thisInstName, x.name))
+    }
   }
 
-  /** var to var Transform: modify names for io
+  /** modify names for io: check if instantiated instance have same name, if so
+    * refer to it by io.a, otherwise add inst name as prefix
     */
-  def varTransform(thisInstName: String, v: Var[?]): Var[?] = {
-    v match {
-      case x @ VarLit(name) => x
-      case x @ Input(instName, name) =>
-        val pfx =
-          if thisInstName == instName then "io" else s"$instName.io"
-        x.copy(instName = pfx)
-
-      case x @ Output(instName, name) =>
-        val pfx =
-          if thisInstName == instName then "io" else s"$instName.io"
-        x.copy(instName = pfx)
-    }
+  def ioNameTransform(thisInstName: String, ioFullName: String) = {
+    val instName :: name :: Nil = ioFullName.split('.').toList: @unchecked
+    // rm inst name if refer in same mod
+    val pfx = if thisInstName == instName then "io" else s"$instName.io"
+    // dbg(pfx)
+    s"$pfx.$name"
   }
 
   /** expr to expr Transform: */
   def exprTransform(thisInstName: String, e: Expr[?]): Expr[?] = {
     e match {
-      case v: Var[?] => varTransform(thisInstName, v)
+      case v: Var[?] => varNameTransform(thisInstName, v)
       case x: BinOp[w] =>
         BinOp(
           exprTransform(thisInstName, x.a).asInstanceOf[Expr[Nothing]],
@@ -261,7 +289,7 @@ object compiler {
     cmdList map {
       case x @ FirStmt(lhs, op, rhs, prefix) =>
         val newStmt = x.copy(
-          lhs = varTransform(thisInstName, lhs),
+          lhs = varNameTransform(thisInstName, lhs),
           rhs = exprTransform(thisInstName, rhs)
         )
         dbg(newStmt)

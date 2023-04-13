@@ -25,11 +25,6 @@ object seqCommands {
   /** for new mod */
   case class NewInstStmt(instNm: String, modNm: String) extends Cmds
 
-  /* TODO:also allow dym check which rm type sig of var[t] ,etc. cases
-   * of (lhs,rhs) are (dym,stat),(dym,dym)....
-   1.new super type for Var[w]
-   */
-
   /** firrtl statements: weakly typed which doesn't require width of lhs = wid
     * of rhs.
     */
@@ -41,5 +36,11 @@ object seqCommands {
   ) extends Cmds
 
   /** for Wire, Reg, and IO */
-  case class VarDecls(prefix: String, tp: String, width: Int)
+  case class VarDecls(v: VarDymTyped) extends Cmds
+
+  /* TODO:also allow dym check which rm type sig of var[t] ,etc. cases
+   * of (lhs,rhs) are (dym,stat),(dym,dym)....
+   1.new super type for Var[w]
+   */
+
 }

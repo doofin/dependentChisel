@@ -28,10 +28,10 @@ object adder extends mainRunnable {
     val fMod = chiselMod2firrtlCircuits(mod)
     // pp(fMod.modules map (_.modInfo))
     val firCirc = firrtlCircuits2str(fMod)
-    // println(firCirc)
+    println(firCirc)
 
     val verilog = firrtlUtils.firrtl2verilog(firCirc)
-    println(verilog)
+    // println(verilog)
   }
 
   class Adder1(using parent: GlobalInfo) extends UserModule {
@@ -95,7 +95,7 @@ object adder extends mainRunnable {
   class UAdder1(using parent: GlobalInfo) extends UserModule {
 // parent contains global info
 
-    val a = VarDymTyped(1, VarDeclTp.Input)
+    val a = VarDymTyped(1, VarDeclTp.Input, "a")
     // val b = newInput[2]("b")
     // val y = newOutput[2]("y")
 //

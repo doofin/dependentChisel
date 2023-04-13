@@ -22,40 +22,56 @@ object varDecls {
     inline def newInput[w <: Int](
         givenName: String = ""
     ) = {
-      val m = modLocalInfo
-      val genName =
-        s"${if givenName.isEmpty() then "io_i" else givenName}${naming.getIdWithDash}"
-      val instNm = ut.thisInstanceName
-      val r = Input[w](instNm, genName) // instName + "." + name
-      m.io.prepend(IOdef(r.instName, r.name, "input", constValueOpt[w]))
-      dbg(r)
-      // m.commands
+      val genName = naming.genNameIfEmpty(givenName, "io_i")
+      val instName = ut.thisInstanceName
+
+      val r = Input[w](instName + "." + genName) // instName + "." + name
+      modLocalInfo.io.prepend(
+        IOdef(genName, "input", constValueOpt[w])
+      )
       r
     }
 
     inline def newOutput[w <: Int](
         givenName: String = ""
     ) = {
-      val m = modLocalInfo
-
       val genName =
-        s"${if givenName.isEmpty() then "io_o" else givenName}${naming.getIdWithDash}"
-      val instNm = ut.thisInstanceName
-      val r = Output[w](instNm, genName)
-      m.io.prepend(IOdef(r.instName, r.name, "output", constValueOpt[w]))
+        naming.genNameIfEmpty(givenName, "io_o")
+
+      val instName = ut.thisInstanceName
+
+      val r = Output[w](
+        instName + "." + genName
+      ) // instName + "." + name
+      modLocalInfo.io.prepend(
+        IOdef(genName, "output", constValueOpt[w])
+      )
       r
     }
 
-    inline def newReg[w <: Int](
-        givenName: String = ""
-    ) = {
+    def newInputDym(width: Int, givenName: String = "") = {
+      val m = modLocalInfo
+      val genName =
+        s"${if givenName.isEmpty() then "io_i" else givenName}${naming.getIdWithDash}"
+
+      val instName = ut.thisInstanceName
+      val r = VarDymTyped(
+        width,
+        VarDeclTp.Input,
+        instName + "." + genName
+      ) // when refered in expr , use this name
+      m.io.prepend(
+        IOdef(r.name, "input", Some(width))
+      ) // when put in io bundle,use short name
+      r
+    }
+
+    def newRegDym(width: Int, givenName: String = "") = {
       val m = modLocalInfo
       // m.commands
       val genName =
-        s"${if givenName.isEmpty() then "io_o" else givenName}${naming.getIdWithDash}"
-      val instNm = ut.thisInstanceName
-      val r = Output[w](instNm, genName)
-      m.io.prepend(IOdef(r.instName, r.name, "output", constValueOpt[w]))
+        s"${if givenName.isEmpty() then "reg" else givenName}${naming.getIdWithDash}"
+      val r = VarDymTyped(width, VarDeclTp.Reg, genName)
       r
     }
   }

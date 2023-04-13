@@ -8,7 +8,6 @@ object firrtlTypes {
 
   /** io part of one firrtl module */
   case class IOdef(
-      modName: String,
       name: String,
       tpe: String,
       width: Option[Int]

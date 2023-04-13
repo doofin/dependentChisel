@@ -39,6 +39,8 @@ object chiselModules {
       extends UserModuleOps,
         UserModuleDecls {
     val thisClassName = this.getClass.getCanonicalName.split('.').last.mkString
+
+    /** Name for this Instance after new class.. */
     val thisInstanceName = naming.mkUidFrom(thisClassName)
     println(s"new inst $thisInstanceName for $thisClassName")
 
