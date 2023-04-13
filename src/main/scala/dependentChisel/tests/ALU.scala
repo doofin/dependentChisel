@@ -6,12 +6,13 @@ import dependentChisel.*
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
-import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
 
 import dependentChisel.typesAndSyntax.chiselModules.*
 
+import dependentChisel.typesAndSyntax.control
 object ALU extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {}

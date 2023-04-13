@@ -1,6 +1,6 @@
 package dependentChisel.codegen
 
-import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
 import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
@@ -21,6 +21,8 @@ object seqCommands {
   sealed trait Cmds
   case class Start[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
   case class End[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
+
+  /** for new mod */
   case class NewInstStmt(instNm: String, modNm: String) extends Cmds
 
   /* TODO:also allow dym check which rm type sig of var[t] ,etc. cases
@@ -38,4 +40,6 @@ object seqCommands {
       prefix: String = "" // prefix can be node
   ) extends Cmds
 
+  /** for Wire, Reg, and IO */
+  case class VarDecls(prefix: String, tp: String, width: Int)
 }

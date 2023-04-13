@@ -2,7 +2,7 @@ package dependentChisel.codegen
 
 import com.doofin.stdScalaCross.*
 
-import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
 

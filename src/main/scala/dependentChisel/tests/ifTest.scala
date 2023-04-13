@@ -7,7 +7,7 @@ import com.doofin.stdScalaCross.*
 import com.doofin.stdScalaCross
 import com.doofin.stdScala.mainRunnable
 
-import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
 
@@ -19,6 +19,7 @@ import algo.seqCmd2tree.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.codegen.firrtlTypes.FirrtlCircuit
 
+import dependentChisel.typesAndSyntax.control
 object ifTest extends mainRunnable {
   // var globalDepInfo
 // stdScalaCross.

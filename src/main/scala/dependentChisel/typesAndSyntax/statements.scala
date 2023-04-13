@@ -10,12 +10,13 @@ import dependentChisel.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.macros.getVarName
 import depTypes.*
-import basicTypes.*
+import typesAndOps.*
 
 import dependentChisel.codegen.seqCommands.*
 import codegen.firrtlTypes.*
 import dependentChisel.syntax.naming
 
+/** assignments */
 object statements {
 
   // InputB(BitsType.Bits()) + InputB(BitsType.UInt()) // fail,ok

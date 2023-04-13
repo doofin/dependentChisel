@@ -2,7 +2,7 @@ package dependentChisel.typesAndSyntax
 
 import scala.collection.mutable.ArrayBuffer
 
-import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
 
@@ -13,6 +13,9 @@ import dependentChisel.codegen.seqCommands
 import scala.reflect.ClassTag
 import dependentChisel.global.getUid
 import dependentChisel.syntax.naming
+
+import dependentChisel.typesAndSyntax.control
+import dependentChisel.typesAndSyntax.varDecls.UserModuleDecls
 
 /** imperative style for chisel ,record info in mutable vars inside class
   * chiselModules
@@ -32,7 +35,9 @@ object chiselModules {
   // trait Module {}
 
   /* function style UserModule ,for example: when {} else {} */
-  trait UserModule(using parent: GlobalInfo) extends UserModuleOps {
+  trait UserModule(using parent: GlobalInfo)
+      extends UserModuleOps,
+        UserModuleDecls {
     val thisClassName = this.getClass.getCanonicalName.split('.').last.mkString
     val thisInstanceName = naming.mkUidFrom(thisClassName)
     println(s"new inst $thisInstanceName for $thisClassName")

@@ -7,10 +7,11 @@ import dependentChisel.*
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
-import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
 
+import dependentChisel.typesAndSyntax.control
 object moduleCall extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
@@ -48,16 +49,4 @@ object moduleCall extends mainRunnable {
     m1.y := a + b
   }
 
-  class UserMod3(using parent: GlobalInfo)(val a: Input[2]) extends UserModule {
-    // val a = newInput[2]("a")
-    val b = newInput[2]("b")
-    val y = newOutput[2]("y")
-
-    val m1 = new UserMod1 // gen some uuid?
-    val m2 = new UserMod1
-
-    val port = if (1 to 2).sum == 4 then m1.y else m2.y
-    port := a + b // will only show as port,
-    m1.y := a + b
-  }
 }

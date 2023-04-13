@@ -7,40 +7,42 @@ import com.doofin.stdScalaJvm.*
 
 import dependentChisel.*
 import dependentChisel.macros.getVarName
-import scala.quoted.ExprMap
 // import dependentChisel.typesAndSyntax.chiselModules.*
 
 /*
 https://github.com/MaximeKjaer/tf-dotty/blob/master/modules/compiletime/src/main/scala/io/kjaer/compiletime/Shape.scala
 https://github.com/MaximeKjaer/tf-dotty/blob/master/modules/compiletime/src/main/scala/io/kjaer/compiletime/Shape.scala
  */
-object basicTypes {
+object typesAndOps {
 
   /* Chisel provides three data types to describe connections, combinational logic, and
 registers: Bits, UInt, and SInt. UInt and SInt extend Bits, and all three types
 represent a vector of bits */
 
-  /** might not need,only uint appear in serial port */
-  enum BitsType[bitsTp <: Int, width <: Int](v: Int) {
-    case UInt[width <: Int](v: Int) extends BitsType[0, width](v)
-    case SInt[width <: Int](v: Int) extends BitsType[1, width](v)
-    case Bits[width <: Int](v: Int) extends BitsType[2, width](v)
-    // inline def valu = constValueOpt[width]
+  // may only need UINT for serial port example(although it needs Bool type )
+  enum bt2 { case u, s, b }
+
+  trait ctype[width <: Int, b <: bt2]
+  case class u1[width <: Int]() extends ctype[width, bt2.u.type]
+  case class s1[width <: Int]() extends ctype[width, bt2.s.type]
+
+  trait ExprB[idx <: bt2, width <: Int, b <: ctype[width, idx]] {
+    // def +(oth: ExprB[idx, width, b]) = { "ok!!" }
   }
 
-// TODO :clean up
-  def add[idx <: Int, width <: Int, b <: BitsType[idx, width]](
+  def add2[idx <: bt2, width <: Int, b <: ctype[width, idx]](
       x: b,
       y: b
   ) = {}
-  add(BitsType.UInt[2](1), BitsType.UInt[2](2))
+
+  add2(u1[1](), u1[1]())
 
   /* mutable vars which can be mutated in lhs, incl input,output */
   sealed trait Var[w <: Int](name: String, isIO: Boolean)
       extends Expr[w],
         BoolEx[w] {
     def getname = name
-    def getIsIO = isIO
+    // def getIsIO = isIO
   }
 
   case class VarLit[w <: Int](name: String) extends Var[w](name, false)
@@ -52,8 +54,8 @@ represent a vector of bits */
 
   extension [w <: Int](x: Expr[w]) {
     def +(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "+")
-    def *(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "*")
     def -(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "-")
+    def *(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "*")
     def |(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "|")
     def &(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "&")
     // def ===(oth: Expr[w]) = Bool(x, oth)
@@ -63,11 +65,17 @@ represent a vector of bits */
   case class Input[w <: Int](instName: String, name: String)
       extends Var[w](instName + "." + name, true)
 
+  // case class Input[w <: Int](name: String) extends Var[w](name, true)
+
   case class Output[w <: Int](instName: String, name: String)
       extends Var[w](instName + "." + name, true)
 
-  /** untyped API */
-  case class IO(width: Int, name: String = "") extends Var[Nothing](name, true)
+  /** Wire, Reg, and IO */
+  enum VarDeclTp { case Input, Output, Reg, Wire }
+
+  /** untyped API for Wire, Reg, and IO */
+  case class VarDymTyped(width: Int, tp: VarDeclTp, name: String = "")
+      extends Var[Nothing](name, true)
 
   /* sealed trait Expr[w <: Int] {
     def +(oth: Expr[w]) = BinOp(this, oth, "+")
@@ -79,9 +87,6 @@ represent a vector of bits */
   } */
 
   // for future use
-  trait ExprB[idx <: Int, width <: Int, b <: BitsType[idx, width]] {
-    def +(oth: ExprB[idx, width, b]) = { "ok!!" }
-  }
 
   case class Lit[w <: Int](i: w) extends Expr[w] {}
   /*

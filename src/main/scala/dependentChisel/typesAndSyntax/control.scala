@@ -2,7 +2,7 @@ package dependentChisel.typesAndSyntax
 
 import com.doofin.stdScalaCross.*
 
-import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 
 import dependentChisel.codegen.seqCommands.*
@@ -35,31 +35,6 @@ object control {
       newMod
     }
 
-    inline def newInput[w <: Int](
-        givenName: String = ""
-    ) = {
-      val m = modLocalInfo
-      val genName =
-        s"${if givenName.isEmpty() then "i" else givenName}${naming.getIdWithDash}"
-      val instNm = ut.thisInstanceName
-      val r = Input[w](instNm, genName)
-      m.io.prepend(IOdef(r.instName, r.name, "input", constValueOpt[w]))
-      dbg(r)
-      r
-    }
-
-    inline def newOutput[w <: Int](
-        givenName: String = ""
-    ) = {
-      val m = modLocalInfo
-
-      val genName =
-        s"${if givenName.isEmpty() then "i" else givenName}${naming.getIdWithDash}"
-      val instNm = ut.thisInstanceName
-      val r = Output[w](instNm, genName)
-      m.io.prepend(IOdef(r.instName, r.name, "output", constValueOpt[w]))
-      r
-    }
   }
 
   /* def switch[condW <: Int](using

@@ -5,7 +5,7 @@ import dependentChisel.*
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
-import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
 
@@ -17,6 +17,7 @@ import algo.seqCmd2tree.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.codegen.firrtlTypes.FirrtlCircuit
 
+import dependentChisel.typesAndSyntax.control
 object adder extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
@@ -25,12 +26,12 @@ object adder extends mainRunnable {
     // new DoubleAdder3(2)
     }
     val fMod = chiselMod2firrtlCircuits(mod)
-    pp(fMod.modules map (_.modInfo))
+    // pp(fMod.modules map (_.modInfo))
     val firCirc = firrtlCircuits2str(fMod)
-    println(firCirc)
+    // println(firCirc)
 
     val verilog = firrtlUtils.firrtl2verilog(firCirc)
-    // println(verilog)
+    println(verilog)
   }
 
   class Adder1(using parent: GlobalInfo) extends UserModule {
@@ -94,7 +95,7 @@ object adder extends mainRunnable {
   class UAdder1(using parent: GlobalInfo) extends UserModule {
 // parent contains global info
 
-    val a = IO(1)
+    val a = VarDymTyped(1, VarDeclTp.Input)
     // val b = newInput[2]("b")
     // val y = newOutput[2]("y")
 //

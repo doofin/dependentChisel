@@ -7,7 +7,7 @@ import com.doofin.stdScalaCross.*
 import dependentChisel.codegen.seqCommands.*
 
 import dependentChisel.codegen.compiler.*
-import dependentChisel.typesAndSyntax.basicTypes.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
 
 import dependentChisel.codegen.seqCommands
 
