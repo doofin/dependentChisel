@@ -5,8 +5,8 @@ import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
 
-/** sequential commands as in chisel UserModule */
-object seqCmdTypes {
+/** sequential commands used in chisel UserModule to build circuit */
+object seqCommands {
   type Uid = Int
 
   /** control structures like if */
@@ -17,14 +17,16 @@ object seqCmdTypes {
     case Top()
   }
 
-  /** sequential commands type as in chisel UserModule */
+  /** all sorts of sequential commands */
   sealed trait Cmds
   case class Start[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
   case class End[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
   case class NewInstStmt(instNm: String, modNm: String) extends Cmds
 
-  // TODO:also allow dym check which rm type sig of var[t] ,etc. cases
-  // * of (lhs,rhs) are (dym,stat),(dym,dym)....
+  /* TODO:also allow dym check which rm type sig of var[t] ,etc. cases
+   * of (lhs,rhs) are (dym,stat),(dym,dym)....
+   1.new super type for Var[w]
+   */
 
   /** firrtl statements: weakly typed which doesn't require width of lhs = wid
     * of rhs.

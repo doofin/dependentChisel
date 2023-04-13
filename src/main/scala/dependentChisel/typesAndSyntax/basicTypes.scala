@@ -27,13 +27,15 @@ represent a vector of bits */
     case Bits[width <: Int](v: Int) extends BitsType[2, width](v)
     // inline def valu = constValueOpt[width]
   }
+
+// TODO :clean up
   def add[idx <: Int, width <: Int, b <: BitsType[idx, width]](
       x: b,
       y: b
   ) = {}
   add(BitsType.UInt[2](1), BitsType.UInt[2](2))
 
-  /* mutable vars in lhs */
+  /* mutable vars which can be mutated in lhs, incl input,output */
   sealed trait Var[w <: Int](name: String, isIO: Boolean)
       extends Expr[w],
         BoolEx[w] {
@@ -42,7 +44,6 @@ represent a vector of bits */
   }
 
   case class VarLit[w <: Int](name: String) extends Var[w](name, false)
-
 
   sealed trait Expr[w <: Int]
   case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
@@ -64,6 +65,10 @@ represent a vector of bits */
 
   case class Output[w <: Int](instName: String, name: String)
       extends Var[w](instName + "." + name, true)
+
+  /** untyped API */
+  case class IO(width: Int, name: String = "") extends Var[Nothing](name, true)
+
   /* sealed trait Expr[w <: Int] {
     def +(oth: Expr[w]) = BinOp(this, oth, "+")
     def *(oth: Expr[w]) = BinOp(this, oth, "*")
@@ -73,7 +78,7 @@ represent a vector of bits */
     def ===(oth: Expr[w]) = Bool(this, oth)
   } */
 
-  // future
+  // for future use
   trait ExprB[idx <: Int, width <: Int, b <: BitsType[idx, width]] {
     def +(oth: ExprB[idx, width, b]) = { "ok!!" }
   }

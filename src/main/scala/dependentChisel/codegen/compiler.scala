@@ -6,14 +6,18 @@ import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
 
-import seqCmdTypes.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.algo.seqCmd2tree.*
 
+import seqCommands.*
 import firrtlTypes.*
 
-import dependentChisel.codegen.seqCmdTypes
 object compiler {
+
+  /** convert chiselMod to str */
+  def chiselMod2str(chiselMod: UserModule) = {
+    firrtlCircuits2str(chiselMod2firrtlCircuits(chiselMod))
+  }
 
   /** chisel ModLocalInfo to FirrtlModule(IO bundle,AST for the circuit) */
   def chiselMod2firrtlCircuits(chiselMod: UserModule) = {
@@ -24,7 +28,7 @@ object compiler {
     FirrtlCircuit(mainModuleName, glob.modules.toList map chiselMod2firrtlMod)
   }
 
-  def chiselMod2firrtlMod(chiselMod: UserModule): FirrtlModule = {
+  private def chiselMod2firrtlMod(chiselMod: UserModule): FirrtlModule = {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     val anf = cmdListToSingleAssign(modInfo.commands.toList)
     val ioNameChanged = cmdsTransform(modInfo.instName, anf)
@@ -32,13 +36,17 @@ object compiler {
     FirrtlModule(modInfo, modInfo.io.toList, tree)
   }
 
-  /** firrtl Circuit AST to serialized str format */
+  /** whole firrtl Circuit AST to serialized str format */
   def firrtlCircuits2str(fCircuits: FirrtlCircuit): String = {
     val modStr = fCircuits.modules map (m => firrtlModule2str(m, " "))
     s"circuit ${fCircuits.mainModuleName} : \n" + modStr.mkString("\n")
   }
 
-  def firrtlModule2str(fMod: FirrtlModule, indent: String = ""): String = {
+  /** for only one firrtl module */
+  private def firrtlModule2str(
+      fMod: FirrtlModule,
+      indent: String = ""
+  ): String = {
     val circuitStr = tree2firrtlStr(fMod.ast, indent)
     val instName: String = fMod.modInfo.instName // name changes for io
     val ioInfoStr = fMod.io.reverse // looks better

@@ -7,8 +7,8 @@ import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
 
 import dependentChisel.codegen.firrtlTypes.*
-import dependentChisel.codegen.seqCmdTypes.*
-import dependentChisel.codegen.seqCmdTypes
+import dependentChisel.codegen.seqCommands.*
+import dependentChisel.codegen.seqCommands
 
 import scala.reflect.ClassTag
 import dependentChisel.global.getUid
@@ -48,9 +48,9 @@ object chiselModules {
 
     def pushBlk(ctr: Ctrl)(block: => Any) = {
       val uid = naming.getIntId
-      pushCmd(seqCmdTypes.Start(ctr, uid))
+      pushCmd(seqCommands.Start(ctr, uid))
       block
-      pushCmd(seqCmdTypes.End(ctr, uid))
+      pushCmd(seqCommands.End(ctr, uid))
     }
 
     add2parent(parent, this)

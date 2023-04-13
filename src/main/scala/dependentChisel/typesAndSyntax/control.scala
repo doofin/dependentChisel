@@ -5,7 +5,7 @@ import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.basicTypes.*
 import dependentChisel.typesAndSyntax.statements.*
 
-import dependentChisel.codegen.seqCmdTypes.*
+import dependentChisel.codegen.seqCommands.*
 
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.syntax.naming

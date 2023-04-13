@@ -4,12 +4,12 @@ import scala.util.*
 import Tree.*
 import com.doofin.stdScalaCross.*
 
-import dependentChisel.codegen.seqCmdTypes.*
+import dependentChisel.codegen.seqCommands.*
 
 import dependentChisel.codegen.compiler.*
 import dependentChisel.typesAndSyntax.basicTypes.*
 
-import dependentChisel.codegen.seqCmdTypes
+import dependentChisel.codegen.seqCommands
 
 /** sequential commands to AST */
 object seqCmd2tree {

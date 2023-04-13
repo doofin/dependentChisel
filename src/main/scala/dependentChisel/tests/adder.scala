@@ -42,6 +42,7 @@ object adder extends mainRunnable {
 
     y := a - b
   }
+
   class DoubleAdder2[I <: Int](using parent: GlobalInfo) extends UserModule {
 // parent contains global info
 
@@ -89,6 +90,16 @@ object adder extends mainRunnable {
     y := m1.y
   }
 
+  /** untyped */
+  class UAdder1(using parent: GlobalInfo) extends UserModule {
+// parent contains global info
+
+    val a = IO(1)
+    // val b = newInput[2]("b")
+    // val y = newOutput[2]("y")
+//
+    a := a - a
+  }
 }
 
 /*
