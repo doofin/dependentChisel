@@ -19,13 +19,9 @@ object firrtlTypes {
   /** the whole circuit with multiple modules */
   case class FirrtlCircuit(mainModuleName: String, modules: List[FirrtlModule])
 
-  /** binary firrtl Operators */
-  enum firrtlOp {
-    case sub, add
-  }
-
+  /** binary firrtl Operators: operator name to firrtl op name */
   val firrtlOpMap =
-    "+ add - sub * mul == eq := ="
+    "+ add - sub * mul == eq := = | or"
       .split(" ")
       .grouped(2)
       .map(x => (x(0), x(1)))

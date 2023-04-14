@@ -30,8 +30,9 @@ object compiler {
 
   private def chiselMod2firrtlMod(chiselMod: UserModule): FirrtlModule = {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
-    val anf = cmdListToSingleAssign(modInfo.commands.toList)
-    val ioNameChanged = cmdsTransform(modInfo.instName, anf)
+    // pp(modInfo.commands.toList)
+    val cmds_ANF: List[Cmds] = cmdListToSingleAssign(modInfo.commands.toList)
+    val ioNameChanged: List[Cmds] = cmdsTransform(modInfo.instName, cmds_ANF)
     val tree: AST = list2tree(ioNameChanged)
     FirrtlModule(modInfo, modInfo.io.toList, tree)
   }
@@ -74,6 +75,29 @@ object compiler {
   def splitName(fullName: String) = {
     val instName :: name :: Nil = fullName.split('.').toList: @unchecked
     (instName, name)
+  }
+
+  /** can insert more commands */
+  def cmdListToSingleAssign(cmdList: List[Cmds]): List[Cmds] = {
+    cmdList flatMap {
+      case x: FirStmt =>
+        val fir = stmtToSingleAssign(x)
+        // dbg(fir)
+        fir
+      case orig @ Start(ctrl, uid) =>
+        ctrl match {
+          case ctrlIf @ Ctrl.If(bool: BoolExpr[Int]) =>
+            val anf_stmts: List[FirStmt] =
+              stmtToSingleAssign(expr2stmtBind(bool.expr))
+            val anf_res = anf_stmts :+ orig.copy(ctrl =
+              ctrlIf.copy(cond = BoolExpr(anf_stmts.last.lhs))
+            )
+            // dbg(anf_res)
+            anf_res
+          case _ => List()
+        }
+      case x => List(x)
+    }
   }
 
   /** print AST to indent firrtl */
@@ -123,8 +147,7 @@ object compiler {
         s"$opName(${expr2firrtlStr(a)},${expr2firrtlStr(b)})" // here it's SSA form
 
       case x: Var[?] =>
-        // fullName2IOName(x.getname, withIOprefix = x.getIsIO)
-        // ioTransformOrSkip(x).getname
+        // dbg(x)
         x.getname
       case Lit(i)         => i.toString()
       case BoolExpr(expr) => expr2firrtlStr(expr)
@@ -240,16 +263,11 @@ object compiler {
     */
   def varNameTransform(thisInstName: String, v: Var[?]): Var[?] = {
     v match {
-      case x @ VarLit(name)                 => x
+      case x @ VarLit(name) => x
       case x @ VarDymTyped(width, tp, name) =>
-        // dbg("VarDymTyped")
         tp match {
-          case VarDeclTp.Input =>
+          case VarDeclTp.Input | VarDeclTp.Output =>
             x.copy(name = ioNameTransform(thisInstName, name))
-          case VarDeclTp.Output =>
-            x.copy(name = ioNameTransform(thisInstName, name))
-          // case VarDeclTp.Reg  =>
-          // case VarDeclTp.Wire =>
           case _ => x
         }
       case x: Input[?] =>
@@ -271,7 +289,7 @@ object compiler {
     s"$pfx.$name"
   }
 
-  /** expr to expr Transform: */
+  /** recursively apply expr to expr Transform like varNameTransform */
   def exprTransform(thisInstName: String, e: Expr[?]): Expr[?] = {
     e match {
       case v: Var[?] => varNameTransform(thisInstName, v)
@@ -281,6 +299,9 @@ object compiler {
           exprTransform(thisInstName, x.b).asInstanceOf[Expr[Nothing]],
           x.nm
         )
+      // case _: BoolEx[?] =>
+      case BoolExpr(expr) =>
+        exprTransform(thisInstName, expr).asInstanceOf[Expr[Nothing]]
       case x => x
     }
   }

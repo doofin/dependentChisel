@@ -1,44 +1,15 @@
 package dependentChisel.algo
 
 import scala.util.*
+
 import Tree.*
 import com.doofin.stdScalaCross.*
 
 import dependentChisel.codegen.seqCommands.*
 
-import dependentChisel.codegen.compiler.*
-import dependentChisel.typesAndSyntax.typesAndOps.*
-
-import dependentChisel.codegen.seqCommands
-
-/** sequential commands to AST */
+/** algorithm to convert sequential commands to AST */
 object seqCmd2tree {
   type AST = TreeNode[NewInstStmt | FirStmt | Ctrl | VarDecls]
-
-  def cmdListToSingleAssign(cmdList: List[Cmds]): List[Cmds] = {
-    cmdList flatMap {
-      case x: FirStmt =>
-        val fir = stmtToSingleAssign(x)
-        // dbg(fir)
-        fir
-      case orig @ Start(ctrl, uid) =>
-        val r: List[Cmds] = ctrl match {
-          case ctrlIf @ Ctrl.If(b: BoolExpr[Int]) =>
-            val anf_stmts = stmtToSingleAssign(expr2stmtBind(b))
-            // dbg(anf)
-            anf_stmts :+ orig.copy(ctrl =
-              ctrlIf.copy(cond = anf_stmts.last.lhs)
-            )
-          // case Ctrl.Else()           =>
-          // case Ctrl.Top()            =>
-          case _ => List()
-        }
-
-        // List(x)
-        r
-      case x => List(x)
-    }
-  }
 
   def list2tree(cmdList: List[Cmds]): AST = {
     import scala.collection.mutable.Stack

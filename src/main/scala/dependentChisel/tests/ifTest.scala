@@ -46,10 +46,11 @@ object ifTest extends mainRunnable {
     val c = newInput[16]("c")
     val y = newOutput[16]("y")
 
-    dbg(y)
     y := a - b
     // val aa: n + 2 = n + 2
-    If(a === b) {
+    val cond1 = a === b
+    val cond2 = (a === b) | (a === b)
+    If(cond2) { // (a === b) | (a === b)
       y := a + b
       If(a === c) {
         y := a * b

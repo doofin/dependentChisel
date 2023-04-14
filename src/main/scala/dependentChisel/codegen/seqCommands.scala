@@ -11,7 +11,7 @@ object seqCommands {
 
   /** control structures like if */
   enum Ctrl {
-    case If(cond: BoolEx[?])
+    case If(cond: BoolExpr[?])
     // case IfElse[w <: Int](b: Bool[w])
     case Else[w <: Int]()
     case Top()
