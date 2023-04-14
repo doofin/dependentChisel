@@ -41,7 +41,7 @@ object statements {
 
   /** untyped API for assign */
   extension (v: Var[Nothing]) {
-    inline def :=(using mli: ModLocalInfo)(oth: Expr[Nothing]) = {
+    inline def :=(using mli: ModLocalInfo)(oth: Expr[?]) = {
       val name = v.getname
 
       mli.commands += FirStmt(v, ":=", oth)

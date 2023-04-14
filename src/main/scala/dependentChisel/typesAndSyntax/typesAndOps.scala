@@ -37,7 +37,10 @@ represent a vector of bits */
 
   /** untyped API for Wire, Reg, and IO */
   case class VarDymTyped(width: Int, tp: VarDeclTp, name: String)
-      extends Var[Nothing](name)
+      extends Var[Nothing](name) {
+
+    def asTyped[w <: Int] = this.asInstanceOf[Var[w]]
+  }
 
   case class Input[w <: Int](name: String) extends Var[w](name)
 
@@ -45,7 +48,6 @@ represent a vector of bits */
 
   case class Output[w <: Int](name: String) extends Var[w](name)
 
-  
   // for future use
 
   case class Lit[w <: Int](i: w) extends Expr[w] {}

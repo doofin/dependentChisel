@@ -84,16 +84,6 @@ object adder extends mainRunnable {
     y := m1.y
   }
 
-  /** untyped */
-  class UAdder1(using parent: GlobalInfo) extends UserModule {
-// parent contains global info
-
-    val a = VarDymTyped(1, VarDeclTp.Input, "a")
-    // val b = newInput[2]("b")
-    // val y = newOutput[2]("y")
-//
-    a := a - a
-  }
 }
 
 /*

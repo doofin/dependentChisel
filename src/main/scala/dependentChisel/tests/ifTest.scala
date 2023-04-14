@@ -29,7 +29,7 @@ object ifTest extends mainRunnable {
     // (1, 2, 3).mapConst((x: Int) => x * 2)
     val (mod, globalCircuit) = makeModule { implicit p =>
 //   new IfElse1
-      new IfModNested // ok
+      new IfModDangling // ok
     }
 
     val fMod = chiselMod2firrtlCircuits(mod)
@@ -88,6 +88,16 @@ maybe static analysis
     }
   }
 
+// ok,will give err in firrtl compiler : Reference io is not fully initialized.
+  class IfModDangling(using parent: GlobalInfo) extends UserModule {
+    val a = newInput[16]("a")
+    val b = newInput[16]("b")
+    val y = newOutput[16]("y")
+
+    If(a === b) {
+      y := a + b
+    }
+  }
 }
 
 /*
