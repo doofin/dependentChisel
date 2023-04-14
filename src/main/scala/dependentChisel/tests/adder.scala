@@ -7,17 +7,10 @@ import com.doofin.stdScala.mainRunnable
 
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
-import dependentChisel.typesAndSyntax.control.*
 
 import dependentChisel.codegen.compiler.*
-import tests.ifTest.*
-
-import algo.seqCmd2tree.*
-
 import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.codegen.firrtlTypes.FirrtlCircuit
 
-import dependentChisel.typesAndSyntax.control
 object adder extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {

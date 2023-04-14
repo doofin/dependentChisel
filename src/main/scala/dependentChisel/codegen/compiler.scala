@@ -186,12 +186,6 @@ object compiler {
   ): List[FirStmt] = {
     val FirStmt(lhs, op, rhs, _) = stmt
 
-    /* if lhs is io,change := to <= and make new conn
-    io.y:=a+b becomes y0=a+b;io.y<=y0
-     */
-
-    // dbg(x)
-
     rhs match {
       // fresh stmt for the first 2 case
       case bop @ BinOp(a: BinOp[?], b, nm) => // bin expr like a+b+c
@@ -208,13 +202,21 @@ object compiler {
           ) ++ resList
         )
       case x: Expr[?] => // bin expr like a+b or others
-        // println(x)
         val genStmt = expr2stmtBind(rhs)
         val stmtNew = lhs match {
-          case x: Input[?] =>
+          /* if lhs is IO,change := to <= and make new conn
+        io.y:=a+b becomes y0=a+b;io.y<=y0
+           */
+
+          case x: (Input[?] | Output[?]) =>
             List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
-          case x: Output[?] =>
-            List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
+          case VarDymTyped(width, tp, name) =>
+            tp match {
+              case VarDeclTp.Input | VarDeclTp.Output =>
+                List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
+              case _ => List(stmt)
+            }
+
           case _ => List(stmt)
         }
         stmtNew ++ resList
@@ -234,22 +236,22 @@ object compiler {
       |""".stripMargin
    */
 
-  /* def treeTransform(ast: AST): AST = {
-    ast.value match {
-      case x: Ctrl        =>
-      case x: FirStmt     =>
-      case x: NewInstStmt =>
-    }
-
-    ast
-  } */
-
   /** var to var Transform (for io): modify names for io
     */
   def varNameTransform(thisInstName: String, v: Var[?]): Var[?] = {
     v match {
       case x @ VarLit(name)                 => x
-      case x @ VarDymTyped(width, tp, name) => x
+      case x @ VarDymTyped(width, tp, name) =>
+        // dbg("VarDymTyped")
+        tp match {
+          case VarDeclTp.Input =>
+            x.copy(name = ioNameTransform(thisInstName, name))
+          case VarDeclTp.Output =>
+            x.copy(name = ioNameTransform(thisInstName, name))
+          // case VarDeclTp.Reg  =>
+          // case VarDeclTp.Wire =>
+          case _ => x
+        }
       case x: Input[?] =>
         x.copy(name = ioNameTransform(thisInstName, x.name))
 
@@ -292,7 +294,7 @@ object compiler {
           lhs = varNameTransform(thisInstName, lhs),
           rhs = exprTransform(thisInstName, rhs)
         )
-        dbg(newStmt)
+        // dbg(newStmt)
         newStmt
       case x => x
     }

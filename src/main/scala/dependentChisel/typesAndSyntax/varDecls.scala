@@ -50,22 +50,12 @@ object varDecls {
     }
 
     def newInputDym(width: Int, givenName: String = "") = {
-      val m = modLocalInfo
-      val genName =
-        s"${if givenName.isEmpty() then "io_i" else givenName}${naming.getIdWithDash}"
-
-      val instName = ut.thisInstanceName
-      val r = VarDymTyped(
-        width,
-        VarDeclTp.Input,
-        instName + "." + genName
-      ) // when refered in expr , use this name
-      m.io.prepend(
-        IOdef(r.name, "input", Some(width))
-      ) // when put in io bundle,use short name
-      r
+      appendIO_untyped(width, VarDeclTp.Input, givenName)
     }
 
+    def newOutputDym(width: Int, givenName: String = "") = {
+      appendIO_untyped(width, VarDeclTp.Output, givenName)
+    }
     def newRegDym(width: Int, givenName: String = "") = {
       val m = modLocalInfo
       // m.commands
@@ -74,6 +64,54 @@ object varDecls {
       val r = VarDymTyped(width, VarDeclTp.Reg, genName)
       r
     }
+
+    private def appendIO_untyped(
+        width: Int,
+        tp: VarDeclTp.Input.type | VarDeclTp.Output.type,
+        givenName: String = ""
+    ) = {
+      val instName = ut.thisInstanceName
+      val (genName, iotext) = tp match {
+        case VarDeclTp.Input =>
+          (naming.genNameIfEmpty(givenName, "io_i"), "input")
+        case VarDeclTp.Output =>
+          (naming.genNameIfEmpty(givenName, "io_o"), "output")
+      }
+      val r = VarDymTyped(
+        width,
+        tp,
+        instName + "." + genName
+      ) // when refered in expr , use this name
+
+      modLocalInfo.io.prepend(
+        IOdef(genName, iotext, Some(width))
+      ) // when put in io bundle,use short name
+      r
+    }
+
+    inline private def appendIO[w <: Int](
+        givenName: String,
+        tp: VarDeclTp.Input.type | VarDeclTp.Output.type
+    ) = {
+
+      val instName = ut.thisInstanceName
+
+      val (genName, iotext) = tp match {
+        case VarDeclTp.Input =>
+          (naming.genNameIfEmpty(givenName, "io_i"), "input")
+        case VarDeclTp.Output =>
+          (naming.genNameIfEmpty(givenName, "io_o"), "output")
+      }
+
+      val r = Input[w](instName + "." + genName) // instName + "." + name
+
+      modLocalInfo.io.prepend(
+        IOdef(genName, iotext, constValueOpt[w])
+      )
+      r
+
+    }
+
   }
 
   /* def switch[condW <: Int](using
