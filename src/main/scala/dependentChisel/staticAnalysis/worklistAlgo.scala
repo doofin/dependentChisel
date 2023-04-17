@@ -3,6 +3,8 @@ import com.doofin.stdScalaJvm.*
 
 import scala.collection.{immutable, mutable}
 
+import MonotoneFramework.*
+
 object worklistAlgo {
   trait Worklist[t] {
     def extract: t
@@ -24,30 +26,44 @@ object worklistAlgo {
     override def isEmpty: Boolean = as.isEmpty
   }
 
-  def wlAlgoProgGraphP[domain, stmt](
-      mutList: Worklist[Int],
-      progGraph: List[(Int, stmt, Int)],
-      transferF: ((Int, stmt, Int), domain) => domain,
-      smallerThan: (domain, domain) => Boolean,
-      lubOp: (domain, domain) => domain,
-      initD: domain,
-      bottomD: domain,
+  def wlAlgoMonotone[domainT, stmtT](
+      mf: MonoFrameworkT[domainT, stmtT],
+      progGraph: List[(Int, stmtT, Int)]
+  ) = {
+
+    wlAlgoProgGraphP[domainMapT[domainT], stmtT](
+      progGraph,
+      mf.transferF,
+      mf.smallerThan,
+      mf.lub,
+      mf.initMap,
+      mf.bottom
+    )
+  }
+
+  private def wlAlgoProgGraphP[domainT, stmtT](
+      progGraph: List[(Int, stmtT, Int)],
+      transferF: ((Int, stmtT, Int), domainT) => domainT,
+      smallerThan: (domainT, domainT) => Boolean,
+      lubOp: (domainT, domainT) => domainT,
+      initD: domainT,
+      bottomD: domainT,
       isReverse: Boolean = false
-  ): Map[Int, domain] = {
+  ): Map[Int, domainT] = {
+
+    val mutList: Worklist[Int] = new WlStack()
 
     pp(progGraph)
-
 //    get program points from edges,ignore stmt in (Int, Stmt, Int)
-    val Q = progGraph.flatMap(x => List(x._1, x._3)).distinct
+    val progPoints = progGraph.flatMap(x => List(x._1, x._3)).distinct
 
 //    initialise work list
-//    val wlMut: mutable.ArrayStack[Int] = mutable.ArrayStack(Q: _*) //flowG: _*
-    mutList.insertAll(Q)
+    mutList.insertAll(progPoints)
 
-    val resMapMut: mutable.Map[Int, domain] = mutable.Map() // 2 -> Set(Var("x"))
+    val resMapMut: mutable.Map[Int, domainT] = mutable.Map()
 
-//    initialize results at program points,set to init for point 0 (first loop)
-    Q foreach { q =>
+//    initialize at each program points,set to init for point 0 (first loop)
+    progPoints foreach { q =>
       resMapMut(q) = if (q == 0) initD else bottomD
     }
 
@@ -56,14 +72,14 @@ object worklistAlgo {
     var steps = 0
     while (!mutList.isEmpty) {
       steps += 1
-//      pp(wlMut.toList, "work list : ")
+      //      pp(wlMut.toList, "work list : ")
 
-      val q_wl = mutList.extract //        extract
+      val q_wl = mutList.extract
 
       val progGraphTups =
         progGraph.filter(_._1 == q_wl) // prog point tuples after q_wl
 
-      progGraphTups foreach { case tup @ (pre, _, post) =>
+      progGraphTups foreach { case tup @ (pre, stmtT, post) =>
         val preMap = resMapMut(pre)
         val postMap = resMapMut(post) // AA(q dot)
         val preMapTransfered = transferF(tup, preMap)
@@ -92,33 +108,3 @@ object worklistAlgo {
     resMapMut.toMap
   }
 }
-
-/* def wlAlgoMonotone[domain](
-      mf: MonotoneFrameworkProgGr[domain, Stmt],
-      stmtInput: Stmt,
-      varlist: String
-  ) = {
-    val initMap =
-      Map(
-        varlist.toCharArray
-          .map(x => Var(x.toString) -> mf.init)
-          .toList: _*
-      )
-
-    val bottomMap =
-      Map(
-        varlist.toCharArray
-          .map(x => Var(x.toString) -> mf.bottomM)
-          .toList: _*
-      )
-
-    wlAlgoProgGraph[MonotoneFrameworkProgGr.domainMapT[domain]](
-      new WlStack[Int](),
-      stmtInput,
-      mf.transferF,
-      mf.smallerThan,
-      mf.lub,
-      initMap,
-      bottomMap
-    )
-  } */

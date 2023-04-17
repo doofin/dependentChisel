@@ -19,25 +19,27 @@ object seqCommands {
 
   /** all sorts of sequential commands */
   sealed trait Cmds
+
+  /** atomic commands like decl,assign,etc */
+  sealed trait AtomCmds extends Cmds
   case class Start[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
   case class End[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
 
   /** for new mod */
-  case class NewInstStmt(instNm: String, modNm: String) extends Cmds
+  case class NewInstStmt(instNm: String, modNm: String) extends AtomCmds
 
-  /** firrtl statements: weakly typed which doesn't require width of lhs = wid
-    * of rhs.
+  /** firrtl statements: weakly typed which doesn't require width of lhs = wid of rhs.
     */
   case class FirStmt(
       lhs: Var[?],
       op: String,
       rhs: Expr[?],
       prefix: String = "" // prefix can be node
-  ) extends Cmds
+  ) extends AtomCmds
 
   /** for Wire, Reg, and IO */
-  case class VarDecls(v: VarDymTyped) extends Cmds
-
+  case class VarDecls(v: VarDymTyped) extends AtomCmds
+  case object Skip extends AtomCmds
   /* TODO:also allow dym check which rm type sig of var[t] ,etc. cases
    * of (lhs,rhs) are (dym,stat),(dym,dym)....
    1.new super type for Var[w]
