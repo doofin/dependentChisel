@@ -16,8 +16,10 @@ object untyped extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
     val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
-      new DoubleAdderUnTpCallUntp
+      new AdderUnTpCallUntp
     // new DoubleAdder3(2)
+    // new AdderUntpBug
+    // new AdderUntp1
     }
     val fMod = chiselMod2firrtlCircuits(mod)
     // pp(fMod.modules map (_.modInfo))
@@ -39,20 +41,8 @@ object untyped extends mainRunnable {
     y := a - b
   }
 
-  class untypedCallTyped(using parent: GlobalInfo) extends UserModule {
-// parent contains global info
-
-    val a = newInputDym(2)
-    val b = newInputDym(2)
-    val y = newOutputDym(2)
-
-    val m1 = newMod(new Adder1)
-    y := m1.a - m1.b
-    y.asTyped[2] := m1.a - m1.b
-  }
-
 // ok, typed call untyped
-  class DoubleAdderTpCallUntp(using parent: GlobalInfo) extends UserModule {
+  class AdderTpCallUntp(using parent: GlobalInfo) extends UserModule {
 // parent contains global info
 
     val a = newInput[2]("a")
@@ -66,7 +56,7 @@ object untyped extends mainRunnable {
   }
 
 //  ok, untyped  call typed
-  class DoubleAdderUnTpCallUntp(using parent: GlobalInfo) extends UserModule {
+  class AdderUnTpCallUntp(using parent: GlobalInfo) extends UserModule {
 
     val a = newInputDym(2)
     val b = newInputDym(2)
@@ -76,5 +66,16 @@ object untyped extends mainRunnable {
     m1.a := a.asTyped[2]
     m1.b := b.asTyped[2]
     y := m1.y
+  }
+
+  // firrtl allow this?
+  class AdderUntpBug(using parent: GlobalInfo) extends UserModule {
+// parent contains global info
+
+    val a = newInputDym(2)
+    val b = newInputDym(2)
+    val y = newOutputDym(10)
+
+    y := a - b
   }
 }

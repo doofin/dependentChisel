@@ -6,4 +6,4 @@ package dependentChisel.staticAnalysis
   * more directly we could decide to represent reaching definitions as a mapping
   * Var -> PowerSet( Q? * Q )
   */
-object reachingDefAnalysis {}
+object uninitializedAnalysis {}
