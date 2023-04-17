@@ -1,9 +1,27 @@
 package dependentChisel.staticAnalysis
 
-/** reaching Def: aim to use this for detect uninitialized vars.for each
-  * variable x we can obtain a set of pairs of nodes {(q1 , q2 )} telling where
-  * the variable x might have been defined. Analysis domains. To represent this
-  * more directly we could decide to represent reaching definitions as a mapping
-  * Var -> PowerSet( Q? * Q )
+import dependentChisel.codegen.seqCommands.FirStmt
+import dependentChisel.staticAnalysis.MonotoneFramework.domainMapT
+import dependentChisel.staticAnalysis.uninitializedLattice
+import dependentChisel.staticAnalysis.MonotoneFramework.MonotoneFrameworkProgGr
+
+/** uninitializedAnalysis
   */
-object uninitializedAnalysis {}
+object uninitializedAnalysis {
+  type mDomain = uninitializedLattice.domain
+  type mStmt = FirStmt
+
+  case class uninitializedAsMonotoneFramework(
+      initMap: domainMapT[mDomain]
+  ) extends MonotoneFrameworkProgGr[mDomain, mStmt](initMap) {
+
+    override val baseLattice: semiLattice[mDomain] = ???
+
+    override val transferF
+        : ((Int, mStmt, Int), domainMapT[mDomain]) => domainMapT[mDomain] = {
+      case ((q0, prog, q1), varmap) => ???
+    }
+
+    override val init: mDomain = ???
+  }
+}
