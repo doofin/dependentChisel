@@ -17,8 +17,7 @@ import dependentChisel.syntax.naming
 import dependentChisel.typesAndSyntax.control
 import dependentChisel.typesAndSyntax.varDecls.UserModuleDecls
 
-/** imperative style for chisel ,record info in mutable vars inside class
-  * chiselModules
+/** imperative style for chisel ,record info in mutable vars inside class chiselModules
   */
 object chiselModules {
   case class GlobalInfo(
@@ -35,9 +34,7 @@ object chiselModules {
   // trait Module {}
 
   /* function style UserModule ,for example: when {} else {} */
-  trait UserModule(using parent: GlobalInfo)
-      extends UserModuleOps,
-        UserModuleDecls {
+  trait UserModule(using parent: GlobalInfo) extends UserModuleOps, UserModuleDecls {
     val thisClassName = this.getClass.getCanonicalName.split('.').last.mkString
 
     /** Name for this Instance after new class.. */

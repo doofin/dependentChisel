@@ -18,7 +18,39 @@ import dependentChisel.typesAndSyntax.control.UserModuleOps
  type info is converted to value by constValueOpt
  */
 object varDecls {
+
+// TODO
+  def newReg[w <: Int, tp <: VarDeclTp](width: Int, givenName: String = "") = {
+    val genName =
+      s"${if givenName.isEmpty() then "reg" else givenName}${naming.getIdWithDash}"
+    VarTyped[w, tp](genName)
+  }
+
+  /** WIP allow to be called outside module */
+  inline def newInput2[w <: Int](using mli: ModLocalInfo)(
+      givenName: String = ""
+  ) = {
+    val genName = naming.genNameIfEmpty(givenName, "io_i")
+
+    val instName = "" // ut.thisInstanceName
+
+    val r = Input[w](instName + "." + genName) // instName + "." + name
+    mli.io.prepend(
+      IOdef(genName, "input", constValueOpt[w])
+    )
+    r
+  }
+
+  /** stmts only allowed inside a module */
   trait UserModuleDecls { ut: UserModule & UserModuleOps =>
+    def newRegDym(width: Int, givenName: String = "") = {
+      // need to push this cmd for varDecl
+      val genName =
+        s"${if givenName.isEmpty() then "reg" else givenName}${naming.getIdWithDash}"
+      val r = VarDymTyped(width, VarDeclTp.Reg, genName)
+      modLocalInfo.commands.append(VarDecls(r))
+      r
+    }
     inline def newInput[w <: Int](
         givenName: String = ""
     ) = {
@@ -55,14 +87,6 @@ object varDecls {
 
     def newOutputDym(width: Int, givenName: String = "") = {
       appendIO_untyped(width, VarDeclTp.Output, givenName)
-    }
-    def newRegDym(width: Int, givenName: String = "") = {
-      val m = modLocalInfo
-      // m.commands
-      val genName =
-        s"${if givenName.isEmpty() then "reg" else givenName}${naming.getIdWithDash}"
-      val r = VarDymTyped(width, VarDeclTp.Reg, genName)
-      r
     }
 
     private def appendIO_untyped(

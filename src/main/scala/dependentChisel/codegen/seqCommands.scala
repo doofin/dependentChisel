@@ -11,7 +11,7 @@ object seqCommands {
 
   /** control structures like if */
   enum Ctrl {
-    case If(cond: BoolExpr[?])
+    case If(cond: ExprAsBool[?])
     // case IfElse[w <: Int](b: Bool[w])
     case Else[w <: Int]()
     case Top()
@@ -19,14 +19,14 @@ object seqCommands {
 
   /** all sorts of sequential commands */
   sealed trait Cmds
-
-  /** atomic commands like decl,assign,etc */
-  sealed trait AtomCmds extends Cmds
   case class Start[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
   case class End[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
 
+  /** atomic commands like decl,assign,etc */
+  sealed trait AtomicCmds extends Cmds
+
   /** for new mod */
-  case class NewInstStmt(instNm: String, modNm: String) extends AtomCmds
+  case class NewInstStmt(instNm: String, modNm: String) extends AtomicCmds
 
   /** firrtl statements: weakly typed which doesn't require width of lhs = wid of rhs.
     */
@@ -35,11 +35,11 @@ object seqCommands {
       op: String,
       rhs: Expr[?],
       prefix: String = "" // prefix can be node
-  ) extends AtomCmds
+  ) extends AtomicCmds
 
   /** for Wire, Reg, and IO */
-  case class VarDecls(v: VarDymTyped) extends AtomCmds
-  case object Skip extends AtomCmds
+  case class VarDecls(v: VarDymTyped) extends AtomicCmds
+  case object Skip extends AtomicCmds
   /* TODO:also allow dym check which rm type sig of var[t] ,etc. cases
    * of (lhs,rhs) are (dym,stat),(dym,dym)....
    1.new super type for Var[w]

@@ -4,6 +4,8 @@ import scala.compiletime.ops.int.*
 
 // import dependentChisel.syntax.dslAST.wireTp
 import dependentChisel.depTypes.*
+
+import dependentChisel.typesAndSyntax.typesAndOps.*
 /* simple tests for compile/ runtime dependent values */
 // test constValueOpt
 constValueOpt[2]
@@ -30,3 +32,7 @@ inline val size = 1
 constValueOpt[size.type]
 
 // em1 =:= em1
+val r = Lit[1]() match {
+  case x: Lit[w] => constValueOpt[w].toString()
+  case x         => x.toString()
+}

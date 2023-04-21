@@ -26,14 +26,23 @@ represent a vector of bits */
 
   case class VarLit[w <: Int](name: String) extends Var[w](name)
 
-  sealed trait Expr[w <: Int]
+  sealed trait Expr[w <: Int] {
+    def asUnTyped = this.asInstanceOf[Expr[Nothing]]
+  }
   case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
 
-  // sealed trait BoolEx[w <: Int] extends Expr[w]
-  case class BoolExpr[w <: Int](expr: Expr[w]) extends Expr[w]
+  sealed trait BoolExpr[w <: Int] extends Expr[w]
+  case class ExprAsBool[w <: Int](expr: Expr[w]) extends BoolExpr[w]
 
   /** Wire, Reg, and IO */
   enum VarDeclTp { case Input, Output, Reg, Wire }
+
+  sealed trait ExprC[w <: Int, tp <: VarDeclTp] {
+
+    inline def +(oth: ExprC[w, tp]) = {}
+  }
+
+  // new ExprC[1, VarDeclTp.Reg.type] {} + new ExprC[1, VarDeclTp.Wire.type] {} //ok ,will fail
 
   /** untyped API for Wire, Reg, and IO */
   case class VarDymTyped(width: Int, tp: VarDeclTp, name: String)
@@ -41,6 +50,9 @@ represent a vector of bits */
 
     def asTyped[w <: Int] = this.asInstanceOf[Var[w]]
   }
+
+  /** typed API for Wire, Reg, and IO */
+  case class VarTyped[w <: Int, tp <: VarDeclTp](name: String) extends Var[w](name)
 
   case class Input[w <: Int](name: String) extends Var[w](name)
 
@@ -51,6 +63,7 @@ represent a vector of bits */
   // for future use
 
   case class Lit[w <: Int](i: w) extends Expr[w] {}
+  case class LitDym(i: Int) extends Expr[Nothing]
   /*
   extension [w <: Int](i: Bounded[0, w]) {
     def asLit = toLit[w](i)

@@ -1,5 +1,7 @@
 package dependentChisel.codegen
 
+import scala.compiletime.*
+
 import com.doofin.stdScalaCross.*
 
 import dependentChisel.typesAndSyntax.typesAndOps.*
@@ -32,7 +34,9 @@ object compiler {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     // pp(modInfo.commands.toList)
     val cmds_ANF: List[Cmds] = cmdListToSingleAssign(modInfo.commands.toList)
+    // dbg(cmds_ANF)
     val ioNameChanged: List[Cmds] = cmdsTransform(modInfo.instName, cmds_ANF)
+    // dbg(ioNameChanged)
     val tree: AST = list2tree(ioNameChanged)
     FirrtlModule(modInfo, modInfo.io.toList, tree)
   }
@@ -84,17 +88,17 @@ object compiler {
         val fir = stmtToSingleAssign(x)
         // dbg(fir)
         fir
-      case orig @ Start(ctrl, uid) =>
+      case orig @ Start(ctrl: Ctrl, uid) =>
         ctrl match {
-          case ctrlIf @ Ctrl.If(bool: BoolExpr[Int]) =>
+          case ctrlIf @ Ctrl.If(bool: ExprAsBool[Int]) =>
             val anf_stmts: List[FirStmt] =
               stmtToSingleAssign(expr2stmtBind(bool.expr))
             val anf_res = anf_stmts :+ orig.copy(ctrl =
-              ctrlIf.copy(cond = BoolExpr(anf_stmts.last.lhs))
+              ctrlIf.copy(cond = ExprAsBool(anf_stmts.last.lhs))
             )
             // dbg(anf_res)
             anf_res
-          case _ => List()
+          case _ => List(orig) // bug! will eat "else"
         }
       case x => List(x)
     }
@@ -106,22 +110,19 @@ object compiler {
       case x: Ctrl =>
         indent + (x match {
           case Ctrl.If(b)  => s"when ${expr2firrtlStr(b)} :"
-          case Ctrl.Else() => "else "
+          case Ctrl.Else() => "else :"
           case Ctrl.Top()  => ""
         })
       case stmt: FirStmt     => indent + stmt2firrtlStr(stmt)
       case stmt: NewInstStmt => newInstStmt2firrtlStr(indent, stmt)
       case stmt: VarDecls =>
-        indent + varDecl2firrtlStr(stmt)
+        indent + varDecl2firrtlStr(indent, stmt)
     }
 
-    nodeStr + (tr.cld map (cld =>
-      "\n" + tree2firrtlStr(cld, indent + "  ")
-    )).mkString
+    nodeStr + (tr.cld map (cld => "\n" + tree2firrtlStr(cld, indent + "  "))).mkString
   }
 
-  /** rm module or instance names from io name, for usage in gen firrtl io
-    * section
+  /** rm module or instance names from io name, for usage in gen firrtl io section
     */
   def fullName2IOName(
       instName: String,
@@ -149,8 +150,12 @@ object compiler {
       case x: Var[?] =>
         // dbg(x)
         x.getname
-      case Lit(i)         => i.toString()
-      case BoolExpr(expr) => expr2firrtlStr(expr)
+      case x: Lit[w] =>
+        // pp(x)
+        // constValueOpt[w].get.toString // doesn't work currently since type param is rm
+        x.i.toString()
+      case LitDym(i)        => i.toString()
+      case ExprAsBool(expr) => expr2firrtlStr(expr)
     }
   }
 
@@ -171,14 +176,15 @@ object compiler {
       .mkString("\n")
   }
 
-  def varDecl2firrtlStr(stmt: VarDecls) = {
+  def varDecl2firrtlStr(indent: String = "", stmt: VarDecls) = {
     val VarDymTyped(width: Int, tp: VarDeclTp, name: String) = stmt.v
     tp match {
       case VarDeclTp.Reg =>
         /* reg mReg : UInt<16>, clock with :
       reset => (reset, UInt<16>("h0")) @[regWire.scala 13:21] */
 
-        s"""reg ${name} : UInt<${width}>, clock with : reset => (reset, UInt<${width}>("h0"))"""
+        s"""reg ${name} : UInt<${width}>, clock with : 
+        ${indent}reset => (reset, UInt<${width}>("h0"))"""
       case VarDeclTp.Wire =>
         /* wire wire1 : UInt<16> @[regWire.scala 18:19] */
         s"wire $name : UInt<$width>"
@@ -278,8 +284,8 @@ object compiler {
     }
   }
 
-  /** modify names for io: check if instantiated instance have same name, if so
-    * refer to it by io.a, otherwise add inst name as prefix
+  /** modify names for io: check if instantiated instance have same name, if so refer to
+    * it by io.a, otherwise add inst name as prefix
     */
   def ioNameTransform(thisInstName: String, ioFullName: String) = {
     val instName :: name :: Nil = ioFullName.split('.').toList: @unchecked
@@ -300,7 +306,7 @@ object compiler {
           x.nm
         )
       // case _: BoolEx[?] =>
-      case BoolExpr(expr) =>
+      case ExprAsBool(expr) =>
         exprTransform(thisInstName, expr).asInstanceOf[Expr[Nothing]]
       case x => x
     }

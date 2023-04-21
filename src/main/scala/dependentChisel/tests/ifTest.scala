@@ -28,10 +28,11 @@ object ifTest extends mainRunnable {
   def run = {
     // (1, 2, 3).mapConst((x: Int) => x * 2)
     val (mod, globalCircuit) = makeModule { implicit p =>
-//   new IfElse1
-      new IfModDangling // ok
+      new IfElse1
+    // new IfModNested
+    // new IfModDangling // ok
     }
-
+    // ppc(mod.modLocalInfo.commands)
     val fMod = chiselMod2firrtlCircuits(mod)
     val firCirc = firrtlCircuits2str(fMod)
     println(firCirc)
@@ -39,7 +40,7 @@ object ifTest extends mainRunnable {
 
   }
 
-  /* module contains nested if */
+  /* ok,module contains nested if */
   class IfModNested(using parent: GlobalInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
@@ -58,6 +59,7 @@ object ifTest extends mainRunnable {
     }
   }
 
+  /* failed */
   class IfElse1(using parent: GlobalInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")

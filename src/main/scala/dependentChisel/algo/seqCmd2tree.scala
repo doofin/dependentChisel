@@ -11,20 +11,23 @@ import dependentChisel.codegen.seqCommands.*
 object seqCmd2tree {
   type AST = TreeNode[NewInstStmt | FirStmt | Ctrl | VarDecls]
 
-  /** convert sequential commands to AST. multiple stmt is appended as multiple
-    * nodes
+  /** convert sequential commands to AST. multiple stmt is appended as multiple nodes
     */
   def list2tree(cmdList: List[Cmds]): AST = {
     import scala.collection.mutable.Stack
     val parents: Stack[AST] = Stack(TreeNode(Ctrl.Top())) // new Stack[AST]
     // parents.push(TreeNode(Ctrl.Top()))
+    // ppc(cmdList)
 
     cmdList.foreach { cmd =>
+      // println("parents bf , cmd")
+      // dbg(cmd)
+      // ppc(parents)
       cmd match {
         case Start(ctrl, uid) =>
           // start of block
           /* create new node and append as child of curr top parent node if exists.
-         then push new node into parent stack*/
+         then push new node into parent stack as new top elem*/
           val newNd: AST = TreeNode(ctrl)
           Try(parents.top).foreach(p => p.cld += newNd)
           parents push newNd
@@ -36,7 +39,11 @@ object seqCmd2tree {
           val newNd: AST = TreeNode(stmt)
           Try(parents.top).foreach(p => p.cld += newNd)
       }
+
+      // println("parents after:")
+      // ppc(parents)
     }
+
     parents.pop()
   }
 

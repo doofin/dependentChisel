@@ -1,25 +1,25 @@
 package dependentChisel.staticAnalysis
 
-import dependentChisel.codegen.seqCommands.AtomCmds
+import dependentChisel.codegen.seqCommands.AtomicCmds
 import dependentChisel.staticAnalysis.MonotoneFramework.domainMapT
-import dependentChisel.staticAnalysis.checkUninitLattice
+import dependentChisel.staticAnalysis.checkUnInitLattice
 
 import dependentChisel.staticAnalysis.MonotoneFramework.MonoFrameworkT
 import dependentChisel.codegen.seqCommands.NewInstStmt
 import dependentChisel.codegen.seqCommands.FirStmt
 import dependentChisel.codegen.seqCommands.VarDecls
 
-/** uninitializedAnalysis
+/** check if vars have an value
   */
 object checkUnInitAnalysis {
-  type mDomain = checkUninitLattice.domain
-  type mStmt = AtomCmds // assign,var decls etc
+  type mDomain = checkUnInitLattice.domain
+  type mStmt = AtomicCmds // assign,var decls etc
 
   case class MonoFramework(
       mInitMap: domainMapT[mDomain]
   ) extends MonoFrameworkT[mDomain, mStmt](
         mInitMap,
-        checkUninitLattice.lattice
+        checkUnInitLattice.lattice
       ) {
 
     // override val baseLattice: semiLattice[mDomain] = uninitializedLattice.lattice //bug! will cause null
