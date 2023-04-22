@@ -33,9 +33,10 @@ object ifTest extends mainRunnable {
     // new IfModDangling // ok
     }
     // ppc(mod.modLocalInfo.commands)
+    pp(mod.modLocalInfo.typeMap)
     val fMod = chiselMod2firrtlCircuits(mod)
     val firCirc = firrtlCircuits2str(fMod)
-    println(firCirc)
+    // println(firCirc)
     firrtlUtils.firrtl2verilog(firCirc)
 
   }
@@ -64,10 +65,15 @@ object ifTest extends mainRunnable {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
     val y = newOutput[16]("y")
-
+// 5
+    // y := a + b
+// 0
+// val newReg=...
     IfElse(a === b) {
       y := a + b
+      // 1
     } {
+      // 2
       y := a - b
     }
   }

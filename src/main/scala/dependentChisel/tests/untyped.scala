@@ -16,10 +16,10 @@ object untyped extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
     val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
-      new AdderUnTpCallUntp
-    // new DoubleAdder3(2)
-    // new AdderUntpBug
-    // new AdderUntp1
+      // new AdderUnTpCallUntp // wid check not ok for inter module
+      // new DoubleAdder3(2)
+      new AdderUntpBug
+      // new AdderUntp1
     }
     val fMod = chiselMod2firrtlCircuits(mod)
     // pp(fMod.modules map (_.modInfo))
@@ -27,7 +27,7 @@ object untyped extends mainRunnable {
     println(firCirc)
 
     val verilog = firrtlUtils.firrtl2verilog(firCirc)
-    println(verilog)
+    // println(verilog)
   }
 
 // ok
@@ -73,7 +73,7 @@ object untyped extends mainRunnable {
 // parent contains global info
 
     val a = newInputDym(2)
-    val b = newInputDym(2)
+    val b = newInputDym(20)
     val y = newOutputDym(10)
 
     y := a - b

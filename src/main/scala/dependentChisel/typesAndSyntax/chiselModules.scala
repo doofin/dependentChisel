@@ -1,6 +1,7 @@
 package dependentChisel.typesAndSyntax
 
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable
 
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
@@ -28,7 +29,9 @@ object chiselModules {
       className: String,
       instName: String,
       io: ArrayBuffer[IOdef] = ArrayBuffer(),
-      commands: ArrayBuffer[Cmds] = ArrayBuffer() // list of seq cmds
+      commands: ArrayBuffer[Cmds] = ArrayBuffer(), // list of seq cmds
+      typeMap: mutable.Map[Expr[?] | Var[?], Option[Int]] =
+        mutable.Map() // list of seq cmds
   )
 
   // trait Module {}

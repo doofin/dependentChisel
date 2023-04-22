@@ -27,14 +27,9 @@ object BubbleFifo extends mainRunnable {
 
   }
 
-  /* class WriterIO(size: Int) extends Bundle {
-  val write = Input(Bool())
-  val full = Output(Bool())
-  val din = Input(UInt(size.W))
-} */
-  /* TODO doesn't work.consider :
-  1.add to io in invoke site ,requires newInput be called outside module
-  2.discriminate between bundle and module like chisel do */
+  /* TODO parameterised IO:  doesn't support parameterised IO yet.consider :
+  1.allow newInput be called outside module at arbitary places,only add it to IO in invoke site
+  2.mimic chisel : discriminate between bundle and module like chisel do */
   class WriterIO(using parent: GlobalInfo)(size: Int) extends UserModule {
     val write = newInput[1]()
     val full = newOutput[1]()
@@ -54,6 +49,13 @@ object BubbleFifo extends mainRunnable {
       enq.write := stateReg.asTyped[1]
     } { enq.write := stateReg.asTyped[1] }
   }
+
+  /* class WriterIO(size: Int) extends Bundle {
+  val write = Input(Bool())
+  val full = Output(Bool())
+  val din = Input(UInt(size.W))
+} */
+
   /*
 class FifoRegister(size: Int) extends Module {
   val io = IO(new Bundle {

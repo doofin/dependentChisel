@@ -33,16 +33,19 @@ object statements {
         case Input(name)  =>
         case Output(name) =>
       } */
-
+      // dbg(v)
+      // dbg(oth)
+      mli.typeMap.addOne(v, constValueOpt[w])
       mli.commands += FirStmt(v, ":=", oth)
     }
 
   }
 
   /** untyped API for assign */
-  extension (v: Var[Nothing]) {
+  extension (v: VarDymTyped) {
     inline def :=(using mli: ModLocalInfo)(oth: Expr[?]) = {
       val name = v.getname
+      mli.typeMap.addOne(v, Some(v.width))
 
       mli.commands += FirStmt(v, ":=", oth)
     }

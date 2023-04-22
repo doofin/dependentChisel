@@ -14,6 +14,8 @@ import dependentChisel.algo.seqCmd2tree.*
 import seqCommands.*
 import firrtlTypes.*
 
+import scala.util.*
+
 object compiler {
 
   /** convert chiselMod to str */
@@ -23,7 +25,7 @@ object compiler {
 
   /** chisel ModLocalInfo to FirrtlModule(IO bundle,AST for the circuit) */
   def chiselMod2firrtlCircuits(chiselMod: UserModule) = {
-    val modInfo = chiselMod.modLocalInfo
+    val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     val glob = chiselMod.globalInfo
     val mainModuleName = modInfo.className
 
@@ -33,7 +35,16 @@ object compiler {
   private def chiselMod2firrtlMod(chiselMod: UserModule): FirrtlModule = {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     // pp(modInfo.commands.toList)
-    val cmds_ANF: List[Cmds] = cmdListToSingleAssign(modInfo.commands.toList)
+    // pp(modInfo.typeMap)
+    val cmds_widthChk: List[Cmds] = modInfo.commands.toList.collect {
+      case x: AtomicCmds =>
+        val checkWidthR = Try(typeCheck.checkWidth(modInfo.typeMap, x))
+        dbg(checkWidthR)
+        x
+      case x => x
+    }
+
+    val cmds_ANF: List[Cmds] = cmdListToSingleAssign(cmds_widthChk)
     // dbg(cmds_ANF)
     val ioNameChanged: List[Cmds] = cmdsTransform(modInfo.instName, cmds_ANF)
     // dbg(ioNameChanged)

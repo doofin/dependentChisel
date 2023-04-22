@@ -58,6 +58,7 @@ object varDecls {
       val instName = ut.thisInstanceName
 
       val r = Input[w](instName + "." + genName) // instName + "." + name
+      modLocalInfo.typeMap.addOne(r, constValueOpt[w])
       modLocalInfo.io.prepend(
         IOdef(genName, "input", constValueOpt[w])
       )
@@ -75,6 +76,7 @@ object varDecls {
       val r = Output[w](
         instName + "." + genName
       ) // instName + "." + name
+      modLocalInfo.typeMap.addOne(r, constValueOpt[w])
       modLocalInfo.io.prepend(
         IOdef(genName, "output", constValueOpt[w])
       )
@@ -107,12 +109,14 @@ object varDecls {
         instName + "." + genName
       ) // when refered in expr , use this name
 
+      modLocalInfo.typeMap.addOne(r, Some(width))
       modLocalInfo.io.prepend(
         IOdef(genName, iotext, Some(width))
       ) // when put in io bundle,use short name
       r
     }
 
+    /* TODO */
     inline private def appendIO[w <: Int](
         givenName: String,
         tp: VarDeclTp.Input.type | VarDeclTp.Output.type
