@@ -16,15 +16,16 @@ object untyped extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
     val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
-      // new AdderUnTpCallUntp // wid check not ok for inter module
+      // new AdderUnTpCallUntp
+      new AdderUnTpCallUntpErr
       // new DoubleAdder3(2)
-      new AdderUntpBug
+      // new AdderUntpBug
       // new AdderUntp1
     }
     val fMod = chiselMod2firrtlCircuits(mod)
     // pp(fMod.modules map (_.modInfo))
     val firCirc = firrtlCircuits2str(fMod)
-    println(firCirc)
+    // println(firCirc)
 
     val verilog = firrtlUtils.firrtl2verilog(firCirc)
     // println(verilog)
@@ -64,6 +65,30 @@ object untyped extends mainRunnable {
 
     val m1 = newMod(new Adder1)
     m1.a := a.asTyped[2]
+    m1.b := b.asTyped[2]
+    y := m1.y
+  }
+
+  class AdderUnTpCallUntpErr(using parent: GlobalInfo) extends UserModule {
+
+    val a = newInputDym(1)
+    val b = newInputDym(2)
+    val y = newOutputDym(2)
+
+    val m1 = newMod(new AdderUntp1)
+    m1.a := a
+    m1.b := b
+    y := m1.y
+  }
+
+  class AdderUnTpCallTpWidthErr(using parent: GlobalInfo) extends UserModule {
+
+    val a = newInputDym(2)
+    val b = newInputDym(2)
+    val y = newOutputDym(2)
+
+    val m1 = newMod(new Adder1)
+    m1.a := a.asTyped[2] // can't detect this due to cast!!
     m1.b := b.asTyped[2]
     y := m1.y
   }

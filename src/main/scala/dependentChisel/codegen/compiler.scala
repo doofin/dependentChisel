@@ -15,6 +15,7 @@ import seqCommands.*
 import firrtlTypes.*
 
 import scala.util.*
+import scala.collection.mutable
 
 object compiler {
 
@@ -27,19 +28,25 @@ object compiler {
   def chiselMod2firrtlCircuits(chiselMod: UserModule) = {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     val glob = chiselMod.globalInfo
+    val allMods: List[UserModule] = glob.modules.toList
+    val allModTypeMap: mutable.Map[Expr[?] | Var[?], Option[Int]] =
+      allMods.map(_.modLocalInfo.typeMap) reduce (_ ++ _)
+
     val mainModuleName = modInfo.className
 
-    FirrtlCircuit(mainModuleName, glob.modules.toList map chiselMod2firrtlMod)
+    FirrtlCircuit(mainModuleName, allMods map chiselMod2firrtlMod(allModTypeMap))
   }
 
-  private def chiselMod2firrtlMod(chiselMod: UserModule): FirrtlModule = {
+  private def chiselMod2firrtlMod(
+      allModTypeMap: mutable.Map[Expr[?] | Var[?], Option[Int]]
+  )(chiselMod: UserModule): FirrtlModule = {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     // pp(modInfo.commands.toList)
     // pp(modInfo.typeMap)
     val cmds_widthChk: List[Cmds] = modInfo.commands.toList.collect {
       case x: AtomicCmds =>
-        val checkWidthR = Try(typeCheck.checkWidth(modInfo.typeMap, x))
-        dbg(checkWidthR)
+        // val checkWidthR = Try(typeCheck.checkWidth(allModTypeMap, x))
+        val checkWidthR = typeCheck.checkWidth(allModTypeMap, x)
         x
       case x => x
     }

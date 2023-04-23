@@ -19,8 +19,14 @@ object typeCheck {
     expr match {
       case BinOp(a, b, nm) =>
         (checkExprWidth(typeMap, a), checkExprWidth(typeMap, b)) match {
-          case (Right(i), Right(j)) => Left(i == j)
-          case _                    => ???
+          case (Right(i), Right(j)) =>
+            val widthEqu = i == j
+            if (!widthEqu) {
+              dbg(a, b, nm)
+              throw new Exception("checkWidth find Width mismatch! ")
+            }
+            Left(widthEqu)
+          case _ => ???
         }
 
       // case VarLit(name)     =>
@@ -43,8 +49,34 @@ object typeCheck {
       /* 1.add width field in FirStmt
         2. add width in lhs var and rhs expr
         3. use a map to store width of var and expr */
-      case FirStmt(lhs, op, rhs, prefix) => checkExprWidth(typeMap, rhs)
-      case x                             => x
+      case FirStmt(lhs, op, rhs, prefix) =>
+        val lr = (checkExprWidth(typeMap, lhs), checkExprWidth(typeMap, rhs)) match {
+          // only check if both result are numbers
+          case lrWidth @ (Right(i), Right(j)) =>
+            // dbg(a, b, nm)
+            // Left(i == j)
+            val widthEqu = i == j
+            if (!widthEqu) {
+              dbg(lrWidth)
+              throw new Exception("checkWidth find Width mismatch! ")
+            }
+            Left(widthEqu)
+            widthEqu
+          // ignore other cases
+          case (lhsR, rhsR) =>
+            // dbg(lhsR, rhsR)
+            // ???
+            true
+        }
+        // checkExprWidth(typeMap, rhs)
+        // (lr, checkExprWidth(typeMap, rhs))
+        if (!lr) {
+          println("checkWidth find Width mismatch! ")
+          dbg(lr)
+          throw new Exception("checkWidth find Width mismatch! ")
+        }
+
+      case x => x
       // case NewInstStmt(instNm, modNm)    =>
       // case VarDecls(v)                   =>
       // case Skip                          =>

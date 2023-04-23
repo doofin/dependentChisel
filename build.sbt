@@ -20,6 +20,7 @@ lazy val root = project
     scalacOptions ++= mScalacOptions,
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "pprint" % "0.8.1", // print,debug
+      "org.scalameta" %% "munit" % "0.7.29" % Test,
       "io.bullet" %% "macrolizer" % "0.6.2" % "compile-internal", // print,debug
       "org.typelevel" %% "cats-core" % catsV,
       "org.typelevel" %% "cats-free" % catsV,
