@@ -48,8 +48,17 @@ represent a vector of bits */
   case class VarDymTyped(width: Int, tp: VarDeclTp, name: String)
       extends Var[Nothing](name) {
 
-    def asTyped[w <: Int] = {
-      constValueOpt[w].foreach(wd => assert(wd == width))
+    inline def asTyped[w <: Int] = {
+
+      // dym check for type cast legality
+      constValueOpt[w].foreach { wd =>
+        val castOk = wd == width
+        val msg = "asTyped cast error !"
+        if (!castOk) {
+          println(s"$msg at ${this}")
+        }
+        assert(castOk, msg)
+      }
       this.asInstanceOf[Var[w]]
     }
   }

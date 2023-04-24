@@ -17,7 +17,7 @@ object untyped extends mainRunnable {
   override def main(args: Array[String] = Array()): Unit = {
     val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
       // new AdderUnTpCallUntp
-      new AdderUnTpCallUntpErr
+      new AdderUntpBug3typeCast
       // new DoubleAdder3(2)
       // new AdderUntpBug
       // new AdderUntp1
