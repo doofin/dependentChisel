@@ -94,13 +94,35 @@ object untyped extends mainRunnable {
   }
 
   // firrtl allow this?
-  class AdderUntpBug(using parent: GlobalInfo) extends UserModule {
+  class AdderUntpBug1(using parent: GlobalInfo) extends UserModule {
 // parent contains global info
 
-    val a = newInputDym(2)
+    val a = newInputDym(20)
     val b = newInputDym(20)
     val y = newOutputDym(10)
 
     y := a - b
+  }
+
+  class AdderUntpBug2(using parent: GlobalInfo) extends UserModule {
+// parent contains global info
+
+    val a = newInputDym(20)
+    val b = newInputDym(10)
+    val y = newOutputDym(20)
+
+    y := a - b + a - b
+  }
+
+  class AdderUntpBug3typeCast(using parent: GlobalInfo) extends UserModule {
+
+    val a = newInputDym(1)
+    val b = newInputDym(2)
+    val y = newOutputDym(2)
+
+    val m1 = newMod(new Adder1)
+    m1.a := a.asTyped[2]
+    m1.b := b.asTyped[2]
+    y := m1.y
   }
 }

@@ -48,7 +48,10 @@ represent a vector of bits */
   case class VarDymTyped(width: Int, tp: VarDeclTp, name: String)
       extends Var[Nothing](name) {
 
-    def asTyped[w <: Int] = this.asInstanceOf[Var[w]]
+    def asTyped[w <: Int] = {
+      constValueOpt[w].foreach(wd => assert(wd == width))
+      this.asInstanceOf[Var[w]]
+    }
   }
 
   /** typed API for Wire, Reg, and IO */

@@ -3,18 +3,14 @@ package dependentChisel
 import dependentChisel.tests.adder.*
 import dependentChisel.tests.untyped
 import dependentChisel.tests.ifTest.*
-import chisel3.assert
+import dependentChisel.testUtils.widthAndFirrtlOk
+import org.scalatest.funsuite.AnyFunSuite
 
-class genFirrtlSuite extends munit.FunSuite {
+class genFirrtlSuite extends AnyFunSuite {
 
-  test("can gen firrtl") {
-    assert(testUtils.canPassFirrtl { implicit p => new DoubleAdder })
-
-    assert(testUtils.canPassFirrtl { implicit p => new IfModNested })
+  test("can pass firrtl compiler") {
+    assert(testUtils.widthAndFirrtlOk { implicit p => new DoubleAdder })
+    assert(testUtils.widthAndFirrtlOk { implicit p => new IfModNested })
   }
 
-  test("width check") {
-
-    assert(testUtils.canPassFirrtl { implicit p => new untyped.AdderUnTpCallUntpErr })
-  }
 }

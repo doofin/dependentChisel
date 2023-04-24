@@ -43,13 +43,18 @@ object compiler {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     // pp(modInfo.commands.toList)
     // pp(modInfo.typeMap)
+    var checkWidthVar = true
     val cmds_widthChk: List[Cmds] = modInfo.commands.toList.collect {
       case x: AtomicCmds =>
         // val checkWidthR = Try(typeCheck.checkWidth(allModTypeMap, x))
         val checkWidthR = typeCheck.checkWidth(allModTypeMap, x)
+        if (!checkWidthR) checkWidthVar = false
         x
       case x => x
     }
+    assert(checkWidthVar, "checkWidth failed!")
+    // if (!checkWidthVar) { throw new Exception("checkWidth failed!") }
+    // dbg(checkWidthVar)
 
     val cmds_ANF: List[Cmds] = cmdListToSingleAssign(cmds_widthChk)
     // dbg(cmds_ANF)

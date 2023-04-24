@@ -11,23 +11,20 @@ import dependentChisel.codegen.seqCommands.*
 object typeCheck {
 
   /** return if width check is ok,or the width of expr */
-  private def checkExprWidth(
+  private def getExprWidth(
       typeMap: mutable.Map[Expr[?] | Var[?], Option[Int]],
       expr: Expr[?]
-  ): Boolean Either Int = {
+  ): Int = {
     val tm = typeMap
     expr match {
       case BinOp(a, b, nm) =>
-        (checkExprWidth(typeMap, a), checkExprWidth(typeMap, b)) match {
-          case (Right(i), Right(j)) =>
-            val widthEqu = i == j
-            if (!widthEqu) {
-              dbg(a, b, nm)
-              throw new Exception("checkWidth find Width mismatch! ")
-            }
-            Left(widthEqu)
-          case _ => ???
+        val (i, j) = (getExprWidth(typeMap, a), getExprWidth(typeMap, b))
+        val isWidthEqu = i == j
+        if (!isWidthEqu) {
+          dbg(a, b, nm)
+          assert(false, "checkWidth find Width mismatch inside expr ! ")
         }
+        i
 
       // case VarLit(name)     =>
       // case ExprAsBool(expr) =>
@@ -37,7 +34,8 @@ object typeCheck {
       // case Output(name)                 =>
       // case Lit(i)                       =>
       // case LitDym(i)                    =>
-      case x => Right(tm(x).get)
+      case x =>
+        tm(x).get
     }
   }
 
@@ -50,33 +48,23 @@ object typeCheck {
         2. add width in lhs var and rhs expr
         3. use a map to store width of var and expr */
       case FirStmt(lhs, op, rhs, prefix) =>
-        val lr = (checkExprWidth(typeMap, lhs), checkExprWidth(typeMap, rhs)) match {
+        val lr = (getExprWidth(typeMap, lhs), getExprWidth(typeMap, rhs)) match {
           // only check if both result are numbers
-          case lrWidth @ (Right(i), Right(j)) =>
-            // dbg(a, b, nm)
-            // Left(i == j)
+          case lrWidth @ (i, j) =>
             val widthEqu = i == j
             if (!widthEqu) {
+              println("checkWidth find Width mismatch for := ! ")
               dbg(lrWidth)
-              throw new Exception("checkWidth find Width mismatch! ")
             }
-            Left(widthEqu)
             widthEqu
-          // ignore other cases
-          case (lhsR, rhsR) =>
-            // dbg(lhsR, rhsR)
-            // ???
-            true
+
         }
         // checkExprWidth(typeMap, rhs)
         // (lr, checkExprWidth(typeMap, rhs))
-        if (!lr) {
-          println("checkWidth find Width mismatch! ")
-          dbg(lr)
-          throw new Exception("checkWidth find Width mismatch! ")
-        }
 
-      case x => x
+        lr
+
+      case x => true
       // case NewInstStmt(instNm, modNm)    =>
       // case VarDecls(v)                   =>
       // case Skip                          =>
