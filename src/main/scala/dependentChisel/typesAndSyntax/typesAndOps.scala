@@ -28,11 +28,15 @@ represent a vector of bits */
 
   sealed trait Expr[w <: Int] {
     def asUnTyped = this.asInstanceOf[Expr[Nothing]]
+    inline def asTypedUnsafe[w <: Int] = {
+      this.asInstanceOf[Expr[w]]
+    }
   }
   case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
 
-  sealed trait BoolExpr[w <: Int] extends Expr[w]
-  case class ExprAsBool[w <: Int](expr: Expr[w]) extends BoolExpr[w]
+  type Bool = Expr[1] // bool is just uint[1]
+  // sealed trait BoolExpr[w <: Int] extends Expr[w]
+  // case class ExprAsBool[w <: Int](expr: Expr[w]) extends BoolExpr[w]
 
   /** Wire, Reg, and IO */
   enum VarType { case Input, Output, Reg, Wire }

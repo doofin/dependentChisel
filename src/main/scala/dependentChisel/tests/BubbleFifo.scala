@@ -31,7 +31,10 @@ object BubbleFifo extends mainRunnable {
   1.allow newInput be called outside module at arbitary places,only add it to IO in invoke site
   2.mimic chisel : discriminate between bundle and module like chisel do */
 
-  /* class WriterIO(size: Int) extends Bundle {
+  /*
+  enq : { flip write : UInt<1>, full : UInt<1>, flip din : UInt<1>}
+
+  class WriterIO(size: Int) extends Bundle {
   val write = Input(Bool())
   val full = Output(Bool())
   val din = Input(UInt(size.W))
@@ -39,7 +42,7 @@ object BubbleFifo extends mainRunnable {
 
   class WriterIO(size: Int)(using mli: ModLocalInfo) {
     // newIO[2](VarType.Input)
-    val write = newIO[1](VarType.Input)
+    val write = newIO[1](VarType.Input) // Bool() = UInt<1>
     val full = newIO[1](VarType.Input)
     val din = newIODym(size, VarType.Output)
   }
@@ -79,7 +82,7 @@ class FifoRegister(size: Int) extends Module {
   when(stateReg === empty) {
     when(io.enq.write) {
       stateReg := full
-      dataReg := io.enq.din
+      dataReg := io.\enq.din
     }
   }.elsewhen(stateReg === full) {
     when(io.deq.read) {

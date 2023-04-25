@@ -18,11 +18,11 @@ use a different trait to split
 assign := is in statements */
 object control {
   trait UserModuleOps { ut: UserModule =>
-    def If[w <: Int](b: ExprAsBool[w])(block: => Any): Unit =
+    def If[w <: Int](b: Bool)(block: => Any): Unit =
       pushBlk(Ctrl.If(b))(block) //  $b
 
     def IfElse[w <: Int](
-        b: ExprAsBool[w]
+        b: Bool
     )(block: => Any)(block2: => Any): Unit = {
       pushBlk(Ctrl.If(b))(block)
       pushBlk(Ctrl.Else())(block2)

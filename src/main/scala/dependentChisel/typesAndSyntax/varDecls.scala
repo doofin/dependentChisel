@@ -26,7 +26,7 @@ object varDecls {
     // VarTyped[w, tp](genName)
   }
 
-  /** WIP allow to be called outside module */
+  /** allow to be called outside module */
   inline def newIO[w <: Int](using
       mli: ModLocalInfo
   )(tp: VarType.Input.type | VarType.Output.type, givenName: String = "") = {
@@ -39,9 +39,7 @@ object varDecls {
     val width = constValueOpt[w]
 
     mli.typeMap.addOne(r, width)
-    mli.io.prepend(
-      IOdef(genName, tp, width)
-    )
+    mli.io.prepend(IOdef(genName, tp, width))
     r
   }
 
@@ -57,9 +55,8 @@ object varDecls {
     ) // when refered in expr , use this name
 
     mli.typeMap.addOne(r, Some(width))
-    mli.io.prepend(
-      IOdef(genName, tp, Some(width))
-    ) // when put in io bundle,use short name
+    mli.io.prepend(IOdef(genName, tp, Some(width)))
+    // when put in io bundle,use short name
     r
   }
 

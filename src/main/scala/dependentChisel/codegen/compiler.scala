@@ -115,12 +115,13 @@ object compiler {
         fir
       case orig @ Start(ctrl: Ctrl, uid) =>
         ctrl match {
-          case ctrlIf @ Ctrl.If(bool: ExprAsBool[Int]) =>
+          case ctrlIf @ Ctrl.If(bool) =>
             val anf_stmts: List[FirStmt] =
-              stmtToSingleAssign(expr2stmtBind(bool.expr))
-            val anf_res = anf_stmts :+ orig.copy(ctrl =
-              ctrlIf.copy(cond = ExprAsBool(anf_stmts.last.lhs))
-            )
+              stmtToSingleAssign(expr2stmtBind(bool))
+            val anf_res =
+              anf_stmts :+ orig.copy(ctrl =
+                ctrlIf.copy(cond = anf_stmts.last.lhs.asTypedUnsafe[1])
+              )
             // dbg(anf_res)
             anf_res
           case _ => List(orig) // bug! will eat "else"
@@ -180,7 +181,7 @@ object compiler {
         // constValueOpt[w].get.toString // doesn't work currently since type param is rm
         x.i.toString()
       // case LitDym(i)        => i.toString()
-      case ExprAsBool(expr) => expr2firrtlStr(expr)
+      // case ExprAsBool(expr) => expr2firrtlStr(expr)
     }
   }
 
@@ -336,8 +337,8 @@ object compiler {
           x.nm
         )
       // case _: BoolEx[?] =>
-      case ExprAsBool(expr) =>
-        exprTransform(thisInstName, expr).asInstanceOf[Expr[Nothing]]
+      // case ExprAsBool(expr) =>
+      // exprTransform(thisInstName, expr).asInstanceOf[Expr[Nothing]]
       case x => x
     }
   }
