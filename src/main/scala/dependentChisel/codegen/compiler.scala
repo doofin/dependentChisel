@@ -176,12 +176,41 @@ object compiler {
       case x: Var[?] =>
         // dbg(x)
         x.getname
-      case x: Lit[w] =>
-        // pp(x)
-        // constValueOpt[w].get.toString // doesn't work currently since type param is rm
-        x.i.toString()
-      // case LitDym(i)        => i.toString()
+      case Lit(w) =>
+        // h0 means HexLit of 0
+        s"""UInt<${w}>("$w")"""
+        ???
+      case LitDym(i) =>
+        val (hex, cl) = int2hexAndCeiling(i)
+        s"""UInt<${cl}>("h$hex")"""
       // case ExprAsBool(expr) => expr2firrtlStr(expr)
+    }
+  }
+
+  /** Compute the log2 of a Scala integer, rounded up. Useful for getting the number of
+    * bits needed to represent some number of states (in - 1). To get the number of bits
+    * needed to represent some number n, use log2Ceil(n + 1). Note: can return zero, and
+    * should not be used in cases where it may generate unsupported zero-width wires.
+    * @example
+    *   {{{ log2Ceil(1) // returns 0 log2Ceil(2) // returns 1 log2Ceil(3) // returns 2
+    *   log2Ceil(4) // returns 2 }}}
+    */
+  object log2Ceil {
+    // (0 until n).map(_.U((1.max(log2Ceil(n))).W))
+    def apply(in: BigInt): Int = {
+      require(in > 0)
+      (in - 1).bitLength
+    }
+    def apply(in: Int): Int = apply(BigInt(in))
+  }
+
+  def int2hexAndCeiling(i: Int) = {
+    // val ceiling = (math.log(i) / math.log(2)).ceil.toInt
+
+    if i == 0 then ("0", 1)
+    else {
+      val ceilingWidth = 1 max log2Ceil(i) // 1.max(log2Ceil(n))
+      (i.toHexString, ceilingWidth)
     }
   }
 
@@ -211,6 +240,12 @@ object compiler {
 
         s"""reg ${name} : UInt<${width}>, clock with : 
         ${indent}reset => (reset, UInt<${width}>("h0"))"""
+      case VarType.RegInit(init) =>
+        /* reg mReg : UInt<16>, clock with :
+      reset => (reset, UInt<16>("h0")) @[regWire.scala 13:21] */
+
+        s"""reg ${name} : UInt<${width}>, clock with : 
+        ${indent}reset => (reset, ${expr2firrtlStr(init)})"""
       case VarType.Wire =>
         /* wire wire1 : UInt<16> @[regWire.scala 18:19] */
         s"wire $name : UInt<$width>"
@@ -265,17 +300,20 @@ object compiler {
 
           case VarTyped(name, tp) =>
             tp match {
-              case VarType.Input | VarType.Output =>
-                List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
-              case _ => List(stmt)
-            }
-          case VarDymTyped(width, tp, name) =>
-            tp match {
-              case VarType.Input | VarType.Output =>
+              case VarType.Input | VarType.Output | VarType.RegInit(_) =>
                 List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
               case _ => List(stmt)
             }
 
+            List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
+
+          case VarDymTyped(width, tp, name) =>
+            tp match {
+              case VarType.Input | VarType.Output | VarType.RegInit(_) =>
+                List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
+              case _ => List(stmt)
+            }
+            List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
           case _ => List(stmt)
         }
         stmtNew ++ resList

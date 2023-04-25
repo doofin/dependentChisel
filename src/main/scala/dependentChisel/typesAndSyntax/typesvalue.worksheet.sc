@@ -32,7 +32,16 @@ inline val size = 1
 constValueOpt[size.type]
 
 // em1 =:= em1
-val r = Lit[1]() match {
+val r = Lit[1](1) match {
   case x: Lit[w] => constValueOpt[w].toString()
   case x         => x.toString()
 }
+
+inline def int2hexAndCeiling(i: Int) = {
+  val ceiling = (math.log(i) / math.log(2)).ceil.toInt
+  (i.toHexString, ceiling)
+}
+
+val i3 = int2hexAndCeiling(2)
+
+// Lit[i3._2.type](1)

@@ -13,17 +13,18 @@ import dependentChisel.codegen.firrtlTypes.IOdef
 
 import scala.compiletime.*
 import dependentChisel.typesAndSyntax.control.UserModuleOps
+import dependentChisel.codegen.compiler
 
 /* decls for variables like Wire, Reg, and IO
  type info is converted to value by constValueOpt
  */
 object varDecls {
 
-// TODO
-  def newReg[w <: Int, tp <: VarType](width: Int, givenName: String = "") = {
-    val genName =
-      s"${if givenName.isEmpty() then "reg" else givenName}${naming.getIdWithDash}"
-    // VarTyped[w, tp](genName)
+  inline def newLit(i: Int) = {
+    // 199 is UInt<8>("hc7")
+    /* expecting {UnsignedInt, SignedInt, HexLit, OctalLit, BinaryLit}
+    output (hexStr,ceiling width)*/
+    LitDym(i)
   }
 
   /** allow to be called outside module */
@@ -37,7 +38,6 @@ object varDecls {
       tp
     )
     val width = constValueOpt[w]
-
     mli.typeMap.addOne(r, width)
     mli.io.prepend(IOdef(genName, tp, width))
     r
@@ -64,12 +64,23 @@ object varDecls {
   trait UserModuleDecls { ut: UserModule & UserModuleOps =>
     def newRegDym(width: Int, givenName: String = "") = {
       // need to push this cmd for varDecl
-      val genName =
-        s"${if givenName.isEmpty() then "reg" else givenName}${naming.getIdWithDash}"
+      val genName = naming.genNameForVar(givenName, VarType.Reg)
       val r = VarDymTyped(width, VarType.Reg, genName)
+      modLocalInfo.typeMap.addOne(r, Some(width))
       modLocalInfo.commands.append(VarDecls(r))
       r
     }
+
+    def newRegInitDym(init: LitDym, givenName: String = "") = {
+      // need to push this cmd for varDecl
+      val width = compiler.int2hexAndCeiling(init.i)._2
+      val genName = naming.genNameForVar(givenName, VarType.Reg)
+      val r = VarDymTyped(width, VarType.RegInit(init), genName)
+      modLocalInfo.typeMap.addOne(r, Some(width))
+      modLocalInfo.commands.append(VarDecls(r))
+      r
+    }
+
     inline def newInput[w <: Int](
         givenName: String = ""
     ) = newIO[w](VarType.Input, givenName)

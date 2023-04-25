@@ -32,8 +32,8 @@ object typeCheck {
       // case VarTyped(name)               =>
       // case Input(name)                  =>
       // case Output(name)                 =>
-      case Lit(i) => i
-      // case LitDym(i)                    =>
+      case Lit(i)    => i
+      case LitDym(i) => compiler.int2hexAndCeiling(i)._2
       case x =>
         tm(x).get
     }

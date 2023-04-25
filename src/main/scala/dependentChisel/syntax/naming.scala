@@ -1,6 +1,8 @@
 package dependentChisel.syntax
 
 import dependentChisel.typesAndSyntax.typesAndOps.VarType
+import dependentChisel.typesAndSyntax.typesAndOps.Lit
+import dependentChisel.typesAndSyntax.typesAndOps.VarType.RegInit
 
 object naming {
   var n: Int = 0
@@ -14,6 +16,7 @@ object naming {
         case VarType.Output => "io_o"
         case VarType.Reg    => "r"
         case VarType.Wire   => "wi"
+        case RegInit(init)  => "ri"
       }
     )
   }

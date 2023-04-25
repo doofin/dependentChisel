@@ -1,6 +1,6 @@
 package dependentChisel.typesAndSyntax
 
-import typesAndOps.{Expr, BinOp}
+import typesAndOps.{Expr, BinOp, Bool}
 
 trait exprOperators {
 //int ops

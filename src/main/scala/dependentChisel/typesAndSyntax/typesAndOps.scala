@@ -39,7 +39,14 @@ represent a vector of bits */
   // case class ExprAsBool[w <: Int](expr: Expr[w]) extends BoolExpr[w]
 
   /** Wire, Reg, and IO */
-  enum VarType { case Input, Output, Reg, Wire }
+  sealed trait VarType
+  object VarType {
+    case object Input extends VarType
+    case object Output extends VarType
+    case object Reg extends VarType
+    case object Wire extends VarType
+    case class RegInit(init: LitDym) extends VarType
+  }
 
   sealed trait ExprC[w <: Int, tp <: VarType] {
 
@@ -76,8 +83,10 @@ represent a vector of bits */
 
   // for future use
 
+// case class Lit[w <: Int](i: w, name: String) extends Expr[w] {}
+  type sml[w <: Int] <: w ^ 2
   case class Lit[w <: Int](i: w) extends Expr[w] {}
-  // case class LitDym(i: Int) extends Expr[Nothing]
+  case class LitDym(i: Int) extends Expr[Nothing]
   /*
   extension [w <: Int](i: Bounded[0, w]) {
     def asLit = toLit[w](i)
