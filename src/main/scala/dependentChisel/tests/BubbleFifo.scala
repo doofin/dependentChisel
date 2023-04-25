@@ -17,7 +17,7 @@ object BubbleFifo extends mainRunnable {
     // (1, 2, 3).mapConst((x: Int) => x * 2)
     val (mod, globalCircuit) = makeModule { implicit p =>
 //   new IfElse1
-      new FifoRegister(1) // ok
+      new FifoRegisterPre(1) // ok
     }
 
     val fMod = chiselMod2firrtlCircuits(mod)
@@ -30,17 +30,32 @@ object BubbleFifo extends mainRunnable {
   /* TODO parameterised IO:  doesn't support parameterised IO yet.consider :
   1.allow newInput be called outside module at arbitary places,only add it to IO in invoke site
   2.mimic chisel : discriminate between bundle and module like chisel do */
-  class WriterIO(using parent: GlobalInfo)(size: Int) extends UserModule {
-    val write = newInput[1]()
-    val full = newOutput[1]()
-    val din = newInputDym(size)
+
+  /* class WriterIO(size: Int) extends Bundle {
+  val write = Input(Bool())
+  val full = Output(Bool())
+  val din = Input(UInt(size.W))
+} */
+
+  class WriterIO(size: Int)(using mli: ModLocalInfo) {
+    // newIO[2](VarType.Input)
+    val write = newIO[1](VarType.Input)
+    val full = newIO[1](VarType.Input)
+    val din = newIODym(size, VarType.Output)
+  }
+
+  class FifoRegisterPre(using parent: GlobalInfo)(size: Int) extends UserModule {
+    val enq = new WriterIO(size)
+
+    enq.din := enq.write
   }
 
   class FifoRegister(using parent: GlobalInfo)(size: Int) extends UserModule {
-    val enq = newMod(new WriterIO(size))
+    val enq = new WriterIO(size)
     // val deq = newMod(new WriterIO(size)) // TODO fix create multiple inst
 
-    val (empty, full) = (Lit[0](0), Lit[1](1))
+    // val (empty, full) = (Lit[0](0), Lit[1](1))
+    val (empty, full) = (Lit[1](1), Lit[1](1))
 
     val stateReg = newRegDym(1)
     stateReg := empty
@@ -49,12 +64,6 @@ object BubbleFifo extends mainRunnable {
       enq.write := stateReg.asTyped[1]
     } { enq.write := stateReg.asTyped[1] }
   }
-
-  /* class WriterIO(size: Int) extends Bundle {
-  val write = Input(Bool())
-  val full = Output(Bool())
-  val din = Input(UInt(size.W))
-} */
 
   /*
 class FifoRegister(size: Int) extends Module {

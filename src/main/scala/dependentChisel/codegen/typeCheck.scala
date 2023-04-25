@@ -32,7 +32,7 @@ object typeCheck {
       // case VarTyped(name)               =>
       // case Input(name)                  =>
       // case Output(name)                 =>
-      // case Lit(i)                       =>
+      case Lit(i) => i
       // case LitDym(i)                    =>
       case x =>
         tm(x).get

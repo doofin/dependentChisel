@@ -1,7 +1,23 @@
 package dependentChisel.syntax
 
+import dependentChisel.typesAndSyntax.typesAndOps.VarType
+
 object naming {
   var n: Int = 0
+
+  def genNameForVar(givenName: String, tp: VarType) = {
+
+    genNameIfEmpty(
+      givenName,
+      tp match {
+        case VarType.Input  => "io_i"
+        case VarType.Output => "io_o"
+        case VarType.Reg    => "r"
+        case VarType.Wire   => "wi"
+      }
+    )
+  }
+
   def genNameIfEmpty(givenName: String, prefix: String) = {
     s"${if givenName.isEmpty() then prefix else givenName}${naming.getIdWithDash}"
   }

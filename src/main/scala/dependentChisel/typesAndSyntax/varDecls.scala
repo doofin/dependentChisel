@@ -20,24 +20,46 @@ import dependentChisel.typesAndSyntax.control.UserModuleOps
 object varDecls {
 
 // TODO
-  def newReg[w <: Int, tp <: VarDeclTp](width: Int, givenName: String = "") = {
+  def newReg[w <: Int, tp <: VarType](width: Int, givenName: String = "") = {
     val genName =
       s"${if givenName.isEmpty() then "reg" else givenName}${naming.getIdWithDash}"
-    VarTyped[w, tp](genName)
+    // VarTyped[w, tp](genName)
   }
 
   /** WIP allow to be called outside module */
-  inline def newInput2[w <: Int](using mli: ModLocalInfo)(
-      givenName: String = ""
-  ) = {
-    val genName = naming.genNameIfEmpty(givenName, "io_i")
+  inline def newIO[w <: Int](using
+      mli: ModLocalInfo
+  )(tp: VarType.Input.type | VarType.Output.type, givenName: String = "") = {
 
-    val instName = "" // ut.thisInstanceName
-
-    val r = Input[w](instName + "." + genName) // instName + "." + name
-    mli.io.prepend(
-      IOdef(genName, "input", constValueOpt[w])
+    val genName = naming.genNameForVar(givenName, tp)
+    val r = VarTyped[w](
+      mli.thisInstanceName + "." + genName,
+      tp
     )
+    val width = constValueOpt[w]
+
+    mli.typeMap.addOne(r, width)
+    mli.io.prepend(
+      IOdef(genName, tp, width)
+    )
+    r
+  }
+
+  def newIODym[w <: Int](using
+      mli: ModLocalInfo
+  )(width: Int, tp: VarType.Input.type | VarType.Output.type, givenName: String = "") = {
+
+    val genName = naming.genNameForVar(givenName, tp)
+    val r = VarDymTyped(
+      width,
+      tp,
+      mli.thisInstanceName + "." + genName
+    ) // when refered in expr , use this name
+
+    mli.typeMap.addOne(r, Some(width))
+    mli.io.prepend(
+      IOdef(genName, tp, Some(width))
+    ) // when put in io bundle,use short name
     r
   }
 
@@ -47,97 +69,25 @@ object varDecls {
       // need to push this cmd for varDecl
       val genName =
         s"${if givenName.isEmpty() then "reg" else givenName}${naming.getIdWithDash}"
-      val r = VarDymTyped(width, VarDeclTp.Reg, genName)
+      val r = VarDymTyped(width, VarType.Reg, genName)
       modLocalInfo.commands.append(VarDecls(r))
       r
     }
     inline def newInput[w <: Int](
         givenName: String = ""
-    ) = {
-      val genName = naming.genNameIfEmpty(givenName, "io_i")
-      val instName = ut.thisInstanceName
-
-      val r = Input[w](instName + "." + genName) // instName + "." + name
-      modLocalInfo.typeMap.addOne(r, constValueOpt[w])
-      modLocalInfo.io.prepend(
-        IOdef(genName, "input", constValueOpt[w])
-      )
-      r
-    }
+    ) = newIO[w](VarType.Input, givenName)
 
     inline def newOutput[w <: Int](
         givenName: String = ""
-    ) = {
-      val genName =
-        naming.genNameIfEmpty(givenName, "io_o")
-
-      val instName = ut.thisInstanceName
-
-      val r = Output[w](
-        instName + "." + genName
-      ) // instName + "." + name
-      modLocalInfo.typeMap.addOne(r, constValueOpt[w])
-      modLocalInfo.io.prepend(
-        IOdef(genName, "output", constValueOpt[w])
-      )
-      r
-    }
+    ) = newIO[w](VarType.Output, givenName)
 
     def newInputDym(width: Int, givenName: String = "") = {
-      appendIO_untyped(width, VarDeclTp.Input, givenName)
+      // appendIO_untyped(width, VarType.Input, givenName)
+      newIODym(width, VarType.Input, givenName)
     }
 
     def newOutputDym(width: Int, givenName: String = "") = {
-      appendIO_untyped(width, VarDeclTp.Output, givenName)
-    }
-
-    private def appendIO_untyped(
-        width: Int,
-        tp: VarDeclTp.Input.type | VarDeclTp.Output.type,
-        givenName: String = ""
-    ) = {
-      val instName = ut.thisInstanceName
-      val (genName, iotext) = tp match {
-        case VarDeclTp.Input =>
-          (naming.genNameIfEmpty(givenName, "io_i"), "input")
-        case VarDeclTp.Output =>
-          (naming.genNameIfEmpty(givenName, "io_o"), "output")
-      }
-      val r = VarDymTyped(
-        width,
-        tp,
-        instName + "." + genName
-      ) // when refered in expr , use this name
-
-      modLocalInfo.typeMap.addOne(r, Some(width))
-      modLocalInfo.io.prepend(
-        IOdef(genName, iotext, Some(width))
-      ) // when put in io bundle,use short name
-      r
-    }
-
-    /* TODO */
-    inline private def appendIO[w <: Int](
-        givenName: String,
-        tp: VarDeclTp.Input.type | VarDeclTp.Output.type
-    ) = {
-
-      val instName = ut.thisInstanceName
-
-      val (genName, iotext) = tp match {
-        case VarDeclTp.Input =>
-          (naming.genNameIfEmpty(givenName, "io_i"), "input")
-        case VarDeclTp.Output =>
-          (naming.genNameIfEmpty(givenName, "io_o"), "output")
-      }
-
-      val r = Input[w](instName + "." + genName) // instName + "." + name
-
-      modLocalInfo.io.prepend(
-        IOdef(genName, iotext, constValueOpt[w])
-      )
-      r
-
+      newIODym(width, VarType.Output, givenName)
     }
 
   }

@@ -3,13 +3,14 @@ package dependentChisel.codegen
 import dependentChisel.algo.seqCmd2tree.AST
 import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.chiselModules.ModLocalInfo
+import dependentChisel.typesAndSyntax.typesAndOps.VarType
 
 object firrtlTypes {
 
   /** io part of one firrtl module */
   case class IOdef(
       name: String,
-      tpe: String,
+      tpe: VarType.Input.type | VarType.Output.type,
       width: Option[Int]
   )
 

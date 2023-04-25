@@ -1,5 +1,6 @@
 package dependentChisel
 
+import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 
 import dependentChisel.codegen.compiler.*
@@ -14,6 +15,7 @@ object testUtils {
       firCirc <- Try {
         val (mod, depInfo: GlobalInfo) = makeModule(f)
         val fMod = chiselMod2firrtlCircuits(mod)
+        // pp(fMod)
         // pp(fMod.modules map (_.modInfo))
         val firCirc = firrtlCircuits2str(fMod)
         println(firCirc)

@@ -37,7 +37,8 @@ object adder extends mainRunnable {
     y := a - b
   }
 
-  class DoubleAdder2[I <: Int](using parent: GlobalInfo) extends UserModule {
+// not work
+  class AdderTypeParm1[I <: Int](using parent: GlobalInfo) extends UserModule {
 // parent contains global info
 
     val a = newInput[I]("a")
@@ -51,8 +52,7 @@ object adder extends mainRunnable {
     y := a + b
   }
 
-  class DoubleAdder3(val size: Int)(using parent: GlobalInfo)
-      extends UserModule {
+  class DoubleAdder3(val size: Int)(using parent: GlobalInfo) extends UserModule {
 // parent contains global info
 
     val a = newInput[size.type]("a") // val a = newInput[size.type]("a",size)

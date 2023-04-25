@@ -35,9 +35,9 @@ represent a vector of bits */
   case class ExprAsBool[w <: Int](expr: Expr[w]) extends BoolExpr[w]
 
   /** Wire, Reg, and IO */
-  enum VarDeclTp { case Input, Output, Reg, Wire }
+  enum VarType { case Input, Output, Reg, Wire }
 
-  sealed trait ExprC[w <: Int, tp <: VarDeclTp] {
+  sealed trait ExprC[w <: Int, tp <: VarType] {
 
     inline def +(oth: ExprC[w, tp]) = {}
   }
@@ -45,7 +45,7 @@ represent a vector of bits */
   // new ExprC[1, VarDeclTp.Reg.type] {} + new ExprC[1, VarDeclTp.Wire.type] {} //ok ,will fail
 
   /** untyped API for Wire, Reg, and IO */
-  case class VarDymTyped(width: Int, tp: VarDeclTp, name: String)
+  case class VarDymTyped(width: Int, tp: VarType, name: String)
       extends Var[Nothing](name) {
 
     inline def asTyped[w <: Int] = {
@@ -64,18 +64,16 @@ represent a vector of bits */
   }
 
   /** typed API for Wire, Reg, and IO */
-  case class VarTyped[w <: Int, tp <: VarDeclTp](name: String) extends Var[w](name)
+  case class VarTyped[w <: Int](name: String, tp: VarType) extends Var[w](name)
 
-  case class Input[w <: Int](name: String) extends Var[w](name)
+  // case class Input[w <: Int](name: String) extends Var[w](name)
 
-  // case class Input[w <: Int](name: String) extends Var[w](name, true)
-
-  case class Output[w <: Int](name: String) extends Var[w](name)
+  // case class Output[w <: Int](name: String) extends Var[w](name)
 
   // for future use
 
   case class Lit[w <: Int](i: w) extends Expr[w] {}
-  case class LitDym(i: Int) extends Expr[Nothing]
+  // case class LitDym(i: Int) extends Expr[Nothing]
   /*
   extension [w <: Int](i: Bounded[0, w]) {
     def asLit = toLit[w](i)

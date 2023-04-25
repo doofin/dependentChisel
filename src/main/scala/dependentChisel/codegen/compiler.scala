@@ -58,7 +58,7 @@ object compiler {
 
     val cmds_ANF: List[Cmds] = cmdListToSingleAssign(cmds_widthChk)
     // dbg(cmds_ANF)
-    val ioNameChanged: List[Cmds] = cmdsTransform(modInfo.instName, cmds_ANF)
+    val ioNameChanged: List[Cmds] = cmdsTransform(modInfo.thisInstanceName, cmds_ANF)
     // dbg(ioNameChanged)
     val tree: AST = list2tree(ioNameChanged)
     FirrtlModule(modInfo, modInfo.io.toList, tree)
@@ -76,13 +76,15 @@ object compiler {
       indent: String = ""
   ): String = {
     val circuitStr = tree2firrtlStr(fMod.ast, indent)
-    val instName: String = fMod.modInfo.instName // name changes for io
+    val instName: String = fMod.modInfo.thisInstanceName // name changes for io
     val ioInfoStr = fMod.io.reverse // looks better
       .map { (x: IOdef) =>
+
         val prefix = x.tpe match {
-          case "input"  => "flip"
-          case "output" => ""
+          case VarType.Input  => "flip"
+          case VarType.Output => ""
         }
+
         // dbg(x.name)
         val name = x.name // fullName2IOName(instName, x.name) // rm module name
         // pt(instName, x.name, name)
@@ -177,7 +179,7 @@ object compiler {
         // pp(x)
         // constValueOpt[w].get.toString // doesn't work currently since type param is rm
         x.i.toString()
-      case LitDym(i)        => i.toString()
+      // case LitDym(i)        => i.toString()
       case ExprAsBool(expr) => expr2firrtlStr(expr)
     }
   }
@@ -200,21 +202,21 @@ object compiler {
   }
 
   def varDecl2firrtlStr(indent: String = "", stmt: VarDecls) = {
-    val VarDymTyped(width: Int, tp: VarDeclTp, name: String) = stmt.v
+    val VarDymTyped(width: Int, tp: VarType, name: String) = stmt.v
     tp match {
-      case VarDeclTp.Reg =>
+      case VarType.Reg =>
         /* reg mReg : UInt<16>, clock with :
       reset => (reset, UInt<16>("h0")) @[regWire.scala 13:21] */
 
         s"""reg ${name} : UInt<${width}>, clock with : 
         ${indent}reset => (reset, UInt<${width}>("h0"))"""
-      case VarDeclTp.Wire =>
+      case VarType.Wire =>
         /* wire wire1 : UInt<16> @[regWire.scala 18:19] */
         s"wire $name : UInt<$width>"
 
       // io is only put in header section like output io : { flip a : UInt<16>, flip b : UInt<16>, y : UInt<16>}
-      case VarDeclTp.Input  => ""
-      case VarDeclTp.Output => ""
+      case VarType.Input  => ""
+      case VarType.Output => ""
     }
   }
 
@@ -260,11 +262,15 @@ object compiler {
         io.y:=a+b becomes y0=a+b;io.y<=y0
            */
 
-          case x: (Input[?] | Output[?]) =>
-            List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
+          case VarTyped(name, tp) =>
+            tp match {
+              case VarType.Input | VarType.Output =>
+                List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
+              case _ => List(stmt)
+            }
           case VarDymTyped(width, tp, name) =>
             tp match {
-              case VarDeclTp.Input | VarDeclTp.Output =>
+              case VarType.Input | VarType.Output =>
                 List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
               case _ => List(stmt)
             }
@@ -295,15 +301,16 @@ object compiler {
       case x @ VarLit(name) => x
       case x @ VarDymTyped(width, tp, name) =>
         tp match {
-          case VarDeclTp.Input | VarDeclTp.Output =>
+          case VarType.Input | VarType.Output =>
             x.copy(name = ioNameTransform(thisInstName, name))
           case _ => x
         }
-      case x: Input[?] =>
-        x.copy(name = ioNameTransform(thisInstName, x.name))
-
-      case x: Output[?] =>
-        x.copy(name = ioNameTransform(thisInstName, x.name))
+      case x @ VarTyped(name, tp) =>
+        tp match {
+          case VarType.Input | VarType.Output =>
+            x.copy(name = ioNameTransform(thisInstName, name))
+          case _ => x
+        }
     }
   }
 

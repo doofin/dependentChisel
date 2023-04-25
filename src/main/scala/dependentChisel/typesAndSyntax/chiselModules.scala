@@ -27,7 +27,7 @@ object chiselModules {
   )
   case class ModLocalInfo(
       className: String,
-      instName: String,
+      thisInstanceName: String,
       io: ArrayBuffer[IOdef] = ArrayBuffer(),
       commands: ArrayBuffer[Cmds] = ArrayBuffer(), // list of seq cmds
       typeMap: mutable.Map[Expr[?] | Var[?], Option[Int]] =
@@ -45,7 +45,7 @@ object chiselModules {
     println(s"new inst $thisInstanceName for $thisClassName")
 
     given modLocalInfo: ModLocalInfo =
-      ModLocalInfo(className = thisClassName, instName = thisInstanceName)
+      ModLocalInfo(className = thisClassName, thisInstanceName = thisInstanceName)
     // def name = this.getClass.getCanonicalName.split('.').last
     val globalInfo = parent
 
