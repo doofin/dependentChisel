@@ -15,8 +15,9 @@ object adder extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
     val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
-      new DoubleAdder
-    // new DoubleAdder3(2)
+      // new AdderCall1
+      // new DoubleAdder3(2)
+      new AdderComb4
     }
     val fMod = chiselMod2firrtlCircuits(mod)
     // pp(fMod.modules map (_.modInfo))
@@ -68,7 +69,7 @@ object adder extends mainRunnable {
     y := a + b
   }
 
-  class DoubleAdder(using parent: GlobalInfo) extends UserModule {
+  class AdderCall1(using parent: GlobalInfo) extends UserModule {
 // parent contains global info
 
     val a = newInput[2]("a")
@@ -82,6 +83,26 @@ object adder extends mainRunnable {
     m1.a := a
     m1.b := b
     y := m1.y
+  }
+
+  class AdderComb4(using parent: GlobalInfo) extends UserModule {
+// parent contains global info
+
+    val a = newInput[2]("a")
+    val b = newInput[2]("b")
+    val c = newInput[2]("c")
+    val d = newInput[2]("d")
+    val y = newOutput[2]("y")
+
+    val m1 = newMod(new Adder1) // might be able to rm this
+    val m2 = newMod(new Adder1) // might be able to rm this
+    // m1.y := a - b // will both err
+    m1.a := a
+    m1.b := b
+    m2.a := c
+    m2.b := d
+
+    y := m1.y + m2.y
   }
 
 }

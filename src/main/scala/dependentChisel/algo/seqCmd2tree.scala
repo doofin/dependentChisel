@@ -38,6 +38,7 @@ object seqCmd2tree {
         case stmt: (FirStmt | NewInstStmt | VarDecls) =>
           val newNd: AST = TreeNode(stmt)
           Try(parents.top).foreach(p => p.cld += newNd)
+        case _ =>
       }
 
       // println("parents after:")

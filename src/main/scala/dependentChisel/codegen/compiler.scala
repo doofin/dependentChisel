@@ -52,7 +52,7 @@ object compiler {
         x
       case x => x
     }
-    assert(checkWidthVar, "checkWidth failed!")
+    if (global.enableWidthCheck) assert(checkWidthVar, "checkWidth failed!")
     // if (!checkWidthVar) { throw new Exception("checkWidth failed!") }
     // dbg(checkWidthVar)
 
@@ -298,22 +298,9 @@ object compiler {
         io.y:=a+b becomes y0=a+b;io.y<=y0
            */
 
-          case VarTyped(name, tp) =>
-            tp match {
-              case VarType.Input | VarType.Output | VarType.RegInit(_) =>
-                List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
-              case _ => List(stmt)
-            }
-
+          case x: (VarTyped[?] | VarDymTyped) =>
             List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
 
-          case VarDymTyped(width, tp, name) =>
-            tp match {
-              case VarType.Input | VarType.Output | VarType.RegInit(_) =>
-                List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
-              case _ => List(stmt)
-            }
-            List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
           case _ => List(stmt)
         }
         stmtNew ++ resList

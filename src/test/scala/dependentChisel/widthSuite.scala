@@ -6,6 +6,7 @@ import dependentChisel.tests.ifTest.*
 import dependentChisel.testUtils.widthAndFirrtlOk
 import org.scalatest.funsuite.AnyFunSuite
 
+/* ATTN! set flags in global to turn on width check! */
 class widthSuite extends AnyFunSuite {
 
   test("width check correct cases") {
