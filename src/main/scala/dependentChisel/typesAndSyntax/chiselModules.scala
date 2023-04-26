@@ -38,7 +38,8 @@ object chiselModules {
 
   /* function style UserModule ,for example: when {} else {} */
   trait UserModule(using parent: GlobalInfo) extends UserModuleOps, UserModuleDecls {
-    val thisClassName = this.getClass.getCanonicalName.split('.').last.mkString
+    val thisClassName =
+      this.getClass.getCanonicalName.split('.').last.mkString + naming.getIdWithDash
 
     /** Name for this Instance after new class.. */
     val thisInstanceName = naming.mkUidFrom(thisClassName)
