@@ -20,11 +20,12 @@ import dependentChisel.codegen.compiler
  */
 object varDecls {
 
-  inline def newLit(i: Int) = {
+  inline def newLit[w <: Int](v: Int, width: Option[Int] = None) = {
     // 199 is UInt<8>("hc7")
     /* expecting {UnsignedInt, SignedInt, HexLit, OctalLit, BinaryLit}
     output (hexStr,ceiling width)*/
-    LitDym(i)
+    val w = constValueOpt[w].orElse(width).getOrElse(compiler.int2hexAndCeiling(v)._2)
+    LitDym(v, w)
   }
 
   /** allow to be called outside module */
@@ -73,7 +74,7 @@ object varDecls {
 
     def newRegInitDym(init: LitDym, givenName: String = "") = {
       // need to push this cmd for varDecl
-      val width = compiler.int2hexAndCeiling(init.i)._2
+      val width = init.width
       val genName = naming.genNameForVar(givenName, VarType.Reg)
       val r = VarDymTyped(width, VarType.RegInit(init), genName)
       modLocalInfo.typeMap.addOne(r, Some(width))

@@ -20,7 +20,9 @@ object BubbleFifo extends mainRunnable {
     val (mod, globalCircuit) = makeModule { implicit p =>
 //   new IfElse1
       // new FifoRegister(1) // ok
-      new BubbleFifo(1, 2)
+      // new BubbleFifo(1, 2)
+      new BubbleFifo(4, 6)
+      // new FifoRegister(5) // ok
     }
 
     val fMod = chiselMod2firrtlCircuits(mod)
@@ -71,7 +73,7 @@ object BubbleFifo extends mainRunnable {
     val (empty, full) = (newLit(0), newLit(1))
 
     val stateReg = newRegInitDym(empty)
-    val dataReg = newRegInitDym(newLit(size)) // TODO
+    val dataReg = newRegInitDym(newLit(0, Some(size))) // TODO
 
     If(stateReg === empty) {
       IfElse(enq.write) {

@@ -181,9 +181,9 @@ object compiler {
         // h0 means HexLit of 0
         s"""UInt<${w}>("$w")"""
         ???
-      case LitDym(i) =>
-        val (hex, cl) = int2hexAndCeiling(i)
-        s"""UInt<${cl}>("h$hex")"""
+      case LitDym(i, width) =>
+        val (hex, _) = int2hexAndCeiling(i)
+        s"""UInt<${width}>("h$hex")"""
       // case ExprAsBool(expr) => expr2firrtlStr(expr)
     }
   }

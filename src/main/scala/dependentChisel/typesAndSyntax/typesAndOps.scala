@@ -59,17 +59,18 @@ represent a vector of bits */
   case class VarDymTyped(width: Int, tp: VarType, name: String)
       extends Var[Nothing](name) {
 
+    /** dym check for type cast */
     inline def asTyped[w <: Int] = {
 
-      // dym check for type cast legality
       constValueOpt[w].foreach { wd =>
         val castOk = wd == width
-        val msg = "asTyped cast error !"
+        val msg = s"asTyped cast error in ${this}!"
         if (!castOk) {
-          println(s"$msg at ${this}")
+          println(msg)
         }
         assert(castOk, msg)
       }
+
       this.asInstanceOf[Var[w]]
     }
   }
@@ -86,7 +87,7 @@ represent a vector of bits */
 // case class Lit[w <: Int](i: w, name: String) extends Expr[w] {}
   type sml[w <: Int] <: w ^ 2
   case class Lit[w <: Int](i: w) extends Expr[w] {}
-  case class LitDym(i: Int) extends Expr[Nothing]
+  case class LitDym(i: Int, width: Int) extends Expr[Nothing]
   /*
   extension [w <: Int](i: Bounded[0, w]) {
     def asLit = toLit[w](i)

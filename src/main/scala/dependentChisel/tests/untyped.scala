@@ -71,12 +71,25 @@ object untyped extends mainRunnable {
 
   class AdderUnTpCallUntpErr(using parent: GlobalInfo) extends UserModule {
 
+    val a = newInputDym(2)
+    val b = newInputDym(2)
+    val y = newOutputDym(1)
+
+    val m1 = newMod(new AdderUntp1)
+    m1.a := a
+    m1.b := b
+    y := m1.y // not allowed since for width, lhs < rhs
+  }
+
+  /** allow width mismatch if lhs>rhs */
+  class AdderUnTpCallUntpWidthGt(using parent: GlobalInfo) extends UserModule {
+
     val a = newInputDym(1)
     val b = newInputDym(2)
     val y = newOutputDym(2)
 
     val m1 = newMod(new AdderUntp1)
-    m1.a := a
+    m1.a := a // allowed since for width, lhs > rhs
     m1.b := b
     y := m1.y
   }
@@ -85,7 +98,7 @@ object untyped extends mainRunnable {
 
     val a = newInputDym(2)
     val b = newInputDym(2)
-    val y = newOutputDym(2)
+    val y = newOutputDym(1)
 
     val m1 = newMod(new Adder1)
     m1.a := a.asTyped[2] // can't detect this due to cast!!

@@ -25,7 +25,7 @@ object testUtils {
       vlg <- firrtlUtils.firrtl2verilog(firCirc)
     } yield vlg
 
-    verilog.isSuccess
+    ("mod.thisInstanceName", verilog.isSuccess)
   }
 
 }

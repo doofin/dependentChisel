@@ -29,8 +29,8 @@ object typeCheck {
       // case VarTyped(name)               =>
       // case Input(name)                  =>
       // case Output(name)                 =>
-      case Lit(i)    => i
-      case LitDym(i) => compiler.int2hexAndCeiling(i)._2
+      case Lit(i)           => i
+      case LitDym(i, width) => width
       case x =>
         tm(x).get
     }
@@ -49,17 +49,17 @@ object typeCheck {
           // only check if both result are numbers
           case lrWidth @ (i, j) =>
             val isWidthEqu = i == j
+            val lhsGeqRhs = i >= j // firrtl allows width of lhs >= rhs in lhs:=rhs
+            val msg =
+              s"checkWidth=$isWidthEqu,lhsGeqRhs=$lhsGeqRhs in  ${(lhs, i)} $op ${(rhs, j)} "
+            val isWidthOk = isWidthEqu | lhsGeqRhs
+            // assert(isWidthOk, msg)
+
             if (!isWidthEqu) {
-              val msg = s"checkWidth err :  ${(lhs, i)} $op ${(rhs, j)} "
-              // assert(isWidthEqu, msg)
-              println(msg)
+              println(msg + s"\n isWidthEqu | lhsGeqRhs =${isWidthEqu | lhsGeqRhs}")
             }
-            isWidthEqu
-
+            isWidthOk
         }
-        // checkExprWidth(typeMap, rhs)
-        // (lr, checkExprWidth(typeMap, rhs))
-
         lr
 
       case x => true

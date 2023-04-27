@@ -10,8 +10,15 @@ import org.scalatest.funsuite.AnyFunSuite
 class widthSuite extends AnyFunSuite {
 
   test("width check correct cases") {
-    assert(testUtils.widthAndFirrtlOk { implicit p => new untyped.AdderUnTpCallUntp })
-
+    val corrCases = Seq(
+      widthAndFirrtlOk { implicit p =>
+        new untyped.AdderUnTpCallUntp
+      },
+      widthAndFirrtlOk { implicit p =>
+        new untyped.AdderUnTpCallUntpWidthGt
+      }
+    )
+    corrCases.foreach(x => assert(x._2, x._1))
   }
 
   test("width check incorrect cases") {
@@ -23,6 +30,6 @@ class widthSuite extends AnyFunSuite {
       widthAndFirrtlOk { implicit p => new untyped.AdderUntpBug3typeCast }
     )
 
-    incorrectCases.foreach(x => assert(!x))
+    incorrectCases.foreach(x => assert(!x._2, x._1))
   }
 }
