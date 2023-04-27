@@ -20,10 +20,7 @@ object typeCheck {
       case BinOp(a, b, nm) =>
         val (i, j) = (getExprWidth(typeMap, a), getExprWidth(typeMap, b))
         val isWidthEqu = i == j
-        if (!isWidthEqu) {
-          dbg(a, b, nm)
-          assert(false, "checkWidth find Width mismatch inside expr ! ")
-        }
+        assert(isWidthEqu, s"getExprWidth: Width mismatch $a $nm $b ")
         i
 
       // case VarLit(name)     =>
@@ -51,12 +48,13 @@ object typeCheck {
         val lr = (getExprWidth(typeMap, lhs), getExprWidth(typeMap, rhs)) match {
           // only check if both result are numbers
           case lrWidth @ (i, j) =>
-            val widthEqu = i == j
-            if (!widthEqu) {
-              println("checkWidth find Width mismatch for := ! ")
-              dbg(lrWidth)
+            val isWidthEqu = i == j
+            if (!isWidthEqu) {
+              val msg = s"checkWidth err :  ${(lhs, i)} $op ${(rhs, j)} "
+              // assert(isWidthEqu, msg)
+              println(msg)
             }
-            widthEqu
+            isWidthEqu
 
         }
         // checkExprWidth(typeMap, rhs)

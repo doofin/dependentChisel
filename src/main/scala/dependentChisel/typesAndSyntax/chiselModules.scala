@@ -17,6 +17,7 @@ import dependentChisel.syntax.naming
 
 import dependentChisel.typesAndSyntax.control
 import dependentChisel.typesAndSyntax.varDecls.UserModuleDecls
+import dependentChisel.global
 
 /** imperative style for chisel ,record info in mutable vars inside class chiselModules
   */
@@ -43,7 +44,7 @@ object chiselModules {
 
     /** Name for this Instance after new class.. */
     val thisInstanceName = naming.mkUidFrom(thisClassName)
-    println(s"new inst $thisInstanceName for $thisClassName")
+    if (global.debugVerbose) println(s"new inst $thisInstanceName for $thisClassName")
 
     given modLocalInfo: ModLocalInfo =
       ModLocalInfo(className = thisClassName, thisInstanceName = thisInstanceName)
