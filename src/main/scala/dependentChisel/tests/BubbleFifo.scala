@@ -20,7 +20,7 @@ object BubbleFifo extends mainRunnable {
     val (mod, globalCircuit) = makeModule { implicit p =>
 //   new IfElse1
       // new FifoRegister(1) // ok
-      new BubbleFifo(2, 2)
+      new BubbleFifo(1, 2)
     }
 
     val fMod = chiselMod2firrtlCircuits(mod)
@@ -45,22 +45,30 @@ object BubbleFifo extends mainRunnable {
 
   class WriterIO(size: Int)(using mli: ModLocalInfo) {
     // newIO[2](VarType.Input)
+    /** Input */
     val write = newIO[1](VarType.Input) // Bool() = UInt<1>
+    /** Output */
     val full = newIO[1](VarType.Output)
+
+    /** Input */
     val din = newIODym(size, VarType.Input)
   }
 
   class ReaderIO(size: Int)(using mli: ModLocalInfo) {
+
+    /** Input */
     val read = newIO[1](VarType.Input) // Bool() = UInt<1>
+    /** Output */
     val empty = newIO[1](VarType.Output) // Bool() = UInt<1>
+    /** Output */
     val dout = newIODym(size, VarType.Output)
   }
 
   class FifoRegister(using parent: GlobalInfo)(size: Int) extends UserModule {
     val enq = new WriterIO(size)
-    val deq = new ReaderIO(size) // TODO fix create multiple inst
+    val deq = new ReaderIO(size)
 
-    val (empty, full) = (newLit(0), newLit(1)) // TODO should be 0,1
+    val (empty, full) = (newLit(0), newLit(1))
 
     val stateReg = newRegInitDym(empty)
     val dataReg = newRegInitDym(newLit(size)) // TODO
@@ -78,27 +86,10 @@ object BubbleFifo extends mainRunnable {
         }
       }
     }
-
-    enq.full := (stateReg === full)
-    deq.empty := (stateReg === empty)
-    deq.dout := dataReg
-  }
-
-  class FifoRegisterSimp1(using parent: GlobalInfo)(size: Int) extends UserModule {
-    val enq = new WriterIO(size)
-    val deq = new ReaderIO(size) // TODO fix create multiple inst
-
-    // val (empty, full) = (Lit[0](0), Lit[1](1))
-    val (empty, full) = (newLit(0), newLit(1)) // TODO should be 0,1
-
-    val stateReg = newRegInitDym(empty)
-    val dataReg = newRegInitDym(newLit(size))
-    IfElse(stateReg === empty) {
-      stateReg := full
-    } {
-      stateReg := empty
-    }
-
+    /* original:
+  io.enq.full := (stateReg === full)
+  io.deq.empty := (stateReg === empty)
+  io.deq.dout := dataReg */
     enq.full := (stateReg === full)
     deq.empty := (stateReg === empty)
     deq.dout := dataReg
@@ -137,19 +128,62 @@ class FifoRegister(size: Int) extends Module {
   /** This is a bubble FIFO.
     */
   class BubbleFifo(using parent: GlobalInfo)(size: Int, depth: Int) extends UserModule {
+    /*   val io = IO(new Bundle {
+    val enq = new WriterIO(size)
+    val deq = new ReaderIO(size)
+  })
+     */
     val enq = new WriterIO(size)
     val deq = new ReaderIO(size)
 
-    val buffers = 0 to depth map (x => newMod(new FifoRegister(size)))
+    val buffers = Array.fill(depth) { newMod(new FifoRegister(size)) }
 
-    (0 until depth - 1) foreach { i =>
+    val depList = 0 until depth - 1
+    assert(depList.nonEmpty)
+    depList foreach { i =>
       buffers(i + 1).enq.din := buffers(i).deq.dout
       buffers(i + 1).enq.write := buffers(i).deq.empty
       buffers(i).deq.read := buffers(i + 1).enq.full
     }
-    // io.enq <> buffers(0).io.enq
-    enq.din := buffers(0).enq.din
-    // io.deq <> buffers(depth - 1).io.deq
+
+    // bulk conn : io.enq <> buffers(0).io.enq
+    buffers(0).enq.din := enq.din // not work! input can't be lhs,but flip lhs rhs works?
+    enq.full := buffers(0).enq.full
+
+    // enq.write (enq : { flip write ) = Expression io.io_i_3 is used as a SinkFlow but can only be used as a SourceFlow
+    buffers(0).enq.write := enq.write // not work! input can't be lhs
+
+    // bulk conn :  io.deq <> buffers(depth - 1).io.deq
+    deq.dout := buffers(depth - 1).deq.dout
+    deq.empty := buffers(depth - 1).deq.empty
+    buffers(depth - 1).deq.read := deq.read // need to flip lhs,rhs
   }
 
 }
+/* bulk conn
+  FifoRegister.io.enq.din <= io.enq.din @[bubbleFIFO.scala 153:10]
+    io.enq.full <= FifoRegister.io.enq.full @[bubbleFIFO.scala 153:10]
+    FifoRegister.io.enq.write <= io.enq.write @[bubbleFIFO.scala 153:10]
+
+    io.deq.dout <= FifoRegister_1.io.deq.dout @[bubbleFIFO.scala 154:10]
+    io.deq.empty <= FifoRegister_1.io.deq.empty @[bubbleFIFO.scala 154:10]
+    FifoRegister_1.io.deq.read <= io.deq.read @[bubbleFIFO.scala 154:10]
+ */
+
+/*
+class BubbleFifo(size: Int, depth: Int) extends Module {
+  val io = IO(new Bundle {
+    val enq = new WriterIO(size)
+    val deq = new ReaderIO(size)
+  })
+
+  val buffers = Array.fill(depth) { Module(new FifoRegister(size)) }
+  for (i <- 0 until depth - 1) {
+    buffers(i + 1).io.enq.din := buffers(i).io.deq.dout
+    buffers(i + 1).io.enq.write := ~buffers(i).io.deq.empty
+    buffers(i).io.deq.read := ~buffers(i + 1).io.enq.full
+  }
+  io.enq <> buffers(0).io.enq
+  io.deq <> buffers(depth - 1).io.deq
+}
+ */

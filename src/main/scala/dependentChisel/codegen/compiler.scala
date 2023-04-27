@@ -56,7 +56,7 @@ object compiler {
     // if (!checkWidthVar) { throw new Exception("checkWidth failed!") }
     // dbg(checkWidthVar)
 
-    val cmds_ANF: List[Cmds] = cmdListToSingleAssign(cmds_widthChk)
+    val cmds_ANF: List[Cmds] = expandCmdList(cmds_widthChk)
     // dbg(cmds_ANF)
     val ioNameChanged: List[Cmds] = cmdsTransform(modInfo.thisInstanceName, cmds_ANF)
     // dbg(ioNameChanged)
@@ -86,9 +86,10 @@ object compiler {
         }
 
         // dbg(x.name)
+        assert(x.width.nonEmpty, "x.width shouldn't be empty")
         val name = x.name // fullName2IOName(instName, x.name) // rm module name
         // pt(instName, x.name, name)
-        s"$prefix $name : UInt<${x.width.getOrElse(-1)}>"
+        s"$prefix $name : UInt<${x.width.get}>"
       }
       .mkString(", ")
 
@@ -107,7 +108,7 @@ object compiler {
   }
 
   /** can insert more commands */
-  def cmdListToSingleAssign(cmdList: List[Cmds]): List[Cmds] = {
+  def expandCmdList(cmdList: List[Cmds]): List[Cmds] = {
     cmdList flatMap {
       case x: FirStmt =>
         val fir = stmtToSingleAssign(x)
@@ -296,10 +297,12 @@ object compiler {
         val stmtNew = lhs match {
           /* if lhs is IO,change := to <= and make new conn
         io.y:=a+b becomes y0=a+b;io.y<=y0
-           */
+        new : don't do above
 
+           */
           case x: (VarTyped[?] | VarDymTyped) =>
-            List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
+            // List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
+            List(stmt.copy(op = "<="))
 
           case _ => List(stmt)
         }

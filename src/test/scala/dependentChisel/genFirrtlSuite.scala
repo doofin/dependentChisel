@@ -6,7 +6,7 @@ import dependentChisel.tests.ifTest.*
 
 import dependentChisel.tests.untyped
 import dependentChisel.testUtils.widthAndFirrtlOk
-import dependentChisel.tests.BubbleFifo.FifoRegisterSimp1
+import dependentChisel.tests.BubbleFifo.*
 
 class genFirrtlSuite extends AnyFunSuite {
 
@@ -17,7 +17,8 @@ class genFirrtlSuite extends AnyFunSuite {
       widthAndFirrtlOk { implicit p => new AdderCall1 },
       widthAndFirrtlOk { implicit p => new AdderComb4 },
       widthAndFirrtlOk { implicit p => new IfModNested },
-      widthAndFirrtlOk { implicit p => new FifoRegisterSimp1(1) }
+      widthAndFirrtlOk { implicit p => new BubbleFifo(1, 2) },
+      widthAndFirrtlOk { implicit p => new FifoRegister(5) }
     ).foreach(assert(_))
   }
 
