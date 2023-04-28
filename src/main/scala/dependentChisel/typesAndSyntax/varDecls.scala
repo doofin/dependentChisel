@@ -20,10 +20,13 @@ import dependentChisel.codegen.compiler
  */
 object varDecls {
 
+  /** use width in type param first,then try with width: Option[Int] in param. if both are
+    * not provided then auto infer the width
+    */
   inline def newLit[w <: Int](v: Int, width: Option[Int] = None) = {
-    // 199 is UInt<8>("hc7")
-    /* expecting {UnsignedInt, SignedInt, HexLit, OctalLit, BinaryLit}
-    output (hexStr,ceiling width)*/
+    /* example : 199 is UInt<8>("hc7")
+    type of lit: {UnsignedInt, SignedInt, HexLit, OctalLit, BinaryLit}
+    output (hexStr,ceiling width) */
     val w = constValueOpt[w].orElse(width).getOrElse(compiler.int2hexAndCeiling(v)._2)
     LitDym(v, w)
   }
