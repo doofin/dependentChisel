@@ -5,6 +5,7 @@ import dependentChisel.tests.untyped
 import dependentChisel.tests.ifTest.*
 import dependentChisel.testUtils.widthAndFirrtlOk
 import org.scalatest.funsuite.AnyFunSuite
+import dependentChisel.tests.BubbleFifoErr
 
 /* ATTN! set flags in global to turn on width check! */
 class widthSuite extends AnyFunSuite {
@@ -27,7 +28,8 @@ class widthSuite extends AnyFunSuite {
       widthAndFirrtlOk { implicit p => new untyped.AdderUnTpCallUntpErr },
       widthAndFirrtlOk { implicit p => new untyped.AdderUntpBug1 },
       widthAndFirrtlOk { implicit p => new untyped.AdderUntpBug2 },
-      widthAndFirrtlOk { implicit p => new untyped.AdderUntpBug3typeCast }
+      widthAndFirrtlOk { implicit p => new untyped.AdderUntpBug3typeCast },
+      widthAndFirrtlOk { implicit p => new BubbleFifoErr.BubbleFifo(2, 3) }
     )
 
     incorrectCases.foreach(x => assert(!x._2, x._1))
