@@ -34,6 +34,9 @@ represent a vector of bits */
   }
   case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
 
+  /** uniary op like negate */
+  case class UniOp[w <: Int](a: Expr[w], nm: String) extends Expr[w]
+
   type Bool = Expr[1] // bool is just uint[1]
   // sealed trait BoolExpr[w <: Int] extends Expr[w]
   // case class ExprAsBool[w <: Int](expr: Expr[w]) extends BoolExpr[w]

@@ -5,6 +5,8 @@ import dependentChisel.typesAndSyntax.chiselModules.*
 
 import dependentChisel.codegen.compiler.*
 import scala.util.Try
+import scala.util.Failure
+import scala.util.Success
 
 object testUtils {
 
@@ -18,14 +20,17 @@ object testUtils {
         // pp(fMod)
         // pp(fMod.modules map (_.modInfo))
         val firCirc = firrtlCircuits2str(fMod)
-        // println(firCirc)
+        println(firCirc)
         firCirc
       }
 
       vlg <- firrtlUtils.firrtl2verilog(firCirc)
     } yield vlg
+    val msg = verilog match
+      case Failure(exception) => exception.getMessage()
+      case Success(value)     => ""
 
-    ("mod.thisInstanceName", verilog.isSuccess)
+    (msg, verilog.isSuccess)
   }
 
 }

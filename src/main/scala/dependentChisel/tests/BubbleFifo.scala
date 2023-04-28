@@ -19,7 +19,7 @@ object BubbleFifo extends mainRunnable {
 //   new IfElse1
       // new FifoRegister(1) // ok
       // new BubbleFifo(1, 2) // ok
-      new BubbleFifo(4, 6) // ok
+      new BubbleFifo(2, 3) // ok
       // new FifoRegister(5) // ok
     }
 
@@ -129,8 +129,8 @@ class FifoRegister(size: Int) extends Module {
     assert(depList.nonEmpty)
     depList foreach { i =>
       buffers(i + 1).enq.din := buffers(i).deq.dout
-      buffers(i + 1).enq.write := buffers(i).deq.empty
-      buffers(i).deq.read := buffers(i + 1).enq.full
+      buffers(i + 1).enq.write := ~buffers(i).deq.empty
+      buffers(i).deq.read := ~buffers(i + 1).enq.full
     }
 
     // bulk conn : io.enq <> buffers(0).io.enq

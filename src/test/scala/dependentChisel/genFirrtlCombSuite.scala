@@ -1,3 +1,4 @@
+/*
 package dependentChisel
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -9,7 +10,7 @@ import dependentChisel.testUtils.widthAndFirrtlOk
 import dependentChisel.tests.BubbleFifo.*
 import dependentChisel.tests.BubbleFifo
 
-/* class genFirrtlCombSuite extends AnyFunSuite {
+ class genFirrtlCombSuite extends AnyFunSuite {
 
   test("can pass firrtl compiler for FifoRegister(1) to FifoRegister(10)") {
     (1 to 10 map (i => widthAndFirrtlOk { implicit p => new FifoRegister(i) })).foreach(

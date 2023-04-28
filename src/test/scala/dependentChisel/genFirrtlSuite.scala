@@ -9,7 +9,7 @@ import dependentChisel.testUtils.widthAndFirrtlOk
 import dependentChisel.tests.BubbleFifo.*
 import dependentChisel.tests.BubbleFifo
 
-class genFirrtlSuite extends AnyFunSuite {
+class genFirrtlSuite extends AnyFunSuite { // AnyFunSuite  munit.FunSuite
 
   test("can pass firrtl compiler down to verilog") {
     Seq(

@@ -173,7 +173,8 @@ object compiler {
       case BinOp(a, b, nm) =>
         val opName = firrtlOpMap.find(_._1 == nm).map(_._2).getOrElse(nm)
         s"$opName(${expr2firrtlStr(a)},${expr2firrtlStr(b)})" // here it's SSA form
-
+      case UniOp(a, opName) =>
+        s"$opName(${expr2firrtlStr(a)})"
       case x: Var[?] =>
         // dbg(x)
         x.getname
@@ -275,9 +276,9 @@ object compiler {
       stmt: FirStmt,
       resList: List[FirStmt] = List()
   ): List[FirStmt] = {
-    val FirStmt(lhs, op, rhs, _) = stmt
+    val FirStmt(stmtLhs, op, stmtRhs, _) = stmt
 
-    rhs match {
+    stmtRhs match {
       // fresh stmt for the first 2 case
       case bop @ BinOp(a: BinOp[?], b, nm) => // bin expr like a+b+c
         val genStmt = expr2stmtBind(a)
@@ -292,21 +293,45 @@ object compiler {
             )
           ) ++ resList
         )
-      case x: Expr[?] => // bin expr like a+b or others
-        val genStmt = expr2stmtBind(rhs)
-        val stmtNew = lhs match {
-          /* if lhs is IO,change := to <= and make new conn
+
+      /* for uniary operators:
+      convert
+      a = not b --->
+      node n0=not b
+      a=n0
+       */
+      case uop @ UniOp(a, nm) =>
+        val genStmt = expr2stmtBind(a)
+        val stmtNew = FirStmt(
+          stmtLhs,
+          ":=",
+          genStmt.lhs
+        )
+
+        stmtToSingleAssign(
+          genStmt,
+          stmtToSingleAssign(stmtNew) // convert := to <= for IO
+            ++ resList
+        )
+      // other expr like a+b or others, just ...
+      case x: Expr[?] =>
+        IOassignTransform(stmt) +: resList
+    }
+  }
+
+  /** just convert := to <= for IO */
+  def IOassignTransform(stmt: FirStmt): FirStmt = {
+    stmt.lhs match {
+      /* if lhs is IO,change := to <= and make new conn
         io.y:=a+b becomes y0=a+b;io.y<=y0
         new : don't do above
+       */
+      case x: (VarTyped[?] | VarDymTyped) =>
+        // val genStmt = expr2stmtBind(a)
+        // List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
+        stmt.copy(op = "<=")
 
-           */
-          case x: (VarTyped[?] | VarDymTyped) =>
-            // List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
-            List(stmt.copy(op = "<="))
-
-          case _ => List(stmt)
-        }
-        stmtNew ++ resList
+      case _ => stmt
     }
   }
 

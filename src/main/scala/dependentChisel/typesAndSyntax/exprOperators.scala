@@ -1,6 +1,7 @@
 package dependentChisel.typesAndSyntax
 
 import typesAndOps.{Expr, BinOp, Bool}
+import dependentChisel.typesAndSyntax.typesAndOps.UniOp
 
 trait exprOperators {
 //int ops
@@ -18,6 +19,7 @@ trait exprOperators {
   extension (x: Expr[1]) {
     def |(oth: Expr[1]) = BinOp(x, oth, "or")
     def &(oth: Expr[1]) = BinOp(x, oth, "and")
+    def unary_~ = UniOp[1](x, "not")
   }
 
   /* sealed trait Expr[w <: Int] {

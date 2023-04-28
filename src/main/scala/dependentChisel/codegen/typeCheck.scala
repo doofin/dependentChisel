@@ -22,7 +22,7 @@ object typeCheck {
         val isWidthEqu = i == j
         assert(isWidthEqu, s"getExprWidth: Width mismatch $a $nm $b ")
         i
-
+      case UniOp(a, nm) => tm(a).get
       // case VarLit(name)     =>
       // case ExprAsBool(expr) =>
       // case VarDymTyped(width, tp, name) =>
@@ -50,13 +50,13 @@ object typeCheck {
           case lrWidth @ (i, j) =>
             val isWidthEqu = i == j
             val lhsGeqRhs = i >= j // firrtl allows width of lhs >= rhs in lhs:=rhs
-            val msg =
-              s"checkWidth=$isWidthEqu,lhsGeqRhs=$lhsGeqRhs in  ${(lhs, i)} $op ${(rhs, j)} "
             val isWidthOk = isWidthEqu | lhsGeqRhs
-            // assert(isWidthOk, msg)
+            val msg =
+              s"checkWidth isWidthOk =${isWidthEqu | lhsGeqRhs} in  ${(lhs, i)} $op ${(rhs, j)} "
 
-            if (!isWidthEqu) {
-              println(msg + s"\n isWidthEqu | lhsGeqRhs =${isWidthEqu | lhsGeqRhs}")
+            // assert(isWidthOk, msg)
+            if (!isWidthOk) {
+              println(msg)
             }
             isWidthOk
         }
