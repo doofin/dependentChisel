@@ -11,7 +11,7 @@ import scala.util.Success
 object testUtils {
 
   /** pass firrtl compiler */
-  def widthAndFirrtlOk[M <: UserModule](f: GlobalInfo => M) = {
+  def checkWidthAndFirrtl[M <: UserModule](f: GlobalInfo => M) = {
 
     val verilog = for {
       firCirc <- Try {

@@ -19,8 +19,8 @@ object BubbleFifo extends mainRunnable {
 //   new IfElse1
       // new FifoRegister(1) // ok
       // new BubbleFifo(1, 2) // ok
-      new BubbleFifo(2, 3) // ok
-      // new FifoRegister(5) // ok
+      // new BubbleFifo(2, 3) // ok
+      new FifoRegister(2) // ok
     }
 
     val fMod = chiselMod2firrtlCircuits(mod)
@@ -76,7 +76,9 @@ object BubbleFifo extends mainRunnable {
         If(stateReg === full) {
           If(deq.read) {
             stateReg := empty
-            dataReg := newLit(0)
+            /* in the book,it's dataReg := 0.U which has size error,but firrtl allows size
+            of rhs>lhs so it won't fail */
+            dataReg := newLit(0, Some(size)) // bug? newLit(0)
           }
         }
       }

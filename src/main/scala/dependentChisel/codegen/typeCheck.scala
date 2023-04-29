@@ -36,8 +36,8 @@ object typeCheck {
     }
   }
 
-  def checkWidth(
-      typeMap: mutable.Map[Expr[?] | Var[?], Option[Int]],
+  def checkCmdWidth(
+      typeMap: mutable.Map[Expr[?], Option[Int]],
       cmds: AtomicCmds
   ) = {
     cmds match {
@@ -50,9 +50,9 @@ object typeCheck {
           case lrWidth @ (i, j) =>
             val isWidthEqu = i == j
             val lhsGeqRhs = i >= j // firrtl allows width of lhs >= rhs in lhs:=rhs
-            val isWidthOk = isWidthEqu | lhsGeqRhs
+            val isWidthOk = isWidthEqu // | lhsGeqRhs
             val msg =
-              s"checkWidth isWidthOk =${isWidthEqu | lhsGeqRhs} in  ${(lhs, i)} $op ${(rhs, j)} "
+              s"checkWidth isWidthOk =$isWidthOk in  ${(lhs, i)} $op ${(rhs, j)} "
 
             // assert(isWidthOk, msg)
             if (!isWidthOk) {

@@ -27,7 +27,9 @@ object varDecls {
     /* example : 199 is UInt<8>("hc7")
     type of lit: {UnsignedInt, SignedInt, HexLit, OctalLit, BinaryLit}
     output (hexStr,ceiling width) */
-    val w = constValueOpt[w].orElse(width).getOrElse(compiler.int2hexAndCeiling(v)._2)
+    val calcWidth = compiler.int2hexAndCeiling(v)._2
+    val w = constValueOpt[w].orElse(width).getOrElse(calcWidth)
+    // dbg(v, calcWidth, w, width)
     LitDym(v, w)
   }
 

@@ -27,34 +27,43 @@ object compiler {
   /** chisel ModLocalInfo to FirrtlModule(IO bundle,AST for the circuit) */
   def chiselMod2firrtlCircuits(chiselMod: UserModule) = {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
-    val glob = chiselMod.globalInfo
-    val allMods: List[UserModule] = glob.modules.toList
-    val allModTypeMap: mutable.Map[Expr[?] | Var[?], Option[Int]] =
+    val allMods: List[UserModule] = chiselMod.globalInfo.modules.toList
+
+    val typeMap: mutable.Map[Expr[?], Option[Int]] =
       allMods.map(_.modLocalInfo.typeMap) reduce (_ ++ _)
 
     val mainModuleName = modInfo.className
 
-    FirrtlCircuit(mainModuleName, allMods map chiselMod2firrtlMod(allModTypeMap))
+    FirrtlCircuit(mainModuleName, allMods map chiselMod2firrtlMod(typeMap))
   }
 
-  private def chiselMod2firrtlMod(
-      allModTypeMap: mutable.Map[Expr[?] | Var[?], Option[Int]]
-  )(chiselMod: UserModule): FirrtlModule = {
-    val modInfo: ModLocalInfo = chiselMod.modLocalInfo
-    // pp(modInfo.commands.toList)
-    // pp(modInfo.typeMap)
+  /** contains width assert if global.enableWidthCheck */
+  def checkWidthAssert(
+      typeMap: mutable.Map[Expr[?], Option[Int]],
+      cmdList: List[Cmds]
+  ) = {
     var checkWidthVar = true
-    val cmds_widthChk: List[Cmds] = modInfo.commands.toList.collect {
+    val r = cmdList.collect {
       case x: AtomicCmds =>
-        // val checkWidthR = Try(typeCheck.checkWidth(allModTypeMap, x))
-        val checkWidthR = typeCheck.checkWidth(allModTypeMap, x)
-        if (!checkWidthR) checkWidthVar = false
+        if (!typeCheck.checkCmdWidth(typeMap, x)) {
+          checkWidthVar = false
+        }
         x
       case x => x
     }
     if (global.enableWidthCheck) assert(checkWidthVar, "checkWidth failed!")
-    // if (!checkWidthVar) { throw new Exception("checkWidth failed!") }
-    // dbg(checkWidthVar)
+    r
+  }
+
+  private def chiselMod2firrtlMod(
+      typeMap: mutable.Map[Expr[?], Option[Int]]
+  )(chiselMod: UserModule): FirrtlModule = {
+    val modInfo: ModLocalInfo = chiselMod.modLocalInfo
+    // pp(modInfo.commands.toList)
+    // pp(modInfo.typeMap)
+    val cmdList = modInfo.commands.toList
+
+    val cmds_widthChk: List[Cmds] = checkWidthAssert(typeMap, cmdList)
 
     val cmds_ANF: List[Cmds] = expandCmdList(cmds_widthChk)
     // dbg(cmds_ANF)
