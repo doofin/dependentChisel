@@ -1,13 +1,15 @@
 package dependentChisel.tests
 
-import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.typesAndSyntax.varDecls.*
-import dependentChisel.typesAndSyntax.typesAndOps.*
-import dependentChisel.typesAndSyntax.statements.*
-import com.doofin.stdScala.mainRunnable
-import dependentChisel.codegen.compiler.*
+// import dependentChisel.typesAndSyntax.chiselModules.*
+// import dependentChisel.typesAndSyntax.varDecls.*
+// import dependentChisel.typesAndSyntax.typesAndOps.*
+// import dependentChisel.typesAndSyntax.statements.*
+// import dependentChisel.codegen.compiler.*
+
+import dependentChisel.api.*
 import dependentChisel.firrtlUtils
-import dependentChisel.typesAndSyntax.varDecls.*
+
+import com.doofin.stdScala.mainRunnable
 
 /* https://github.com/schoeberl/chisel-examples/blob/master/src/main/scala/simple/BubbleFifo.scala
  */
