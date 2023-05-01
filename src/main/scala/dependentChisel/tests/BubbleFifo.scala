@@ -1,12 +1,12 @@
 package dependentChisel.tests
 
-// import dependentChisel.typesAndSyntax.chiselModules.*
-// import dependentChisel.typesAndSyntax.varDecls.*
-// import dependentChisel.typesAndSyntax.typesAndOps.*
-// import dependentChisel.typesAndSyntax.statements.*
-// import dependentChisel.codegen.compiler.*
+import dependentChisel.typesAndSyntax.chiselModules.*
+import dependentChisel.typesAndSyntax.varDecls.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
+import dependentChisel.typesAndSyntax.statements.*
+import dependentChisel.codegen.compiler.*
 
-import dependentChisel.api.*
+// import dependentChisel.api.*
 import dependentChisel.firrtlUtils
 
 import com.doofin.stdScala.mainRunnable

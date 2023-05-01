@@ -20,7 +20,8 @@ class genFirrtlSuite extends AnyFunSuite { // AnyFunSuite  munit.FunSuite
       checkWidthAndFirrtl { implicit p => new IfModNested },
       checkWidthAndFirrtl { implicit p => new FifoRegister(5) },
       checkWidthAndFirrtl { implicit p => new BubbleFifo(1, 2) },
-      checkWidthAndFirrtl { implicit p => new BubbleFifo(3, 5) }
+      checkWidthAndFirrtl { implicit p => new BubbleFifo(3, 5) },
+      checkWidthAndFirrtl { implicit p => new AdderTypeParm3 }
     ).foreach(x => assert(x._2, x._1))
   }
 

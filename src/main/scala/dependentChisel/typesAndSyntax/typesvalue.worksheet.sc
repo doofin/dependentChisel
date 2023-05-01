@@ -44,4 +44,11 @@ inline def int2hexAndCeiling(i: Int) = {
 
 val i3 = int2hexAndCeiling(2)
 
+class c1[i <: Int] { inline def sz = constValueOpt[i] }
+(new c1[1]).sz
 // Lit[i3._2.type](1)
+
+class c2[i <: Int] { println("constValueOpt:" + constValueOpt[i]) }
+new c2[2]
+
+// r2.rr

@@ -11,13 +11,19 @@ import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.codegen.compiler.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 
+import scala.compiletime.*
+import scala.compiletime.ops.int.*
+import dependentChisel.typesAndSyntax.varDecls.newIO
+
 object adder extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
     val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
       // new AdderCall1
       // new DoubleAdder3(2)
-      new AdderComb4
+      // new AdderComb4
+      // new AdderTypeParm1[1]
+      new AdderTypeParm3
     }
     val fMod = chiselMod2firrtlCircuits(mod)
     // pp(fMod.modules map (_.modInfo))
@@ -44,13 +50,24 @@ object adder extends mainRunnable {
 
     val a = newInput[I]("a")
     val b = newInput[I]("b")
-    // val c = newInput[2]("c")
-    // val d = newInput[2]("d")
     val y = newOutput[I]("y")
 
-    // val m1 = newMod(new Adder1) // might be able to rm this
-    // m1.y := a - b // will both err
+    println(constValueOpt[I]) // is none
+
     y := a + b
+  }
+
+// works if with inline
+  inline def adderTypeParam2[I <: Int](using mli: ModLocalInfo) = {
+    val a = newIO[I](VarType.Input)
+    val b = newIO[I](VarType.Input)
+    val y = newIO[I](VarType.Output)
+    y := a + b
+  }
+
+  /** works with inline methods */
+  class AdderTypeParm3(using parent: GlobalInfo) extends UserModule {
+    adderTypeParam2[10]
   }
 
   class DoubleAdder3(val size: Int)(using parent: GlobalInfo) extends UserModule {

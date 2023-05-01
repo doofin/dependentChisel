@@ -67,6 +67,10 @@ object scala3features {
     case Earth extends Planet(5.976e+24, 6.37814e6)
   }
 
+  enum E1 {
+    case c1(a: Int)
+    case c2
+  }
 //poly function : https://docs.scala-lang.org/scala3/reference/new-types/polymorphic-function-types.html
   val bar: [A] => List[A] => List[A] = [A] => (xs: List[A]) => xs
 

@@ -18,6 +18,9 @@ import dependentChisel.syntax.naming
 import dependentChisel.typesAndSyntax.control
 import dependentChisel.typesAndSyntax.varDecls.UserModuleDecls
 import dependentChisel.global
+import scala.util.Try
+import scala.util.Failure
+import scala.util.Success
 
 /** imperative style for chisel ,record info in mutable vars inside class chiselModules
   */
@@ -40,7 +43,12 @@ object chiselModules {
   /* function style UserModule ,for example: when {} else {} */
   trait UserModule(using parent: GlobalInfo) extends UserModuleOps, UserModuleDecls {
     val thisClassName =
-      this.getClass.getCanonicalName.split('.').last.mkString + naming.getIdWithDash
+      (Try(
+        this.getClass.getCanonicalName.split('.').last.mkString
+      ) match
+        case Failure(exception) => "noName"
+        case Success(value)     => value
+      ) + naming.getIdWithDash
 
     /** Name for this Instance after new class.. */
     val thisInstanceName = naming.mkUidFrom(thisClassName)
