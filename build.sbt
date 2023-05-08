@@ -27,7 +27,7 @@ lazy val root = project
       "org.typelevel" %% "cats-core" % catsV,
       "org.typelevel" %% "cats-free" % catsV,
       "com.github.doofin.stdScala" %% "stdscala" % "b10536c37c", // new : 184b5cbc7d  %%% for cr
-      // ("edu.berkeley.cs" %% "chisel3" % "3.5.0-RC1").cross(CrossVersion.for3Use2_13) // for 2.13 libs
+      "io.github.iltotore" %% "iron" % "2.1.0",
       ("edu.berkeley.cs" %% "chisel3" % "3.5.5")
         .cross(CrossVersion.for3Use2_13) // for 2.13 libs
     )

@@ -116,8 +116,20 @@ object scala3features {
 
   person.age
 
-  //   https://stackoverflow.com/questions/69145604/what-is-the-meaning-of-in-scala-3
-  def imp(f: Int ?=> Unit) = {}
-//   imp { ct => newIn[1] }
+  /*
+  Context Functions
+  https://docs.scala-lang.org/scala3/reference/contextual/context-functions.html
+  https://www.scala-lang.org/blog/2016/12/07/implicit-function-types.html
+   */
 
+  def imp(f: Int ?=> Unit) = {}
+  val f: Int ?=> Unit = x ?=> ()
+  val lf: Seq[Int ?=> Unit] = Seq(f)
+
+  case class I(x: Int)
+
+  def f(g: I ?=> String) = {
+    given i: I = I(1)
+    g
+  }
 }

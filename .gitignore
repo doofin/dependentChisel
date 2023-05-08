@@ -57,3 +57,6 @@ classes/
 
 # mill
 out/
+
+#idris
+build/

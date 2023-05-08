@@ -34,6 +34,10 @@ represent a vector of bits */
   }
   case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
 
+  // to prevent overflow like AFix in spinalHDL
+  // case class MulOp[w <: Int](a: Expr[w], b: Expr[w], nm: String = "mul")
+  //     extends Expr[2 * w]
+
   /** uniary op like negate */
   case class UniOp[w <: Int](a: Expr[w], nm: String) extends Expr[w]
 
