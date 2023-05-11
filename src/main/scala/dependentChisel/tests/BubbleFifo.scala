@@ -11,6 +11,8 @@ import dependentChisel.firrtlUtils
 
 import com.doofin.stdScala.mainRunnable
 
+import io.github.iltotore.iron.*
+import io.github.iltotore.iron.constraint.numeric.*
 /* https://github.com/schoeberl/chisel-examples/blob/master/src/main/scala/simple/BubbleFifo.scala
  */
 object BubbleFifo extends mainRunnable {
@@ -40,7 +42,7 @@ object BubbleFifo extends mainRunnable {
   val din = Input(UInt(size.W))
 } */
 
-  class WriterIO(size: Int)(using mli: ModLocalInfo) {
+  class WriterIO(size: Int :| Positive)(using mli: ModLocalInfo) {
 
     /** Input */
     val write = newIO[1](VarType.Input) // Bool is same as UInt<1>
@@ -61,7 +63,7 @@ object BubbleFifo extends mainRunnable {
     val dout = newIODym(size, VarType.Output)
   }
 
-  class FifoRegister(using parent: GlobalInfo)(size: Int) extends UserModule {
+  class FifoRegister(using parent: GlobalInfo)(size: Int :| Positive) extends UserModule {
     val enq = new WriterIO(size)
     val deq = new ReaderIO(size)
 
@@ -123,7 +125,8 @@ class FifoRegister(size: Int) extends Module {
 
   /** This is a bubble FIFO.
     */
-  class BubbleFifo(using parent: GlobalInfo)(size: Int, depth: Int) extends UserModule {
+  class BubbleFifo(using parent: GlobalInfo)(size: Int :| Positive, depth: Int)
+      extends UserModule {
     val enq = new WriterIO(size)
     val deq = new ReaderIO(size)
 

@@ -1,5 +1,8 @@
 import io.github.iltotore.iron.*
 import io.github.iltotore.iron.constraint.numeric.*
+/*
+ https://www.tweag.io/blog/2021-02-05-refinement-types/
+ */
 
 def log(x: Double :| Positive): Double =
   Math.log(x) // Used like a normal `Double`
