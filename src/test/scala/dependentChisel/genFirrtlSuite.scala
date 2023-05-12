@@ -9,6 +9,8 @@ import dependentChisel.testUtils.checkWidthAndFirrtl
 import dependentChisel.tests.BubbleFifo.*
 import dependentChisel.tests.BubbleFifo
 
+import io.github.iltotore.iron.autoRefine
+
 class genFirrtlSuite extends AnyFunSuite { // AnyFunSuite  munit.FunSuite
 
   test("can pass firrtl compiler down to verilog") {
