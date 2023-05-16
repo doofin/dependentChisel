@@ -6,6 +6,7 @@ import dependentChisel.tests.ifTest.*
 import dependentChisel.testUtils.checkWidthAndFirrtl
 import org.scalatest.funsuite.AnyFunSuite
 import dependentChisel.tests.BubbleFifoErr
+import dependentChisel.tests.adder
 
 /* ATTN! set flags in global to turn on width check! */
 class widthSuite extends AnyFunSuite {

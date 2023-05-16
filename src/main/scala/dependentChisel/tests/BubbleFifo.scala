@@ -42,7 +42,7 @@ object BubbleFifo extends mainRunnable {
   val din = Input(UInt(size.W))
 } */
 
-  class WriterIO(size: Int :| Positive)(using mli: ModLocalInfo) {
+  class WriterIO(using ModLocalInfo)(size: Int :| Positive) {
 
     /** Input */
     val write = newIO[1](VarType.Input) // Bool is same as UInt<1>
@@ -53,7 +53,7 @@ object BubbleFifo extends mainRunnable {
     val din = newIODym(size, VarType.Input)
   }
 
-  class ReaderIO(size: Int)(using mli: ModLocalInfo) {
+  class ReaderIO(using ModLocalInfo)(size: Int) {
 
     /** Input */
     val read = newIO[1](VarType.Input) // Bool() = UInt<1>
@@ -63,7 +63,7 @@ object BubbleFifo extends mainRunnable {
     val dout = newIODym(size, VarType.Output)
   }
 
-  class FifoRegister(using parent: GlobalInfo)(size: Int :| Positive) extends UserModule {
+  class FifoRegister(using GlobalInfo)(size: Int :| Positive) extends UserModule {
     val enq = new WriterIO(size)
     val deq = new ReaderIO(size)
 
@@ -125,7 +125,7 @@ class FifoRegister(size: Int) extends Module {
 
   /** This is a bubble FIFO.
     */
-  class BubbleFifo(using parent: GlobalInfo)(size: Int :| Positive, depth: Int)
+  class BubbleFifo(using GlobalInfo)(size: Int :| Positive, depth: Int)
       extends UserModule {
     val enq = new WriterIO(size)
     val deq = new ReaderIO(size)

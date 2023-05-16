@@ -13,14 +13,14 @@ class Row:
 
 case class Cell(elem: String)
 
-def table(init: Table ?=> Unit): Table =
+def table(block: Table ?=> Unit): Table =
   given t: Table = new Table()
-  init
+  block
   t
 
-def row(init: Row ?=> Unit)(using t: Table): Unit =
+def row(block: Row ?=> Unit)(using t: Table): Unit =
   given r: Row = new Row()
-  init
+  block
   t.add(r)
 
 def cell(str: String)(using r: Row) =

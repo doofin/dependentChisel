@@ -132,4 +132,21 @@ object scala3features {
     given i: I = I(1)
     g
   }
+
+  transparent inline def default(inline name: String) = {
+    inline if name == "Int" then 0
+    else ""
+  }
+
+  default("Int")
+  val n0: Int = default("Int")
+  val s0: String = default("String")
+
+  /* inline def doSomething(inline mode: Boolean): Unit = {
+    if mode then 1
+    else if !mode then 1
+    else println("Mode must be a known value but got: " + codeOf(mode))
+  }
+  val bool: Boolean = true
+  doSomething(bool) */
 }

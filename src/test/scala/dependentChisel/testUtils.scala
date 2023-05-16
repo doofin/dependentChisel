@@ -20,7 +20,7 @@ object testUtils {
         // pp(fMod)
         // pp(fMod.modules map (_.modInfo))
         val firCirc = firrtlCircuits2str(fMod)
-        println(firCirc)
+        // println(firCirc)
         firCirc
       }
 

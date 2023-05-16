@@ -21,9 +21,9 @@ object adder extends mainRunnable {
     val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
       // new AdderCall1
       // new DoubleAdder3(2)
-      // new AdderComb4
+      new AdderComb4
       // new AdderTypeParm1[1]
-      new AdderTypeParm3
+      // new AdderTypeParm3
     }
     val fMod = chiselMod2firrtlCircuits(mod)
     // pp(fMod.modules map (_.modInfo))
@@ -34,12 +34,18 @@ object adder extends mainRunnable {
     // println(verilog)
   }
 
-  class Adder1(using parent: GlobalInfo) extends UserModule {
-// parent contains global info
-
+  class Adder1(using GlobalInfo) extends UserModule {
     val a = newInput[2]("a")
     val b = newInput[2]("b")
     val y = newOutput[2]("y")
+
+    y := a - b
+  }
+
+  class Adder2(using GlobalInfo) extends UserModule {
+    val a = newIO[2](VarType.Input)
+    val b = newIO[2](VarType.Input)
+    val y = newIO[2](VarType.Output)
 
     y := a - b
   }

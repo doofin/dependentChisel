@@ -6,7 +6,11 @@ import dependentChisel.staticAnalysis.checkUnInitAnalysis
 import com.doofin.stdScalaCross.*
 
 val varlist = "xyz"
-// Some(bool)
+/* use  Some(bool) : none for all vars, some false for declared ,some true for declared and have values
+make sure no some true after some false
+
+can always make it pass for some test cases , but not formal guarantee ?
+ */
 // initialize a default value for each var
 val initMap: Map[String, Boolean] =
   Map(

@@ -10,6 +10,7 @@ import dependentChisel.tests.BubbleFifo.*
 import dependentChisel.tests.BubbleFifo
 
 import io.github.iltotore.iron.autoRefine
+import dependentChisel.tests.adder
 
 class genFirrtlSuite extends AnyFunSuite { // AnyFunSuite  munit.FunSuite
 
@@ -24,6 +25,7 @@ class genFirrtlSuite extends AnyFunSuite { // AnyFunSuite  munit.FunSuite
       checkWidthAndFirrtl { implicit p => new BubbleFifo(1, 2) },
       checkWidthAndFirrtl { implicit p => new BubbleFifo(3, 5) },
       checkWidthAndFirrtl { implicit p => new AdderTypeParm3 }
+      // checkWidthAndFirrtl { implicit p => adderTypeParam22[20] }
     ).foreach(x => assert(x._2, x._1))
   }
 

@@ -12,6 +12,7 @@ import dependentChisel.codegen.compiler.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 
 import adder.*
+import dependentChisel.tests.adder
 object untyped extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {

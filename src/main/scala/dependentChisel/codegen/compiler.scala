@@ -76,7 +76,7 @@ object compiler {
   /** whole firrtl Circuit AST to serialized str format */
   def firrtlCircuits2str(fCircuits: FirrtlCircuit): String = {
     val modStr = fCircuits.modules map (m => firrtlModule2str(m, " "))
-    s"circuit ${fCircuits.mainModuleName} : \n" + modStr.mkString("\n")
+    s"circuit ${fCircuits.mainModuleName} : \n" + modStr.mkString("\n\n")
   }
 
   /** for only one firrtl module */
@@ -84,7 +84,11 @@ object compiler {
       fMod: FirrtlModule,
       indent: String = ""
   ): String = {
-    val circuitStr = tree2firrtlStr(fMod.ast, indent)
+    // val skip = "\n" + indent + "  " + "skip"
+    val skip = ""
+    val circuitStr = tree2firrtlStr(fMod.ast, indent) + skip
+    // println("circuitStr.isEmpty:" + circuitStr.trim().isEmpty())
+    // pp(circuitStr)
     val instName: String = fMod.modInfo.thisInstanceName // name changes for io
     val ioInfoStr = fMod.io.reverse // looks better
       .map { (x: IOdef) =>
@@ -150,7 +154,7 @@ object compiler {
           case Ctrl.Top()  => ""
         })
       case stmt: FirStmt     => indent + stmt2firrtlStr(stmt)
-      case stmt: NewInstStmt => newInstStmt2firrtlStr(indent, stmt)
+      case stmt: NewInstStmt => newInstStmt2firrtlStr(indent, stmt) + "\n"
       case stmt: VarDecls =>
         indent + varDecl2firrtlStr(indent, stmt)
     }
@@ -324,23 +328,25 @@ object compiler {
         )
       // other expr like a+b or others, just ...
       case x: Expr[?] =>
-        IOassignTransform(stmt) +: resList
+        IOassignTransform(stmt) ++ resList
     }
   }
 
-  /** just convert := to <= for IO */
-  def IOassignTransform(stmt: FirStmt): FirStmt = {
+  /** if lhs is IO,change := to <= and make new conn io.y:=a+b becomes y0=a+b;io.y<=y0 new
+    * : don't do above
+    */
+  def IOassignTransform(stmt: FirStmt): List[FirStmt] = {
     stmt.lhs match {
       /* if lhs is IO,change := to <= and make new conn
         io.y:=a+b becomes y0=a+b;io.y<=y0
         new : don't do above
        */
       case x: (VarTyped[?] | VarDymTyped) =>
-        // val genStmt = expr2stmtBind(a)
-        // List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
-        stmt.copy(op = "<=")
+        val genStmt = expr2stmtBind(stmt.rhs)
+        List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
+      // List(stmt.copy(op = "<="))
 
-      case _ => stmt
+      case _ => List(stmt)
     }
   }
 

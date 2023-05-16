@@ -12,19 +12,16 @@ import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
 
 import dependentChisel.typesAndSyntax.control
+import dependentChisel.codegen.compiler.*
 object moduleCall extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
 
     val (mod, globalDepInfo) = makeModule { implicit p => new UserMod2 }
-    // mod.create
-    // pp(mod.modLocalInfo)
-    // pp(dep.names.toList)
-    // mod.parent
-    val outInfo =
-      globalDepInfo.modules.toList.map(_.modLocalInfo)
-    pp(outInfo)
-    // pp(dep)
+    val fMod = chiselMod2firrtlCircuits(mod)
+    val firCirc = firrtlCircuits2str(fMod)
+    println(firCirc)
+    firrtlUtils.firrtl2verilog(firCirc)
   }
 
   class UserMod1(using parent: GlobalInfo) extends UserModule {
@@ -41,8 +38,8 @@ object moduleCall extends mainRunnable {
     val b = newInput[2]("b")
     val y = newOutput[2]("y")
 
-    val m1 = new UserMod1 // gen some uuid?
-    val m2 = new UserMod1
+    val m1 = newMod(new UserMod1) // gen some uuid?
+    val m2 = newMod(new UserMod1)
 
     val port = if (1 to 2).sum == 4 then m1.y else m2.y
     port := a + b // will only show as port,
