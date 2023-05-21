@@ -34,19 +34,23 @@ object varDecls {
   }
 
   /** allow to be called outside module */
-  inline def newIO[w <: Int](using
+  inline def newIO[w <: Int: ValueOf](using
       mli: ModLocalInfo
-  )(tp: VarType.Input.type | VarType.Output.type, givenName: String = "") = {
+  )(
+      tp: VarType.Input.type | VarType.Output.type,
+      // widthOpt: Option[Int] = None,
+      givenName: String = ""
+  ) = {
 
     val genName = naming.genNameForVar(givenName, tp)
     val r = VarTyped[w](
       mli.thisInstanceName + "." + genName,
       tp
     )
-    val width = constValueOpt[w]
-    // dbg(r, width)
+    val width = constValueOpt[w].getOrElse(valueOf[w]) // .orElse(widthOpt)
+    dbg(r, width)
     mli.typeMap.addOne(r, width)
-    mli.io.prepend(IOdef(genName, tp, width))
+    mli.io.prepend(IOdef(genName, tp, Some(width)))
     r
   }
 
@@ -61,7 +65,7 @@ object varDecls {
       mli.thisInstanceName + "." + genName
     ) // when refered in expr , use this name
 
-    mli.typeMap.addOne(r, Some(width))
+    mli.typeMap.addOne(r, width)
     mli.io.prepend(IOdef(genName, tp, Some(width)))
     // when put in io bundle,use short name
     r
@@ -73,7 +77,7 @@ object varDecls {
       // need to push this cmd for varDecl
       val genName = naming.genNameForVar(givenName, VarType.Reg)
       val r = VarDymTyped(width, VarType.Reg, genName)
-      modLocalInfo.typeMap.addOne(r, Some(width))
+      modLocalInfo.typeMap.addOne(r, width)
       modLocalInfo.commands.append(VarDecls(r))
       r
     }
@@ -83,16 +87,16 @@ object varDecls {
       val width = init.width
       val genName = naming.genNameForVar(givenName, VarType.Reg)
       val r = VarDymTyped(width, VarType.RegInit(init), genName)
-      modLocalInfo.typeMap.addOne(r, Some(width))
+      modLocalInfo.typeMap.addOne(r, width)
       modLocalInfo.commands.append(VarDecls(r))
       r
     }
 
-    inline def newInput[w <: Int](
+    inline def newInput[w <: Int: ValueOf](
         givenName: String = ""
     ) = newIO[w](VarType.Input, givenName)
 
-    inline def newOutput[w <: Int](
+    inline def newOutput[w <: Int: ValueOf](
         givenName: String = ""
     ) = newIO[w](VarType.Output, givenName)
 

@@ -29,7 +29,7 @@ object compiler {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     val allMods: List[UserModule] = chiselMod.globalInfo.modules.toList
 
-    val typeMap: mutable.Map[Expr[?], Option[Int]] =
+    val typeMap =
       allMods.map(_.modLocalInfo.typeMap) reduce (_ ++ _)
 
     val mainModuleName = modInfo.className
@@ -39,7 +39,7 @@ object compiler {
 
   /** contains width assert if global.enableWidthCheck */
   def checkWidthAssert(
-      typeMap: mutable.Map[Expr[?], Option[Int]],
+      typeMap: mutable.Map[Expr[?], Int],
       cmdList: List[Cmds]
   ) = {
     var checkWidthVar = true
@@ -56,7 +56,7 @@ object compiler {
   }
 
   private def chiselMod2firrtlMod(
-      typeMap: mutable.Map[Expr[?], Option[Int]]
+      typeMap: mutable.Map[Expr[?], Int]
   )(chiselMod: UserModule): FirrtlModule = {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     // pp(modInfo.commands.toList)

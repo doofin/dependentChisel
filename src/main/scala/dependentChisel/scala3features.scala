@@ -149,4 +149,5 @@ object scala3features {
   }
   val bool: Boolean = true
   doSomething(bool) */
+
 }

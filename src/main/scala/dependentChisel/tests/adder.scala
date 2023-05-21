@@ -51,7 +51,7 @@ object adder extends mainRunnable {
   }
 
 // not work
-  class AdderTypeParm1[I <: Int](using parent: GlobalInfo) extends UserModule {
+  class AdderTypeParm1[I <: Int: ValueOf](using parent: GlobalInfo) extends UserModule {
 // parent contains global info
 
     val a = newInput[I]("a")
@@ -64,7 +64,7 @@ object adder extends mainRunnable {
   }
 
 // works if with inline
-  inline def adderTypeParam2[I <: Int](using mli: ModLocalInfo) = {
+  inline def adderTypeParam2[I <: Int: ValueOf](using mli: ModLocalInfo) = {
     val a = newIO[I](VarType.Input)
     val b = newIO[I](VarType.Input)
     val y = newIO[I](VarType.Output)

@@ -22,7 +22,8 @@ object parametric extends mainRunnable {
       // new AdderTypeParmCallMod
       // new AdderTypeParmCallInline
       // new AdderComb4TypeParamMod // ok
-      val r = new AdderTypeParmNotWork[2]; println("r.i:" + r.i); r
+      // val r = new AdderTypeParmNotWork[2]; println("r.i:" + r.i); r
+      new AdderTypeParmNotWork[2]
     }
     val fMod = chiselMod2firrtlCircuits(mod)
     // pp(fMod.modules map (_.modInfo))
@@ -32,12 +33,11 @@ object parametric extends mainRunnable {
     val verilog = firrtlUtils.firrtl2verilog(firCirc)
     // println(verilog)
   }
-
-// not work
-  class AdderTypeParmNotWork[I <: Int](using parent: GlobalInfo) extends UserModule {
-// parent contains global info
-    inline def i = constValueOpt[I]
-    println("AdderTypeParmNotWork:" + i)
+  // type ConstInt=[I]=>>[I <: Int: ValueOf]
+// now works ValueOf.  not work previously
+  class AdderTypeParmNotWork[I <: Int: ValueOf](using GlobalInfo) extends UserModule {
+    // inline def i = constValueOpt[I]
+    // println("AdderTypeParmNotWork:" + valueOf[I])
     val a = newInput[I]("a")
     val b = newInput[I]("b")
     val y = newOutput[I]("y")
@@ -56,7 +56,7 @@ object parametric extends mainRunnable {
     // val y: VarTyped[I]
   }
 
-  inline def adderTypeParamMod[I <: Int](using parent: GlobalInfo)(using
+  inline def adderTypeParamMod[I <: Int: ValueOf](using parent: GlobalInfo)(using
       mli: ModLocalInfo
   ) = new UserModule with adder[I] {
     val a = newIO[I](VarType.Input)
@@ -66,7 +66,7 @@ object parametric extends mainRunnable {
   }
 
 // works if with inline
-  inline def adderTypeParam2[I <: Int](using mli: ModLocalInfo) = {
+  inline def adderTypeParam2[I <: Int: ValueOf](using mli: ModLocalInfo) = {
     val a = newIO[I](VarType.Input)
     val b = newIO[I](VarType.Input)
     val y = newIO[I](VarType.Output)
@@ -99,14 +99,12 @@ object parametric extends mainRunnable {
 
   /* module call */
   trait Adder1I[I <: Int] {
-    // inline val ii: Int
     val a: VarTyped[I]
     val b: VarTyped[I]
     val y: VarTyped[I]
   }
 
-  class Adder1(using parent: GlobalInfo) extends UserModule {
-// parent contains global info
+  class Adder1(using GlobalInfo) extends UserModule {
 
     val a = newInput[2]("a")
     val b = newInput[2]("b")
@@ -115,16 +113,15 @@ object parametric extends mainRunnable {
     y := a - b
   }
 
-  inline def adder1TypeParamMod[I <: Int](using parent: GlobalInfo)(using
-      mli: ModLocalInfo
-  ) = new UserModule with Adder1I[I] {
-    val a = newIO[I](VarType.Input)
-    val b = newIO[I](VarType.Input)
-    val y = newIO[I](VarType.Output)
-    y := a - b
-  }
+  inline def adder1TypeParamMod[I <: Int: ValueOf](using GlobalInfo, ModLocalInfo) =
+    new UserModule with Adder1I[I] {
+      val a = newIO[I](VarType.Input)
+      val b = newIO[I](VarType.Input)
+      val y = newIO[I](VarType.Output)
+      y := a - b
+    }
   /* ok */
-  class AdderComb4TypeParamMod(using parent: GlobalInfo) extends UserModule {
+  class AdderComb4TypeParamMod(using GlobalInfo) extends UserModule {
 // parent contains global info
     // inline val ii = 2
     val a = newInput[2]("a")

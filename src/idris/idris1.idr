@@ -22,11 +22,11 @@ mkSingle False = []
 data FinN : Nat -> Type where
   Fin : (n : Nat) ->  FinN n
 
-add2:{n:Nat}  -> FinN n -> FinN (S n) 
-add2 (Fin n) = Fin (S n)
+add1: FinN n -> FinN (n+1) 
+add1 (Fin n) = Fin (n+1)
 
-f5:FinN 0
-f5 = Fin 0
+fin0 : FinN 0
+fin0 = Fin 0
 
 -- f6: 6
 -- add3:{n:Na}  ->  n -> FinN (S n)

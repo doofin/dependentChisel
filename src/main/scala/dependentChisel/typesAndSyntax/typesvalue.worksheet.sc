@@ -51,4 +51,17 @@ class c1[i <: Int] { inline def sz = constValueOpt[i] }
 class c2[i <: Int] { println("constValueOpt:" + constValueOpt[i]) }
 new c2[2]
 
+def add1[I <: Int](i: I): I + 1 = (i + 1).asInstanceOf[I + 1]
+
+// val a1: 2 = add1(1) // not work?
+
 // r2.rr
+
+case class FinN[I <: Int]() { inline def pt = println(constValueOpt[I]) }
+val i2 = 1
+FinN[1]().pt
+FinN[i2.type]().pt
+
+class c3[i <: Int: ValueOf] { println("valueOf:" + valueOf[i]) }
+
+new c3[2]

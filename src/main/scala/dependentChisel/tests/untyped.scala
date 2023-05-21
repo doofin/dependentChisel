@@ -13,6 +13,7 @@ import dependentChisel.typesAndSyntax.chiselModules.*
 
 import adder.*
 import dependentChisel.tests.adder
+import dependentChisel.typesAndSyntax.varDecls.newIODym
 object untyped extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
@@ -34,13 +35,21 @@ object untyped extends mainRunnable {
 
 // ok
   class AdderUntp1(using parent: GlobalInfo) extends UserModule {
-// parent contains global info
 
-    val a = newInputDym(2)
-    val b = newInputDym(2)
-    val y = newOutputDym(2)
+    val a = newIODym(2, VarType.Input)
+    val b = newIODym(2, VarType.Input)
+    val y = newIODym(2, VarType.Output)
 
-    y := a - b
+    y := a + b
+  }
+
+  class AdderUntp1Param(using parent: GlobalInfo)(width: Int) extends UserModule {
+
+    val a = newIODym(width, VarType.Input)
+    val b = newIODym(width, VarType.Input)
+    val y = newIODym(width, VarType.Output)
+
+    y := a + b
   }
 
 // ok, typed call untyped

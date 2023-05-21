@@ -80,4 +80,14 @@ mkSingle False = []
       case x: AnyVal => true
     }
   } */
+
+  case class FinN[I <: Int]() { inline def pt = println(constValueOpt[I]) }
+  def add1f[I <: Int](i: FinN[I]): FinN[I + 1] = FinN()
+  def add1[I <: Int](i: I): I + 1 = (i + 1).asInstanceOf[I + 1]
+
+  val a1: Int + 1 = add1(1) // not work?
+  val a2: FinN[2] = add1f(FinN[1]())
+
+  val i1 = 2
+  val a3: FinN[i1.type + 1] = add1f(FinN[i1.type]())
 }

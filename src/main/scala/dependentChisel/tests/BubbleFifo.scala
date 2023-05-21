@@ -51,6 +51,7 @@ object BubbleFifo extends mainRunnable {
 
     /** Input */
     val din = newIODym(size, VarType.Input)
+    // val din = newIO(VarType.Input, Some(size))
   }
 
   class ReaderIO(using ModLocalInfo)(size: Int) {

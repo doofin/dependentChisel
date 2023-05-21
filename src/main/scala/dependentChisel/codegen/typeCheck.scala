@@ -12,7 +12,7 @@ object typeCheck {
 
   /** return if width check is ok,or the width of expr */
   private def getExprWidth(
-      typeMap: mutable.Map[Expr[?] | Var[?], Option[Int]],
+      typeMap: mutable.Map[Expr[?] | Var[?], Int],
       expr: Expr[?]
   ): Int = {
     val tm = typeMap
@@ -22,7 +22,7 @@ object typeCheck {
         val isWidthEqu = i == j
         assert(isWidthEqu, s"getExprWidth: Width mismatch $a $nm $b ")
         i
-      case UniOp(a, nm) => tm(a).get
+      case UniOp(a, nm) => tm(a)
       // case VarLit(name)     =>
       // case ExprAsBool(expr) =>
       // case VarDymTyped(width, tp, name) =>
@@ -32,12 +32,12 @@ object typeCheck {
       case Lit(i)           => i
       case LitDym(i, width) => width
       case x =>
-        tm(x).get
+        throwE(tm(x), "can't get type for " + x)
     }
   }
 
   def checkCmdWidth(
-      typeMap: mutable.Map[Expr[?], Option[Int]],
+      typeMap: mutable.Map[Expr[?], Int],
       cmds: AtomicCmds
   ) = {
     cmds match {

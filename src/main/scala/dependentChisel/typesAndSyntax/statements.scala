@@ -35,7 +35,7 @@ object statements {
       } */
       // dbg(v)
       // dbg(oth)
-      mli.typeMap.addOne(v, constValueOpt[w])
+      // mli.typeMap.addOne(v, constValueOpt[w].get)
       mli.commands += FirStmt(v, ":=", oth)
     }
 
@@ -45,7 +45,7 @@ object statements {
   extension (v: VarDymTyped) {
     inline def :=(using mli: ModLocalInfo)(oth: Expr[?]) = {
       val name = v.getname
-      mli.typeMap.addOne(v, Some(v.width))
+      mli.typeMap.addOne(v, v.width)
 
       mli.commands += FirStmt(v, ":=", oth)
     }
