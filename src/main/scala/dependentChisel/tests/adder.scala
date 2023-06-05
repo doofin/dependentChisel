@@ -7,13 +7,14 @@ import com.doofin.stdScala.mainRunnable
 
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
-
-import dependentChisel.codegen.compiler.*
 import dependentChisel.typesAndSyntax.chiselModules.*
+import dependentChisel.typesAndSyntax.varDecls.newIO
+import dependentChisel.codegen.compiler.*
+
+// import dependentChisel.api.*
 
 import scala.compiletime.*
 import scala.compiletime.ops.int.*
-import dependentChisel.typesAndSyntax.varDecls.newIO
 
 object adder extends mainRunnable {
 
@@ -39,7 +40,7 @@ object adder extends mainRunnable {
     val b = newInput[2]("b")
     val y = newOutput[2]("y")
 
-    y := a - b
+    y := a + b
   }
 
   class Adder2(using GlobalInfo) extends UserModule {

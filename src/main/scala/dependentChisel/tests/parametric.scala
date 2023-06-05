@@ -23,8 +23,11 @@ object parametric extends mainRunnable {
       // new AdderTypeParmCallInline
       // new AdderComb4TypeParamMod // ok
       // val r = new AdderTypeParmNotWork[2]; println("r.i:" + r.i); r
-      new AdderTypeParmNotWork[2]
+      inline val i1 = 1;
+      // new AdderTypeParmClass[2 + i1.type]
+      new AdderComb4TypeParm
     }
+
     val fMod = chiselMod2firrtlCircuits(mod)
     // pp(fMod.modules map (_.modInfo))
     val firCirc = firrtlCircuits2str(fMod)
@@ -33,20 +36,41 @@ object parametric extends mainRunnable {
     val verilog = firrtlUtils.firrtl2verilog(firCirc)
     // println(verilog)
   }
-  // type ConstInt=[I]=>>[I <: Int: ValueOf]
-// now works ValueOf.  not work previously
-  class AdderTypeParmNotWork[I <: Int: ValueOf](using GlobalInfo) extends UserModule {
-    // inline def i = constValueOpt[I]
-    // println("AdderTypeParmNotWork:" + valueOf[I])
+
+  class AdderParm[I <: Int: ValueOf](using GlobalInfo) extends UserModule {
     val a = newInput[I]("a")
     val b = newInput[I]("b")
     val y = newOutput[I]("y")
 
-    // println(constValueOpt[I]) // is none
+    y := a + b
+  }
+
+  class AdderTypeParmClass1(using GlobalInfo) extends UserModule {
+    val a = newInput[2]("a")
+    val b = newInput[2]("b")
+    val y = newOutput[2]("y")
 
     y := a + b
   }
 
+  class AdderComb4TypeParm(using parent: GlobalInfo) extends UserModule {
+    val a = newInput[2]("a")
+    val b = newInput[2]("b")
+    val c = newInput[2]("c")
+    val d = newInput[2]("d")
+
+    val y = newOutput[2]("y")
+
+    val m1 = newMod(new AdderParm[2])
+    val m2 = newMod(new AdderParm[2])
+
+    m1.a := a
+    m1.b := b
+    m2.a := c
+    m2.b := d
+
+    y := m1.y + m2.y
+  }
   /* compromise : in order to make it work by inline def and trait interface  */
 
   /*only need to define fields that will be used */
@@ -56,7 +80,7 @@ object parametric extends mainRunnable {
     // val y: VarTyped[I]
   }
 
-  inline def adderTypeParamMod[I <: Int: ValueOf](using parent: GlobalInfo)(using
+  inline def adderTypeParamAnonMod[I <: Int: ValueOf](using parent: GlobalInfo)(using
       mli: ModLocalInfo
   ) = new UserModule with adder[I] {
     val a = newIO[I](VarType.Input)
@@ -76,14 +100,14 @@ object parametric extends mainRunnable {
   /** works with inline methods */
   class AdderTypeParmCallMod(using parent: GlobalInfo) extends UserModule {
     val y = newIO[10](VarType.Output)
-    val ad1 = newMod(adderTypeParamMod[10])
+    val ad1 = newMod(adderTypeParamAnonMod[10])
     // ad1.y := ad1.a + ad1.b // err : used as a SinkFlow but can only be used as a SourceFlow
     y := ad1.a + ad1.b
   }
 
   /** works with inline methods */
   class AdderTypeParmCallInline(using parent: GlobalInfo) extends UserModule {
-    adderTypeParamMod[10]
+    adderTypeParamAnonMod[10]
   }
 
   class AdderTypeParmNotWork2(val size: Int)(using parent: GlobalInfo)

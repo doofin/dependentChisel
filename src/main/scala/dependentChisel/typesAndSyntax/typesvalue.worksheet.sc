@@ -58,10 +58,18 @@ def add1[I <: Int](i: I): I + 1 = (i + 1).asInstanceOf[I + 1]
 // r2.rr
 
 case class FinN[I <: Int]() { inline def pt = println(constValueOpt[I]) }
-val i2 = 1
+val i2 = 1 + 3
+val i4 = 1 + 3
 FinN[1]().pt
 FinN[i2.type]().pt
 
 class c3[i <: Int: ValueOf] { println("valueOf:" + valueOf[i]) }
 
+def addc3[i <: Int: ValueOf](a: c3[i], b: c3[i]) = {}
+
 new c3[2]
+
+new c3[i2.type]
+
+// addc3(new c3[i2.type], new c3[i4.type]) // won't compile
+addc3(new c3[1], new c3[1]) // ok
