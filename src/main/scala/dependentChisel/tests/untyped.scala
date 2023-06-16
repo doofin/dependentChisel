@@ -34,7 +34,7 @@ object untyped extends mainRunnable {
   }
 
 // ok
-  class AdderUntp1(using parent: GlobalInfo) extends UserModule {
+  class AdderDym(using parent: GlobalInfo) extends UserModule {
 
     val a = newIODym(2, VarType.Input)
     val b = newIODym(2, VarType.Input)
@@ -53,14 +53,14 @@ object untyped extends mainRunnable {
   }
 
 // ok, typed call untyped
-  class AdderTpCallUntp(using parent: GlobalInfo) extends UserModule {
-// parent contains global info
+
+  class AdderCallDym(using GlobalInfo) extends UserModule {
 
     val a = newInput[2]("a")
     val b = newInput[2]("b")
     val y = newOutput[2]("y")
 
-    val m1 = newMod(new AdderUntp1)
+    val m1 = newMod(new AdderDym)
     m1.a := a
     m1.b := b
     y := m1.y.asTyped[2]
@@ -85,7 +85,7 @@ object untyped extends mainRunnable {
     val b = newInputDym(2)
     val y = newOutputDym(1)
 
-    val m1 = newMod(new AdderUntp1)
+    val m1 = newMod(new AdderDym)
     m1.a := a
     m1.b := b
     y := m1.y // not allowed since for width, lhs < rhs
@@ -98,7 +98,7 @@ object untyped extends mainRunnable {
     val b = newInputDym(2)
     val y = newOutputDym(2)
 
-    val m1 = newMod(new AdderUntp1)
+    val m1 = newMod(new AdderDym)
     m1.a := a // allowed since for width, lhs > rhs
     m1.b := b
     y := m1.y

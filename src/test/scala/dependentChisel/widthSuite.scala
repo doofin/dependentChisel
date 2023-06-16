@@ -15,6 +15,9 @@ class widthSuite extends AnyFunSuite {
     val corrCases = Seq(
       checkWidthAndFirrtl { implicit p =>
         new untyped.AdderUnTpCallUntp
+      },
+      checkWidthAndFirrtl { implicit p =>
+        new adder.AdderMixed(2)
       }
       /* checkWidthAndFirrtl { implicit p =>
         new untyped.AdderUnTpCallUntpWidthGt
@@ -35,7 +38,10 @@ class widthSuite extends AnyFunSuite {
       },
       checkWidthAndFirrtl { implicit p =>
         new untyped.AdderUnTpCallUntpWidthGt
-      } // switch more strict width check so this shall fail
+      }, // switch more strict width check so this shall fail
+      checkWidthAndFirrtl { implicit p =>
+        new adder.AdderMixed(1)
+      }
     )
 
     incorrectCases.foreach(x => assert(!x._2, x._1))

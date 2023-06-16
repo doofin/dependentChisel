@@ -7,9 +7,11 @@ import dependentChisel.*
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.varDecls.*
+import dependentChisel.typesAndSyntax.chiselModules.*
 
 import dependentChisel.codegen.compiler.*
-import dependentChisel.typesAndSyntax.chiselModules.*
+
+// import dependentChisel.api.* //  missing argument for parameter givenName of method newIO
 
 import scala.compiletime.*
 import scala.compiletime.ops.int.*
@@ -144,19 +146,18 @@ object parametric extends mainRunnable {
       val y = newIO[I](VarType.Output)
       y := a - b
     }
-  /* ok */
+  /* ok
+  m1.y := a - b  will both err */
   class AdderComb4TypeParamMod(using GlobalInfo) extends UserModule {
-// parent contains global info
-    // inline val ii = 2
     val a = newInput[2]("a")
     val b = newInput[2]("b")
     val c = newInput[2]("c")
     val d = newInput[2]("d")
     val y = newOutput[2]("y")
 
-    val m1 = newMod(adder1TypeParamMod[2]) // might be able to rm this
-    val m2 = newMod(adder1TypeParamMod[2]) // might be able to rm this
-    // m1.y := a - b // will both err
+    val m1 = newMod(adder1TypeParamMod[2])
+    val m2 = newMod(adder1TypeParamMod[2])
+
     m1.a := a
     m1.b := b
     m2.a := c

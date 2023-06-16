@@ -48,7 +48,7 @@ object varDecls {
       tp
     )
     val width = constValueOpt[w].getOrElse(valueOf[w]) // .orElse(widthOpt)
-    dbg(r, width)
+    // dbg(r, width)
     mli.typeMap.addOne(r, width)
     mli.io.prepend(IOdef(genName, tp, Some(width)))
     r

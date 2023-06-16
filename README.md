@@ -20,6 +20,11 @@ This is a sbt project for Scala 3
     run : `sbt run`
     compile : `sbt compile` 
 
+# test
+
+many tests under src/test can be run by 
+    sbt test
+    
 ### IDE support
 
 [Metals](https://scalameta.org/metals/) with vscode 

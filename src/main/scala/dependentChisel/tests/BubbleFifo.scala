@@ -94,7 +94,40 @@ object BubbleFifo extends mainRunnable {
     deq.dout := dataReg
   }
 
-  /*
+  class BubbleFifo(using GlobalInfo)(size: Int :| Positive, depth: Int)
+      extends UserModule {
+    val enq = new WriterIO(size)
+    val deq = new ReaderIO(size)
+
+    val buffers = Array.fill(depth) { newMod(new FifoRegister(size)) }
+
+    val depList = 0 until depth - 1
+    assert(depList.nonEmpty)
+    depList foreach { i =>
+      buffers(i + 1).enq.din := buffers(i).deq.dout
+      buffers(i + 1).enq.write := ~buffers(i).deq.empty
+      buffers(i).deq.read := ~buffers(i + 1).enq.full
+    }
+
+    // bulk conn : io.enq <> buffers(0).io.enq
+    buffers(0).enq.din := enq.din
+    enq.full := buffers(0).enq.full
+    buffers(0).enq.write := enq.write
+
+    // bulk conn :  io.deq <> buffers(depth - 1).io.deq
+    deq.dout := buffers(depth - 1).deq.dout
+    deq.empty := buffers(depth - 1).deq.empty
+    buffers(depth - 1).deq.read := deq.read
+  }
+
+  def bulkConn(using ModLocalInfo)(enq: WriterIO, enq2: WriterIO) = {
+    enq.din := enq2.din
+    enq2.full := enq.full
+    enq.write := enq2.write
+
+  }
+}
+/*
 class FifoRegister(size: Int) extends Module {
   val io = IO(new Bundle {
     val enq = new WriterIO(size)
@@ -124,35 +157,6 @@ class FifoRegister(size: Int) extends Module {
   io.deq.dout := dataReg
 } */
 
-  /** This is a bubble FIFO.
-    */
-  class BubbleFifo(using GlobalInfo)(size: Int :| Positive, depth: Int)
-      extends UserModule {
-    val enq = new WriterIO(size)
-    val deq = new ReaderIO(size)
-
-    val buffers = Array.fill(depth) { newMod(new FifoRegister(size)) }
-
-    val depList = 0 until depth - 1
-    assert(depList.nonEmpty)
-    depList foreach { i =>
-      buffers(i + 1).enq.din := buffers(i).deq.dout
-      buffers(i + 1).enq.write := ~buffers(i).deq.empty
-      buffers(i).deq.read := ~buffers(i + 1).enq.full
-    }
-
-    // bulk conn : io.enq <> buffers(0).io.enq
-    buffers(0).enq.din := enq.din // not work! input can't be lhs,but flip lhs rhs works?
-    enq.full := buffers(0).enq.full
-    buffers(0).enq.write := enq.write // not work! input can't be lhs
-
-    // bulk conn :  io.deq <> buffers(depth - 1).io.deq
-    deq.dout := buffers(depth - 1).deq.dout
-    deq.empty := buffers(depth - 1).deq.empty
-    buffers(depth - 1).deq.read := deq.read // need to flip lhs,rhs
-  }
-
-}
 /* bulk conn
   FifoRegister.io.enq.din <= io.enq.din @[bubbleFIFO.scala 153:10]
     io.enq.full <= FifoRegister.io.enq.full @[bubbleFIFO.scala 153:10]

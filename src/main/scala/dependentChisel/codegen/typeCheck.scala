@@ -1,8 +1,8 @@
 package dependentChisel.codegen
 import scala.collection.mutable
 
-import com.doofin.stdScalaCross.*
-
+// import com.doofin.stdScalaCross.*
+import com.doofin.stdScalaJvm.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.codegen.seqCommands.*
@@ -52,7 +52,9 @@ object typeCheck {
             val lhsGeqRhs = i >= j // firrtl allows width of lhs >= rhs in lhs:=rhs
             val isWidthOk = isWidthEqu // | lhsGeqRhs
             val msg =
-              s"checkWidth isWidthOk =$isWidthOk in  ${(lhs, i)} $op ${(rhs, j)} "
+              s"width mismatch in \n lhs: ${(lhs.getname, i.toString().toRed())}\n " +
+                s"op: $op \n" +
+                s" rhs: ${(rhs, j.toString().toRed())} "
 
             // assert(isWidthOk, msg)
             if (!isWidthOk) {

@@ -52,6 +52,9 @@ class c2[i <: Int] { println("constValueOpt:" + constValueOpt[i]) }
 new c2[2]
 
 def add1[I <: Int](i: I): I + 1 = (i + 1).asInstanceOf[I + 1]
+def add11[I <: Int](i: I): I + 1 = (i + 2).asInstanceOf[I + 1]
+
+add11(1)
 
 // val a1: 2 = add1(1) // not work?
 
@@ -73,3 +76,8 @@ new c3[i2.type]
 
 // addc3(new c3[i2.type], new c3[i4.type]) // won't compile
 addc3(new c3[1], new c3[1]) // ok
+
+def add1i(i: Int): i.type + 1 = (i + 10).asInstanceOf[i.type + 1]
+
+// def add1[I <: Int](i: I): I + 1 = (i + 10).asInstanceOf[I + 1]
+val a: 1 = add1i(0)
