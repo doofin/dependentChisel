@@ -18,17 +18,15 @@ object typeCheck {
     val tm = typeMap
     expr match {
       case BinOp(a, b, nm) =>
+        val relOps = Seq("gt", "lt", "==")
+        val isRelOp = relOps.contains(nm)
+
         val (i, j) = (getExprWidth(typeMap, a), getExprWidth(typeMap, b))
         val isWidthEqu = i == j
         assert(isWidthEqu, s"getExprWidth: Width mismatch $a $nm $b ")
-        i
-      case UniOp(a, nm) => tm(a)
-      // case VarLit(name)     =>
-      // case ExprAsBool(expr) =>
-      // case VarDymTyped(width, tp, name) =>
-      // case VarTyped(name)               =>
-      // case Input(name)                  =>
-      // case Output(name)                 =>
+        if isRelOp then 1 else i
+
+      case UniOp(a, nm)     => tm(a)
       case Lit(i)           => i
       case LitDym(i, width) => width
       case x =>
@@ -65,9 +63,6 @@ object typeCheck {
         lr
 
       case x => true
-      // case NewInstStmt(instNm, modNm)    =>
-      // case VarDecls(v)                   =>
-      // case Skip                          =>
     }
   }
 

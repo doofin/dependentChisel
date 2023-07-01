@@ -59,9 +59,9 @@ object compiler {
       typeMap: mutable.Map[Expr[?], Int]
   )(chiselMod: UserModule): FirrtlModule = {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
-    // pp(modInfo.commands.toList)
     // pp(modInfo.typeMap)
     val cmdList = modInfo.commands.toList
+    pp(modInfo.commands.toList)
 
     val cmds_widthChk: List[Cmds] = checkWidthAssert(typeMap, cmdList)
 
@@ -249,23 +249,26 @@ object compiler {
   def varDecl2firrtlStr(indent: String = "", stmt: VarDecls) = {
     val VarDymTyped(width: Int, tp: VarType, name: String) = stmt.v
     tp match {
-      case VarType.Reg =>
+      case VarType.Reg => // reg without init
         /* reg mReg : UInt<16>, clock with :
       reset => (reset, UInt<16>("h0")) @[regWire.scala 13:21] */
 
         s"""reg ${name} : UInt<${width}>, clock with : 
         ${indent}reset => (reset, UInt<${width}>("h0"))"""
+
       case VarType.RegInit(init) =>
         /* reg mReg : UInt<16>, clock with :
       reset => (reset, UInt<16>("h0")) @[regWire.scala 13:21] */
 
         s"""reg ${name} : UInt<${width}>, clock with : 
         ${indent}reset => (reset, ${expr2firrtlStr(init)})"""
+
       case VarType.Wire =>
         /* wire wire1 : UInt<16> @[regWire.scala 18:19] */
         s"wire $name : UInt<$width>"
 
-      // io is only put in header section like output io : { flip a : UInt<16>, flip b : UInt<16>, y : UInt<16>}
+      /* io is only put in header section like output io : { flip a : UInt<16>, flip b : UInt<16>, y : UInt<16>}
+      so no need to deal with it */
       case VarType.Input  => ""
       case VarType.Output => ""
     }

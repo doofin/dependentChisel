@@ -7,10 +7,15 @@ import dependentChisel.testUtils.checkWidthAndFirrtl
 import org.scalatest.funsuite.AnyFunSuite
 import dependentChisel.tests.BubbleFifoErr
 import dependentChisel.tests.adder
+import dependentChisel.typesAndSyntax.chiselModules.GlobalInfo
+import firrtl.FirrtlProtos.Firrtl.Module.UserModule
 
 /* ATTN! set flags in global to turn on width check! */
 class widthSuite extends AnyFunSuite {
 
+  /* def t1[M <: UserModule]: Seq[GlobalInfo ?=> M] = Seq({ p ?=>
+    new untyped.AdderUnTpCallUntp
+  }) */
   test("width check correct cases") {
     val corrCases = Seq(
       checkWidthAndFirrtl { implicit p =>
@@ -19,9 +24,6 @@ class widthSuite extends AnyFunSuite {
       checkWidthAndFirrtl { implicit p =>
         new adder.AdderMixed(2)
       }
-      /* checkWidthAndFirrtl { implicit p =>
-        new untyped.AdderUnTpCallUntpWidthGt
-      } */ // switch more strict width check
     )
     corrCases.foreach(x => assert(x._2, x._1))
   }
@@ -47,3 +49,7 @@ class widthSuite extends AnyFunSuite {
     incorrectCases.foreach(x => assert(!x._2, x._1))
   }
 }
+
+/* checkWidthAndFirrtl { implicit p =>
+        new untyped.AdderUnTpCallUntpWidthGt
+      } */ // switch more strict width check

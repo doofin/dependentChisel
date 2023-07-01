@@ -33,6 +33,12 @@ object varDecls {
     LitDym(v, w)
   }
 
+  inline def newLitp[w <: Int: ValueOf](v: Int, width: Option[Int] = None) = {
+
+    val width = constValueOpt[w].getOrElse(valueOf[w])
+    LitDym(v, width).asTypedUnsafe[w]
+  }
+
   /** allow to be called outside module */
   inline def newIO[w <: Int: ValueOf](using
       mli: ModLocalInfo
@@ -73,6 +79,21 @@ object varDecls {
 
   /** stmts only allowed inside a module */
   trait UserModuleDecls { ut: UserModule & UserModuleOps =>
+    def newReg[w <: Int: ValueOf](givenName: String = "") = {
+      // need to push this cmd for varDecl
+      val genName = naming.genNameForVar(givenName, VarType.Reg)
+
+      val r = VarTyped[w](
+        genName,
+        VarType.Reg
+      )
+
+      val width = constValueOpt[w].getOrElse(valueOf[w]) // .orElse(widthOpt)
+      modLocalInfo.typeMap.addOne(r, width)
+      modLocalInfo.commands.append(VarDecls(r.toDym(width)))
+      r
+    }
+
     def newRegDym(width: Int, givenName: String = "") = {
       // need to push this cmd for varDecl
       val genName = naming.genNameForVar(givenName, VarType.Reg)

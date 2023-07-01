@@ -52,6 +52,11 @@ class c2[i <: Int] { println("constValueOpt:" + constValueOpt[i]) }
 new c2[2]
 
 def add1[I <: Int](i: I): I + 1 = (i + 1).asInstanceOf[I + 1]
+
+val v1: 2 = add1[1](1)
+
+val v2: 3 = add1[1](1)
+
 def add11[I <: Int](i: I): I + 1 = (i + 2).asInstanceOf[I + 1]
 
 add11(1)

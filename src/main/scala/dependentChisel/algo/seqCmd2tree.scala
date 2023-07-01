@@ -20,29 +20,26 @@ object seqCmd2tree {
     // ppc(cmdList)
 
     cmdList.foreach { cmd =>
-      // println("parents bf , cmd")
       // dbg(cmd)
-      // ppc(parents)
       cmd match {
         case Start(ctrl, uid) =>
-          // start of block
-          /* create new node and append as child of curr top parent node if exists.
+          /* start of block: create new node and append as child of curr top parent node if exists.
          then push new node into parent stack as new top elem*/
-          val newNd: AST = TreeNode(ctrl)
-          Try(parents.top).foreach(p => p.cld += newNd)
-          parents push newNd
+          val newParNode: AST = TreeNode(ctrl) // new parent node
+          // add this newParNode as child
+          parents.top.cld += newParNode
+          parents push newParNode
         case End(ctrl, uid) =>
           // end of block, pop out one parent
           parents.pop()
         // for other stmt,just append
         case stmt: (FirStmt | NewInstStmt | VarDecls) =>
           val newNd: AST = TreeNode(stmt)
-          Try(parents.top).foreach(p => p.cld += newNd)
+          parents.top.cld += newNd
         case _ =>
       }
 
-      // println("parents after:")
-      // ppc(parents)
+      // println("parents after:"); ppc(parents)
     }
 
     parents.pop()

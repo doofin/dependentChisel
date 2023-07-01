@@ -10,9 +10,13 @@ trait exprOperators {
     def -(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "-")
     def *(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "*")
     def /(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "div")
-    // def ===(oth: Expr[w]) = Bool(x, oth)
-    /* TODO allow dym mixed with typed without casting? */
+
+    /* relational ops */
     def ===(oth: Expr[w]): Expr[1] = BinOp(x, oth, "==").asTypedUnsafe[1]
+    def >(oth: Expr[w]) = BinOp(x, oth, "gt").asTypedUnsafe[1]
+    def <(oth: Expr[w]) = BinOp(x, oth, "lt").asTypedUnsafe[1]
+    /* TODO allow dym mixed with typed without casting? */
+
   }
 
 // bool ops

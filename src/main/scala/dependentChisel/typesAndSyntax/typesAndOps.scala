@@ -83,7 +83,11 @@ represent a vector of bits */
   }
 
   /** typed API for Wire, Reg, and IO */
-  case class VarTyped[w <: Int](name: String, tp: VarType) extends Var[w](name)
+  case class VarTyped[w <: Int](name: String, tp: VarType) extends Var[w](name) {
+
+    /** a dirty hack */
+    def toDym(width: Int) = VarDymTyped(width, tp, name)
+  }
 
   // case class Input[w <: Int](name: String) extends Var[w](name)
 

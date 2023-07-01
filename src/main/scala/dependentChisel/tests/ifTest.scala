@@ -21,23 +21,23 @@ import dependentChisel.codegen.firrtlTypes.FirrtlCircuit
 
 import dependentChisel.typesAndSyntax.control
 object ifTest extends mainRunnable {
-  // var globalDepInfo
-// stdScalaCross.
   override def main(args: Array[String] = Array()): Unit = run
 
   def run = {
     // (1, 2, 3).mapConst((x: Int) => x * 2)
     val (mod, globalCircuit) = makeModule { implicit p =>
-      new IfElse1
-    // new IfModNested
-    // new IfModDangling // ok
+      // new IfElse1
+      // new IfModNested
+      // new IfModDangling // ok
+      new IfMod
     }
     // ppc(mod.modLocalInfo.commands)
-    pp(mod.modLocalInfo.typeMap)
+    // pp(mod.modLocalInfo.typeMap)
     val fMod = chiselMod2firrtlCircuits(mod)
+    pp(fMod.modules.map(_.ast))
     val firCirc = firrtlCircuits2str(fMod)
-    // println(firCirc)
-    firrtlUtils.firrtl2verilog(firCirc)
+    println(firCirc)
+    // firrtlUtils.firrtl2verilog(firCirc)
 
   }
 
@@ -78,6 +78,10 @@ object ifTest extends mainRunnable {
     }
   }
 
+  /* should require initialized y2:=0
+within firrtl or before firrtl
+maybe static analysis
+   */
   class IfMod(using parent: GlobalInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
@@ -85,10 +89,6 @@ object ifTest extends mainRunnable {
     val y2 = newOutput[16]("y2")
 
     y := a - b
-    /* should require initialized y2:=0
-within firrtl or before firrtl
-maybe static analysis
-     */
     If(a === b) {
       y := a + b
       y2 := a - b

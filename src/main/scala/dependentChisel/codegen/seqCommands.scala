@@ -19,7 +19,7 @@ object seqCommands {
 
   /** all sorts of sequential commands */
   sealed trait Cmds
-  case class Start[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
+  case class Start[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds // uid is not used
   case class End[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
 
   /** atomic commands like decl,assign,etc */
