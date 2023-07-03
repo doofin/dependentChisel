@@ -9,20 +9,18 @@ import dependentChisel.codegen.compiler.*
 import dependentChisel.firrtlUtils
 
 /* show case to detect dynamic size mismatch
-In line 22
+In line 34
 correct : val din = newIODym(size + 1, VarType.Input)
 error :   val din = newIODym(size, VarType.Input)
  */
 object BubbleFifoErr {
-  def main(args: Array[String] = Array()): Unit = run
 
-  def run = {
-    val mod = makeModule { implicit p => new FifoRegister(2) }
-
+  def main(args: Array[String] = Array()): Unit = {
+    val mod = makeModule { implicit p => new BubbleFifoErr(2, 3) }
     chiselMod2verilog(mod)
   }
 
-  class WriterIO(size: Int)(using mli: ModLocalInfo) {
+  class WriterIO_err(size: Int)(using mli: ModLocalInfo) {
 
     /** Input */
     val write = newIO[1](VarType.Input)
@@ -45,7 +43,7 @@ object BubbleFifoErr {
   }
 
   class FifoRegister(using parent: GlobalInfo)(size: Int) extends UserModule {
-    val enq = new WriterIO(size)
+    val enq = new WriterIO_err(size)
     val deq = new ReaderIO(size)
 
     val (empty, full) = (newLit(0), newLit(1))
@@ -72,8 +70,9 @@ object BubbleFifoErr {
     deq.dout := dataReg
   }
 
-  class BubbleFifo(using parent: GlobalInfo)(size: Int, depth: Int) extends UserModule {
-    val enq = new WriterIO(size)
+  class BubbleFifoErr(using parent: GlobalInfo)(size: Int, depth: Int)
+      extends UserModule {
+    val enq = new WriterIO_err(size)
     val deq = new ReaderIO(size)
 
     val buffers = Array.fill(depth) { newMod(new FifoRegister(size)) }

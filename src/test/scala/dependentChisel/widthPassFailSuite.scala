@@ -11,7 +11,7 @@ import dependentChisel.typesAndSyntax.chiselModules.GlobalInfo
 import firrtl.FirrtlProtos.Firrtl.Module.UserModule
 
 /* ATTN! set flags in global to turn on width check! */
-class widthSuite extends AnyFunSuite {
+class widthPassFailSuite extends AnyFunSuite {
 
   /* def t1[M <: UserModule]: Seq[GlobalInfo ?=> M] = Seq({ p ?=>
     new untyped.AdderUnTpCallUntp
@@ -36,7 +36,7 @@ class widthSuite extends AnyFunSuite {
       checkWidthAndFirrtl { implicit p => new untyped.AdderUntpBug2 },
       checkWidthAndFirrtl { implicit p => new untyped.AdderUntpBug3typeCast },
       checkWidthAndFirrtl { implicit p =>
-        new BubbleFifoErr.BubbleFifo(2, 3)
+        new BubbleFifoErr.BubbleFifoErr(2, 3)
       },
       checkWidthAndFirrtl { implicit p =>
         new untyped.AdderUnTpCallUntpWidthGt

@@ -16,9 +16,7 @@ import io.github.iltotore.iron.constraint.numeric.*
 /* https://github.com/schoeberl/chisel-examples/blob/master/src/main/scala/simple/BubbleFifo.scala
  */
 object BubbleFifo extends mainRunnable {
-  override def main(args: Array[String] = Array()): Unit = run
-
-  def run = {
+  override def main(args: Array[String] = Array()): Unit = {
     val mod = makeModule { implicit p =>
       new BubbleFifo(2, 3) // ok
     }

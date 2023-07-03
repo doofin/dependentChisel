@@ -18,11 +18,18 @@ import dependentChisel.codegen.compiler.*
 object parametric extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
-    val mod = makeModule { implicit p => new AdderComb4TypeParm }
+    val mod = makeModule { implicit p => new Adder4Parm }
 
     chiselMod2verilog(mod)
   }
 
+  /*
+
+
+
+
+
+   */
   class AdderParm[I <: Int: ValueOf](using GlobalInfo) extends UserModule {
     val a = newInput[I]("a")
     val b = newInput[I]("b")
@@ -31,7 +38,15 @@ object parametric extends mainRunnable {
     y := a + b
   }
 
-  class AdderComb4TypeParm(using parent: GlobalInfo) extends UserModule {
+  /*
+
+
+
+
+
+   */
+  /* adder with 4 inputs */
+  class Adder4Parm(using parent: GlobalInfo) extends UserModule {
     val a = newInput[2]("a")
     val b = newInput[2]("b")
     val c = newInput[2]("c")
@@ -50,15 +65,14 @@ object parametric extends mainRunnable {
     y := m1.y + m2.y
   }
 
-// works if with inline
-  inline def adderTypeParam2[I <: Int: ValueOf](using mli: ModLocalInfo) = {
-    val a = newIO[I](VarType.Input)
-    val b = newIO[I](VarType.Input)
-    val y = newIO[I](VarType.Output)
-    y := a + b
-  }
+}
 
-  class AdderTypeParmNotWork2(val size: Int)(using parent: GlobalInfo)
+/*
+
+
+
+
+class AdderTypeParmNotWork2(val size: Int)(using parent: GlobalInfo)
       extends UserModule {
 
     val a = newInput[size.type]("a") // val a = newInput[size.type]("a",size)
@@ -69,10 +83,18 @@ object parametric extends mainRunnable {
     y := a + b
   }
 
-}
 
-/*
-/* compromise : in order to make it work by inline def and trait interface  */
+// works if with inline
+  inline def adderTypeParam2[I <: Int: ValueOf](using mli: ModLocalInfo) = {
+    val a = newIO[I](VarType.Input)
+    val b = newIO[I](VarType.Input)
+    val y = newIO[I](VarType.Output)
+    y := a + b
+  }
+
+
+
+ compromise : in order to make it work by inline def and trait interface
   /* old way module call */
   trait Adder1I[I <: Int] {
     val a: VarTyped[I]
