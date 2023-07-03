@@ -23,11 +23,12 @@ object firrtlUtils extends mainRunnable {
     } match
       case x @ Failure(exception) =>
         println(
-          "compile firrtl to verilog Failure: \n" + exception.getMessage()
+          "[error]".toRed() + " compile firrtl to verilog Failure: \n" + exception
+            .getMessage()
         )
         x
       case x @ Success(value) =>
-        println("compile firrtl to verilog Succeed")
+        println("[ok]".toGreen() + " compile firrtl to verilog succeed")
         x
 
   }

@@ -19,19 +19,10 @@ object BubbleFifo extends mainRunnable {
   override def main(args: Array[String] = Array()): Unit = run
 
   def run = {
-    val (mod, globalCircuit) = makeModule { implicit p =>
-//   new IfElse1
-      // new FifoRegister(1) // ok
-      // new BubbleFifo(1, 2) // ok
-      // new BubbleFifo(2, 3) // ok
-      new FifoRegister(2) // ok
+    val mod = makeModule { implicit p =>
+      new BubbleFifo(2, 3) // ok
     }
-
-    val fMod = chiselMod2firrtlCircuits(mod)
-    val firCirc = firrtlCircuits2str(fMod)
-    println(firCirc)
-    firrtlUtils.firrtl2verilog(firCirc)
-
+    chiselMod2verilog(mod)
   }
 
   /*
@@ -190,3 +181,7 @@ class BubbleFifo(size: Int, depth: Int) extends Module {
 /* TODO parameterised IO:  doesn't support parameterised IO yet.consider :
   1.allow newInput be called outside module at arbitary places,only add it to IO in invoke site
   2.mimic chisel : discriminate between bundle and module like chisel do */
+
+// new FifoRegister(1) // ok
+// new BubbleFifo(1, 2) // ok
+// new FifoRegister(2) // ok

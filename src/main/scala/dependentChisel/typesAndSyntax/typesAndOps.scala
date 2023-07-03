@@ -6,7 +6,8 @@ import scala.compiletime.*
 import com.doofin.stdScalaJvm.*
 
 import dependentChisel.*
-import dependentChisel.macros.getVarName
+// import dependentChisel.macros.getVarName
+import dependentChisel.misc.macros
 // import dependentChisel.typesAndSyntax.chiselModules.*
 
 /*

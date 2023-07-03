@@ -82,7 +82,8 @@ object chiselModules {
   def makeModule[M <: UserModule](f: GlobalInfo => M) = {
     val di = GlobalInfo()
     val r = f(di)
-    (r, di)
+    // (r, di)
+    r
   }
 
 }

@@ -46,13 +46,16 @@ object typeCheck {
         val lr = (getExprWidth(typeMap, lhs), getExprWidth(typeMap, rhs)) match {
           // only check if both result are numbers
           case lrWidth @ (i, j) =>
+            val showPair = { (s: String, i: Int) => s"$s : ${i.toString().toRed()}" }
+
             val isWidthEqu = i == j
             val lhsGeqRhs = i >= j // firrtl allows width of lhs >= rhs in lhs:=rhs
             val isWidthOk = isWidthEqu // | lhsGeqRhs
             val msg =
-              s"width mismatch in \n lhs: ${(lhs.getname, i.toString().toRed())}\n " +
-                s"op: $op \n" +
-                s" rhs: ${(rhs, j.toString().toRed())} "
+              "[error]".toRed() +
+                s" width mismatch in statement:\n${showPair(lhs.getname, i)}\n " +
+                s"$op \n" +
+                s"${showPair(rhs.toString(), j)} "
 
             // assert(isWidthOk, msg)
             if (!isWidthOk) {

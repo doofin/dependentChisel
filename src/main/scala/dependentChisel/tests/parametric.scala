@@ -1,5 +1,8 @@
 package dependentChisel.tests
 
+import scala.compiletime.*
+import scala.compiletime.ops.int.*
+
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
 
@@ -11,46 +14,19 @@ import dependentChisel.typesAndSyntax.chiselModules.*
 
 import dependentChisel.codegen.compiler.*
 
-// import dependentChisel.api.* //  missing argument for parameter givenName of method newIO
-
-import scala.compiletime.*
-import scala.compiletime.ops.int.*
-
 /* static parametric modules */
 object parametric extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
-    val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
-      // new AdderTypeParmCallMod
-      // new AdderTypeParmCallInline
-      // new AdderComb4TypeParamMod // ok
-      // val r = new AdderTypeParmNotWork[2]; println("r.i:" + r.i); r
-      inline val i1 = 1;
-      // new AdderTypeParmClass[2 + i1.type]
-      new AdderComb4TypeParm
-    }
+    val mod = makeModule { implicit p => new AdderComb4TypeParm }
 
-    val fMod = chiselMod2firrtlCircuits(mod)
-    // pp(fMod.modules map (_.modInfo))
-    val firCirc = firrtlCircuits2str(fMod)
-    println(firCirc)
-
-    val verilog = firrtlUtils.firrtl2verilog(firCirc)
-    // println(verilog)
+    chiselMod2verilog(mod)
   }
 
   class AdderParm[I <: Int: ValueOf](using GlobalInfo) extends UserModule {
     val a = newInput[I]("a")
     val b = newInput[I]("b")
     val y = newOutput[I]("y")
-
-    y := a + b
-  }
-
-  class AdderTypeParmClass1(using GlobalInfo) extends UserModule {
-    val a = newInput[2]("a")
-    val b = newInput[2]("b")
-    val y = newOutput[2]("y")
 
     y := a + b
   }
@@ -73,23 +49,6 @@ object parametric extends mainRunnable {
 
     y := m1.y + m2.y
   }
-  /* compromise : in order to make it work by inline def and trait interface  */
-
-  /*only need to define fields that will be used */
-  trait adder[I <: Int] {
-    val a: VarTyped[I]
-    val b: VarTyped[I]
-    // val y: VarTyped[I]
-  }
-
-  inline def adderTypeParamAnonMod[I <: Int: ValueOf](using parent: GlobalInfo)(using
-      mli: ModLocalInfo
-  ) = new UserModule with adder[I] {
-    val a = newIO[I](VarType.Input)
-    val b = newIO[I](VarType.Input)
-    // val y = newIO[I](VarType.Output)
-    // y := a + b
-  }
 
 // works if with inline
   inline def adderTypeParam2[I <: Int: ValueOf](using mli: ModLocalInfo) = {
@@ -97,19 +56,6 @@ object parametric extends mainRunnable {
     val b = newIO[I](VarType.Input)
     val y = newIO[I](VarType.Output)
     y := a + b
-  }
-
-  /** works with inline methods */
-  class AdderTypeParmCallMod(using parent: GlobalInfo) extends UserModule {
-    val y = newIO[10](VarType.Output)
-    val ad1 = newMod(adderTypeParamAnonMod[10])
-    // ad1.y := ad1.a + ad1.b // err : used as a SinkFlow but can only be used as a SourceFlow
-    y := ad1.a + ad1.b
-  }
-
-  /** works with inline methods */
-  class AdderTypeParmCallInline(using parent: GlobalInfo) extends UserModule {
-    adderTypeParamAnonMod[10]
   }
 
   class AdderTypeParmNotWork2(val size: Int)(using parent: GlobalInfo)
@@ -123,32 +69,26 @@ object parametric extends mainRunnable {
     y := a + b
   }
 
-  /* module call */
+}
+
+/*
+/* compromise : in order to make it work by inline def and trait interface  */
+  /* old way module call */
   trait Adder1I[I <: Int] {
     val a: VarTyped[I]
     val b: VarTyped[I]
     val y: VarTyped[I]
   }
 
-  class Adder1(using GlobalInfo) extends UserModule {
-
-    val a = newInput[2]("a")
-    val b = newInput[2]("b")
-    val y = newOutput[2]("y")
-
-    y := a - b
-  }
-
-  inline def adder1TypeParamMod[I <: Int: ValueOf](using GlobalInfo, ModLocalInfo) =
+inline def adder1TypeParamMod[I <: Int: ValueOf](using GlobalInfo, ModLocalInfo) =
     new UserModule with Adder1I[I] {
       val a = newIO[I](VarType.Input)
       val b = newIO[I](VarType.Input)
       val y = newIO[I](VarType.Output)
       y := a - b
     }
-  /* ok
-  m1.y := a - b  will both err */
-  class AdderComb4TypeParamMod(using GlobalInfo) extends UserModule {
+
+class AdderComb4TypeParamMod(using GlobalInfo) extends UserModule {
     val a = newInput[2]("a")
     val b = newInput[2]("b")
     val c = newInput[2]("c")
@@ -165,5 +105,4 @@ object parametric extends mainRunnable {
 
     y := m1.y + m2.y
   }
-
-}
+ */

@@ -5,22 +5,18 @@ import scala.compiletime.*
 
 import com.doofin.stdScalaJvm.*
 
+// import dependentChisel.macros.getVarName
 import dependentChisel.*
-
 import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.macros.getVarName
-import depTypes.*
 import typesAndOps.*
-
 import dependentChisel.codegen.seqCommands.*
 import codegen.firrtlTypes.*
 import dependentChisel.syntax.naming
+import dependentChisel.misc.macros
+import dependentChisel.misc.depTypes
 
 /** assignments */
 object statements {
-
-  // InputB(BitsType.Bits()) + InputB(BitsType.UInt()) // fail,ok
-  // InputB(BitsType.Bits()) + InputB(BitsType.Bits())
 
   /** typed API for assign */
   extension [w <: Int, V <: Var[w]](v: V) {
@@ -50,10 +46,12 @@ object statements {
       mli.commands += FirStmt(v, ":=", oth)
     }
   }
+}
 
-  // case class InputB[w <: Int, b <: BitsType[w]](x: b) extends ExprB[w, b] {}
+/*
+ case class InputB[w <: Int, b <: BitsType[w]](x: b) extends ExprB[w, b] {}
 
-  /* inline def newInput[w <: Int](using m: ModLocalInfo)(
+ inline def newInput[w <: Int](using m: ModLocalInfo)(
       givenName: String = ""
   ) = {
     val name =
@@ -61,11 +59,12 @@ object statements {
     // io : type,name,width
     m.io.prepend(IOdef(m.instNm, name, "input", constValueOpt[w]))
     Input[w](name)
-  } */
+  }
 
-// varW <: Int
+  varW <: Int
+ */
 
-  /* inline def newOutput[w <: Int](using m: ModLocalInfo)(
+/* inline def newOutput[w <: Int](using m: ModLocalInfo)(
       givenName: String = ""
   ) = {
     val name =
@@ -75,4 +74,5 @@ object statements {
     Output[w](name)
   } */
 
-}
+// InputB(BitsType.Bits()) + InputB(BitsType.UInt()) // fail,ok
+// InputB(BitsType.Bits()) + InputB(BitsType.Bits())

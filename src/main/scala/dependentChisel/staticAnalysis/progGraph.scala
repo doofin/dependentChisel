@@ -28,7 +28,7 @@ object progGraph extends mainRunnable {
 
   def run = {
     // (1, 2, 3).mapConst((x: Int) => x * 2)
-    val (mod, globalCircuit) = makeModule { implicit p =>
+    val mod = makeModule { implicit p =>
       new IfElse1
     // new IfModNested
     // new IfModDangling // ok

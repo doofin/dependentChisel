@@ -1,23 +1,20 @@
 package dependentChisel.tests
 
-/* imperativeStyle dependent chisel */
-import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.*
-
 import com.doofin.stdScalaCross.*
 import com.doofin.stdScala.mainRunnable
+
+import dependentChisel.*
+import dependentChisel.typesAndSyntax.chiselModules.*
 
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
-
-import dependentChisel.typesAndSyntax.control
 import dependentChisel.codegen.compiler.*
 object moduleCall extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
 
-    val (mod, globalDepInfo) = makeModule { implicit p => new UserMod2 }
+    val mod = makeModule { implicit p => new UserMod2 }
     val fMod = chiselMod2firrtlCircuits(mod)
     val firCirc = firrtlCircuits2str(fMod)
     println(firCirc)

@@ -1,4 +1,4 @@
-package dependentChisel
+package dependentChisel.misc
 
 import java.util.Random
 

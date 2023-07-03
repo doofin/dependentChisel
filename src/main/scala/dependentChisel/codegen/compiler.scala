@@ -16,6 +16,7 @@ import firrtlTypes.*
 
 import scala.util.*
 import scala.collection.mutable
+import dependentChisel.firrtlUtils
 
 object compiler {
 
@@ -24,8 +25,20 @@ object compiler {
     firrtlCircuits2str(chiselMod2firrtlCircuits(chiselMod))
   }
 
+  def chiselMod2verilog(
+      mod: UserModule,
+      printVerilog: Boolean = false,
+      printCmdList: Boolean = false
+  ) = {
+    val fMod = chiselMod2firrtlCircuits(mod, printCmdList)
+    val firCirc = firrtlCircuits2str(fMod)
+    val verilog = firrtlUtils.firrtl2verilog(firCirc)
+    if printVerilog then println(verilog)
+    verilog
+  }
+
   /** chisel ModLocalInfo to FirrtlModule(IO bundle,AST for the circuit) */
-  def chiselMod2firrtlCircuits(chiselMod: UserModule) = {
+  def chiselMod2firrtlCircuits(chiselMod: UserModule, printCmdList: Boolean = false) = {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     val allMods: List[UserModule] = chiselMod.globalInfo.modules.toList
 
@@ -34,7 +47,7 @@ object compiler {
 
     val mainModuleName = modInfo.className
 
-    FirrtlCircuit(mainModuleName, allMods map chiselMod2firrtlMod(typeMap))
+    FirrtlCircuit(mainModuleName, allMods map chiselMod2firrtlMod(typeMap, printCmdList))
   }
 
   /** contains width assert if global.enableWidthCheck */
@@ -56,12 +69,13 @@ object compiler {
   }
 
   private def chiselMod2firrtlMod(
-      typeMap: mutable.Map[Expr[?], Int]
+      typeMap: mutable.Map[Expr[?], Int],
+      printCmdList: Boolean
   )(chiselMod: UserModule): FirrtlModule = {
     val modInfo: ModLocalInfo = chiselMod.modLocalInfo
     // pp(modInfo.typeMap)
     val cmdList = modInfo.commands.toList
-    pp(modInfo.commands.toList)
+    if printCmdList then pp(modInfo.commands.toList)
 
     val cmds_widthChk: List[Cmds] = checkWidthAssert(typeMap, cmdList)
 
@@ -73,7 +87,7 @@ object compiler {
     FirrtlModule(modInfo, modInfo.io.toList, tree)
   }
 
-  /** whole firrtl Circuit AST to serialized str format */
+  /** whole firrtl Circuit AST(several modules) to serialized str format */
   def firrtlCircuits2str(fCircuits: FirrtlCircuit): String = {
     val modStr = fCircuits.modules map (m => firrtlModule2str(m, " "))
     s"circuit ${fCircuits.mainModuleName} : \n" + modStr.mkString("\n\n")

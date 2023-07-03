@@ -3,41 +3,31 @@ package dependentChisel.tests
 /* imperativeStyle dependent chisel */
 import dependentChisel.*
 
-import com.doofin.stdScalaCross.*
-import com.doofin.stdScalaCross
+import com.doofin.stdScalaJvm.*
 import com.doofin.stdScala.mainRunnable
 
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
+import dependentChisel.typesAndSyntax.chiselModules.*
 
 import dependentChisel.codegen.compiler.*
 import tests.ifTest.*
 
 import algo.seqCmd2tree.*
 
-import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.codegen.firrtlTypes.FirrtlCircuit
-
-import dependentChisel.typesAndSyntax.control
 object ifTest extends mainRunnable {
   override def main(args: Array[String] = Array()): Unit = run
 
   def run = {
-    // (1, 2, 3).mapConst((x: Int) => x * 2)
-    val (mod, globalCircuit) = makeModule { implicit p =>
-      // new IfElse1
-      // new IfModNested
-      // new IfModDangling // ok
-      new IfMod
+    val mod = makeModule { implicit p =>
+      new IfElse1
+    // new IfModNested
+    // new IfModDangling // ok
+    // new IfMod
     }
-    // ppc(mod.modLocalInfo.commands)
-    // pp(mod.modLocalInfo.typeMap)
-    val fMod = chiselMod2firrtlCircuits(mod)
-    pp(fMod.modules.map(_.ast))
-    val firCirc = firrtlCircuits2str(fMod)
-    println(firCirc)
-    // firrtlUtils.firrtl2verilog(firCirc)
+
+    chiselMod2verilog(mod)
 
   }
 
@@ -60,15 +50,11 @@ object ifTest extends mainRunnable {
     }
   }
 
-  /* failed */
+  /* ok */
   class IfElse1(using parent: GlobalInfo) extends UserModule {
     val a = newInput[16]("a")
     val b = newInput[16]("b")
     val y = newOutput[16]("y")
-// 5
-    // y := a + b
-// 0
-// val newReg=...
     IfElse(a === b) {
       y := a + b
       // 1

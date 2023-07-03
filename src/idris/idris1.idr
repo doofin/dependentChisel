@@ -35,13 +35,14 @@ data Vect : Nat -> Type -> Type where
    Nil  : Vect Z a
    (::) : a -> Vect k a -> Vect (S k) a
 
--- incorrect map for list , showing potential errors 
-map : (a -> b) -> List a -> List b
-map f []        = []
-map f (x::y :: xs) =  [f x, f y]
-map f (x :: xs) =  [] -- f x :: map f xs
 
 -- map for vectors 
 mapV : (a -> b) -> Vect n a -> Vect n b
 mapV f []        = []
 mapV f (x :: xs) = f x :: mapV f xs
+
+-- incorrect map for list , showing potential errors 
+map : (a -> b) -> List a -> List b
+map f []        = []
+map f (x::y :: xs) =  [f x, f y]
+map f (x :: xs) =  [] -- f x :: map f xs

@@ -1,4 +1,4 @@
-import dependentChisel.macros // call macros here
+import dependentChisel.misc.macros // call macros here
 import scala.quoted.*
 import macros.*
 import com.doofin.stdScala.mainRunnable

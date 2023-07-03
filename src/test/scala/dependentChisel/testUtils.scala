@@ -15,7 +15,7 @@ object testUtils {
 
     val verilog = for {
       firCirc <- Try {
-        val (mod, depInfo: GlobalInfo) = makeModule(f)
+        val mod = makeModule(f)
         val fMod = chiselMod2firrtlCircuits(mod)
         // pp(fMod)
         // pp(fMod.modules map (_.modInfo))

@@ -1,4 +1,4 @@
-package dependentChisel
+package dependentChisel.misc
 
 /*partial DependentTypes via compile time inline and checks */
 import scala.compiletime.ops.int.*
@@ -113,8 +113,7 @@ object depTypes {
     wireTp[n + m, Int](1)
   }
 
-  inline def wireNew[n <: Int]
-      : wireTp[n + 2, Int] = { // must use inline for  valueOf!
+  inline def wireNew[n <: Int]: wireTp[n + 2, Int] = { // must use inline for  valueOf!
     val singV = valueOf[n]
     wireTp(1) // singV.add(2)
   }

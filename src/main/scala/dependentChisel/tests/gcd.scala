@@ -1,6 +1,5 @@
 package dependentChisel.tests
 
-/* imperativeStyle dependent chisel */
 import dependentChisel.*
 
 import com.doofin.stdScalaCross.*
@@ -19,16 +18,9 @@ import dependentChisel.codegen.compiler.*
 object gcd extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
-    val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
-      new gcdParam[16]
-    }
+    val mod = makeModule { implicit p => new gcdParam[16] }
 
-    val fMod = chiselMod2firrtlCircuits(mod)
-    // pp(fMod.modules map (_.modInfo))
-    val firCirc = firrtlCircuits2str(fMod)
-    println(firCirc)
-
-    val verilog = firrtlUtils.firrtl2verilog(firCirc)
+    chiselMod2verilog(mod)
   }
 
   class gcdParam[I <: Int: ValueOf](using parent: GlobalInfo) extends UserModule {

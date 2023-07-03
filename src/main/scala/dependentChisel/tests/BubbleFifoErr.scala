@@ -5,11 +5,23 @@ import dependentChisel.typesAndSyntax.varDecls.*
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.varDecls.*
+import dependentChisel.codegen.compiler.*
+import dependentChisel.firrtlUtils
 
-/*this is an error case to detect dynamic size mismatch:
-I changed line 22 "val din = newIODym(size, VarType.Input)" to
-val din = newIODym(size + 1, VarType.Input) // correct should be just size */
+/* show case to detect dynamic size mismatch
+In line 22
+correct : val din = newIODym(size + 1, VarType.Input)
+error :   val din = newIODym(size, VarType.Input)
+ */
 object BubbleFifoErr {
+  def main(args: Array[String] = Array()): Unit = run
+
+  def run = {
+    val mod = makeModule { implicit p => new FifoRegister(2) }
+
+    chiselMod2verilog(mod)
+  }
+
   class WriterIO(size: Int)(using mli: ModLocalInfo) {
 
     /** Input */
@@ -86,3 +98,7 @@ object BubbleFifoErr {
   }
 
 }
+
+// new FifoRegister(1) // ok
+// new BubbleFifo(1, 2) // ok
+// new BubbleFifo(2, 3) // ok

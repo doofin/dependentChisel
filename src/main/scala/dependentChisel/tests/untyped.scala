@@ -7,30 +7,24 @@ import com.doofin.stdScala.mainRunnable
 
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
-
-import dependentChisel.codegen.compiler.*
 import dependentChisel.typesAndSyntax.chiselModules.*
+import dependentChisel.typesAndSyntax.varDecls.*
+import dependentChisel.codegen.compiler.*
+import dependentChisel.tests.adder
 
 import adder.*
-import dependentChisel.tests.adder
-import dependentChisel.typesAndSyntax.varDecls.newIODym
 object untyped extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {
-    val (mod, depInfo: GlobalInfo) = makeModule { implicit p =>
+    val mod = makeModule { implicit p =>
       // new AdderUnTpCallUntp
       new AdderUntpBug3typeCast
       // new DoubleAdder3(2)
       // new AdderUntpBug
       // new AdderUntp1
     }
-    val fMod = chiselMod2firrtlCircuits(mod)
-    // pp(fMod.modules map (_.modInfo))
-    val firCirc = firrtlCircuits2str(fMod)
-    // println(firCirc)
 
-    val verilog = firrtlUtils.firrtl2verilog(firCirc)
-    // println(verilog)
+    chiselMod2verilog(mod)
   }
 
 // ok

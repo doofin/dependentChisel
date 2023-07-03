@@ -1,6 +1,6 @@
-package dependentChisel
+package dependentChisel.misc
 
-import dependentChisel.scala3features
+import dependentChisel.misc.scala3features
 /*  Quoting and splicing are combined with inline to cause this macro implementation
 to do compile-time metaprogramming.
  */
