@@ -25,8 +25,9 @@ data FinN : Nat -> Type where
 add1: FinN n -> FinN (n+1) 
 add1 (Fin n) = Fin (n+1)
 
-fin0 : FinN 0
+fin0,fin1 : FinN 0
 fin0 = Fin 0
+fin1 = Fin (0 + 0)
 
 -- f6: 6
 -- add3:{n:Na}  ->  n -> FinN (S n)

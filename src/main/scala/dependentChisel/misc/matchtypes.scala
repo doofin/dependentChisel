@@ -87,7 +87,6 @@ mkSingle False = []
 
   val a1: Int + 1 = add1(1) // not work?
   val a2: FinN[2] = add1f(FinN[1]())
-
   val i1 = 2
   val a3: FinN[i1.type + 1] = add1f(FinN[i1.type]())
 }
