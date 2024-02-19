@@ -1,25 +1,22 @@
 package dependentChisel
 
-import dependentChisel.tests.adder.*
-import dependentChisel.tests.untyped
-import dependentChisel.tests.ifTest.*
+import dependentChisel.examples.adder.*
+import dependentChisel.examples.dynamicAdder
+import dependentChisel.examples.ifTest.*
 import dependentChisel.testUtils.checkWidthAndFirrtl
 import org.scalatest.funsuite.AnyFunSuite
-import dependentChisel.tests.BubbleFifoErr
-import dependentChisel.tests.adder
+import dependentChisel.examples.BubbleFifoErr
+import dependentChisel.examples.adder
 import dependentChisel.typesAndSyntax.chiselModules.GlobalInfo
 import firrtl.FirrtlProtos.Firrtl.Module.UserModule
 
 /* ATTN! set flags in global to turn on width check! */
 class widthPassFailSuite extends AnyFunSuite {
 
-  /* def t1[M <: UserModule]: Seq[GlobalInfo ?=> M] = Seq({ p ?=>
-    new untyped.AdderUnTpCallUntp
-  }) */
   test("width check correct cases") {
     val corrCases = Seq(
       checkWidthAndFirrtl { implicit p =>
-        new untyped.AdderUnTpCallUntp
+        new dynamicAdder.AdderDymCallStatic
       },
       checkWidthAndFirrtl { implicit p =>
         new adder.AdderMixed(2)
@@ -31,15 +28,15 @@ class widthPassFailSuite extends AnyFunSuite {
   test("width check incorrect cases") {
 
     val incorrectCases = Seq(
-      checkWidthAndFirrtl { implicit p => new untyped.AdderUnTpCallUntpErr },
-      checkWidthAndFirrtl { implicit p => new untyped.AdderUntpBug1 },
-      checkWidthAndFirrtl { implicit p => new untyped.AdderUntpBug2 },
-      checkWidthAndFirrtl { implicit p => new untyped.AdderUntpBug3typeCast },
+      checkWidthAndFirrtl { implicit p => new dynamicAdder.AdderUnTpCallUntpErr },
+      checkWidthAndFirrtl { implicit p => new dynamicAdder.AdderUntpBug1 },
+      checkWidthAndFirrtl { implicit p => new dynamicAdder.AdderUntpBug2 },
+      checkWidthAndFirrtl { implicit p => new dynamicAdder.AdderUntpBug3typeCast },
       checkWidthAndFirrtl { implicit p =>
         new BubbleFifoErr.BubbleFifoErr(2, 3)
       },
       checkWidthAndFirrtl { implicit p =>
-        new untyped.AdderUnTpCallUntpWidthGt
+        new dynamicAdder.AdderUnTpCallUntpWidthGt
       }, // switch more strict width check so this shall fail
       checkWidthAndFirrtl { implicit p =>
         new adder.AdderMixed(1)
@@ -53,3 +50,7 @@ class widthPassFailSuite extends AnyFunSuite {
 /* checkWidthAndFirrtl { implicit p =>
         new untyped.AdderUnTpCallUntpWidthGt
       } */ // switch more strict width check
+
+/* def t1[M <: UserModule]: Seq[GlobalInfo ?=> M] = Seq({ p ?=>
+    new untyped.AdderUnTpCallUntp
+  }) */

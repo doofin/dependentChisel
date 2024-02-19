@@ -1,8 +1,10 @@
 package dependentChisel.staticAnalysis
+
+import com.doofin.stdScala.mainRunnable
+
 import dependentChisel.codegen.seqCommands.*
 import dependentChisel.algo.seqCmd2tree.AST
 import dependentChisel.typesAndSyntax.typesAndOps.*
-import com.doofin.stdScala.mainRunnable
 
 import dependentChisel.*
 
@@ -15,7 +17,6 @@ import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
 
 import dependentChisel.codegen.compiler.*
-import tests.ifTest.*
 
 import algo.seqCmd2tree.*
 
@@ -26,12 +27,25 @@ import dependentChisel.typesAndSyntax.control
 
 object progGraph extends mainRunnable {
 
+  class IfElse1(using parent: GlobalInfo) extends UserModule {
+    val a = newInput[16]("a")
+    val b = newInput[16]("b")
+    val y = newOutput[16]("y")
+    IfElse(a === b) {
+      y := a + b
+      // 1
+    } {
+      // 2
+      y := a - b
+    }
+  }
+
   def run = {
     // (1, 2, 3).mapConst((x: Int) => x * 2)
     val mod = makeModule { implicit p =>
       new IfElse1
-    // new IfModNested
-    // new IfModDangling // ok
+      // new IfModNested
+      // new IfModDangling // ok
     }
     // ppc(mod.modLocalInfo.commands)
     // val newValue = chiselMod2tree(mod)

@@ -1,4 +1,4 @@
-package dependentChisel.tests
+package dependentChisel.examples
 
 import dependentChisel.*
 

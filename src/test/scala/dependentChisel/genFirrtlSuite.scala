@@ -1,16 +1,16 @@
 package dependentChisel
 import org.scalatest.funsuite.AnyFunSuite
 
-import dependentChisel.tests.adder.*
-import dependentChisel.tests.ifTest.*
+import dependentChisel.examples.adder.*
+import dependentChisel.examples.ifTest.*
 
-import dependentChisel.tests.untyped
+import dependentChisel.examples.dynamicAdder
 import dependentChisel.testUtils.checkWidthAndFirrtl
-import dependentChisel.tests.BubbleFifo.*
-import dependentChisel.tests.BubbleFifo
+import dependentChisel.examples.BubbleFifo.*
+import dependentChisel.examples.BubbleFifo
 
 import io.github.iltotore.iron.autoRefine
-import dependentChisel.tests.adder
+import dependentChisel.examples.adder
 
 class genFirrtlSuite extends AnyFunSuite { // AnyFunSuite  munit.FunSuite
 
@@ -18,7 +18,7 @@ class genFirrtlSuite extends AnyFunSuite { // AnyFunSuite  munit.FunSuite
     Seq(
       checkWidthAndFirrtl { implicit p => new Adder1 },
       // widthAndFirrtlOk { implicit p => new AdderTypeParm1[2] }, // not work
-      checkWidthAndFirrtl { implicit p => new AdderCall1 },
+      checkWidthAndFirrtl { implicit p => new AdderStaticCall },
       checkWidthAndFirrtl { implicit p => new AdderComb4 },
       checkWidthAndFirrtl { implicit p => new IfModNested },
       checkWidthAndFirrtl { implicit p => new FifoRegister(5) },

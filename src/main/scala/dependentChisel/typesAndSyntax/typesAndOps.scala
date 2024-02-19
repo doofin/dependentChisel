@@ -36,8 +36,11 @@ represent a vector of bits */
   case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
 
   // to prevent overflow like AFix in spinalHDL
-  // case class MulOp[w <: Int](a: Expr[w], b: Expr[w], nm: String = "mul")
-  //     extends Expr[2 * w]
+  case class MulOp[w <: Int](a: Expr[w], b: Expr[w], nm: String = "mul")
+      extends Expr[2 * w]
+
+  case class AddOp[w <: Int](a: Expr[w], b: Expr[w], nm: String = "mul")
+      extends Expr[w + 1]
 
   /** uniary op like negate */
   case class UniOp[w <: Int](a: Expr[w], nm: String) extends Expr[w]
@@ -72,7 +75,10 @@ represent a vector of bits */
 
       constValueOpt[w].foreach { wd =>
         val castOk = wd == width
-        val msg = s"asTyped cast error in ${this}!"
+        val msg = "[error]"
+          .toRed() + s" try to cast ${this} of width "
+          + width.toString().toRed()
+          + " to " + wd.toString().toRed()
         if (!castOk) {
           println(msg)
         }

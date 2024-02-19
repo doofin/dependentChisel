@@ -4,7 +4,7 @@ resolvers ++= Seq(
   "jitpack" at "https://jitpack.io",
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 )
-val mScala3Version = "3.2.2" // "3.3.1-RC1-bin-SNAPSHOT" 3.3.0-RC3
+val mScala3Version = "3.3.1" // "3.3.1-RC1-bin-SNAPSHOT" 3.3.0-RC3
 
 /* To print the code as it is transformed through the compiler, use the compiler flag -Xprint:all
 trace the code that generated the error by adding the -Ydebug-error compiler flag,

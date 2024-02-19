@@ -1,17 +1,17 @@
 package dependentChisel
 import org.scalatest.funsuite.AnyFunSuite
 
-import dependentChisel.tests.adder.*
-import dependentChisel.tests.ifTest.*
+import dependentChisel.examples.adder.*
+import dependentChisel.examples.ifTest.*
 
-import dependentChisel.tests.untyped
+import dependentChisel.examples.dynamicAdder
 import dependentChisel.testUtils.checkWidthAndFirrtl
-import dependentChisel.tests.BubbleFifo.*
-import dependentChisel.tests.BubbleFifo
+import dependentChisel.examples.BubbleFifo.*
+import dependentChisel.examples.BubbleFifo
 
 import io.github.iltotore.iron.*
 import io.github.iltotore.iron.constraint.numeric.*
-import dependentChisel.tests.adder
+import dependentChisel.examples.adder
 
 /* more tests for parameterized mod*/
 class genFirrtlCombSuite extends AnyFunSuite {

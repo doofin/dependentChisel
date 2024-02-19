@@ -1,12 +1,17 @@
 package dependentChisel.typesAndSyntax
 
-import typesAndOps.{Expr, BinOp, Bool}
+import typesAndOps.*
 import dependentChisel.typesAndSyntax.typesAndOps.UniOp
 
+import scala.compiletime.ops.int.*
+import scala.compiletime.*
+
 trait exprOperators {
-//int ops
+  // int ops
   extension [w <: Int](x: Expr[w]) {
     def +(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "+")
+    def ++(oth: Expr[w]) = AddOp(x, oth, "+")
+
     def -(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "-")
     def *(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "*")
     def /(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "div")

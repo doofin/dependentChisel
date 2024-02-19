@@ -1,4 +1,4 @@
-package dependentChisel.tests
+package dependentChisel.examples
 
 /* imperativeStyle dependent chisel */
 import dependentChisel.*
@@ -12,7 +12,6 @@ import dependentChisel.typesAndSyntax.control.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 
 import dependentChisel.codegen.compiler.*
-import tests.ifTest.*
 
 import algo.seqCmd2tree.*
 
@@ -22,9 +21,9 @@ object ifTest extends mainRunnable {
   def run = {
     val mod = makeModule { implicit p =>
       new IfElse1
-    // new IfModNested
-    // new IfModDangling // ok
-    // new IfMod
+      // new IfModNested
+      // new IfModDangling // ok
+      // new IfMod
     }
 
     chiselMod2verilog(mod)
