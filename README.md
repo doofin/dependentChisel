@@ -1,5 +1,6 @@
 # dependentChisel
 This is the Master thesis : Dependent Chisel: Statically-checked hardware designs based on Chisel and Scala 3, by Yuchen du
+https://github.com/doofin/dependentChisel/blob/master/Msc_Thesis_yuchen.pdf
 
 It uses partial dependent types in Scala 3 to provide early error message for Chisel.
 
