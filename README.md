@@ -23,6 +23,18 @@ This is a sbt project for Scala 3
     run : `sbt run`
     compile : `sbt compile` 
 
+an simple adder example: 
+
+```scala
+  class Adder1(using GlobalInfo) extends UserModule {
+    val a = newIO[2](VarType.Input)
+    val b = newIO[2](VarType.Input)
+    val y = newIO[2](VarType.Output)
+
+    y := a + b
+  }
+```
+
 # test
 
 many tests under src/test can be run by 
