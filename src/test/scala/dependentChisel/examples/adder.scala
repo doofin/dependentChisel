@@ -13,7 +13,6 @@ import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.typesAndSyntax.varDecls.newIO
 import dependentChisel.codegen.compiler.*
 
-// import dependentChisel.api.*
 
 import dependentChisel.typesAndSyntax.varDecls.newIODym
 
@@ -28,10 +27,8 @@ object adder extends mainRunnable {
     chiselMod2verilog(mod)
   }
 
-  /* static adder
-
-
-   */
+  /** static adder with 2 inputs and 1 output
+    */
   class Adder1(using GlobalInfo) extends UserModule {
     val a = newIO[2](VarType.Input)
     val b = newIO[2](VarType.Input)
@@ -40,16 +37,8 @@ object adder extends mainRunnable {
     y := a + b
   }
 
-  /*
-  parametric static adder
-
-
-
-
-
-
-
-   */
+  /** static adder, parameterized
+    */
   class AdderParm[I <: Int: ValueOf](using GlobalInfo) extends UserModule {
     val a = newInput[I]("a")
     val b = newInput[I]("b")
