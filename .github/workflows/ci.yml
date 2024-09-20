@@ -9,7 +9,7 @@ env:
 
 jobs:
   run:
-    name: compile and test
+    name: test
     strategy:
       matrix:
         java-version: [17]
@@ -26,9 +26,6 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java-version }}
           cache: sbt
-
-      - name: compile the project
-        run: sbt compile
 
       - name: Run the unit tests
         run: sbt test
