@@ -1,3 +1,7 @@
+# resources and references
+Here are some resources and references that may be useful for understanding the project or for further research.
+
+# Domain Specific Languages
 ## chisel
 
 Chisel: Constructing Hardware in a Scala Embedded Language : https://people.eecs.berkeley.edu/~krste/papers/chisel-dac2012.pdf
@@ -41,9 +45,12 @@ https://github.com/MaximeKjaer/tf-dotty
  
 https://maximekjaer.github.io/tf-dotty/docs/dotty
 
-
-## other works
-
+# Verification 
 formal specification of RISC-V : https://github.com/riscv/sail-riscv
 
+    Sail is a language for describing the instruction-set architecture (ISA) semantics of processors: the architectural specification of the behaviour of machine instructions
+
+## other works
 Clash is a hardware description language based on Haskell : https://clash-lang.org/
+
+
