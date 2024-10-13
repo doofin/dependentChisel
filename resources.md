@@ -46,6 +46,15 @@ https://github.com/MaximeKjaer/tf-dotty
 https://maximekjaer.github.io/tf-dotty/docs/dotty
 
 # Verification 
+
+formal verification in spinalHDL :
+https://github.com/SpinalHDL/SpinalHDL/issues/137
+
+In Chisel:
+- model checking with system verilog:https://www.chisel-lang.org/docs/explanations/layers
+- potentially, we can add deductive verification or theorem proving utilities to the Chisel library
+
+
 formal specification of RISC-V : https://github.com/riscv/sail-riscv
 
     Sail is a language for describing the instruction-set architecture (ISA) semantics of processors: the architectural specification of the behaviour of machine instructions
