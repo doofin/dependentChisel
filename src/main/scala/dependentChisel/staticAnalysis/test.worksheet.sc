@@ -1,6 +1,6 @@
 import dependentChisel.typesAndSyntax.typesAndOps.Lit
 import dependentChisel.typesAndSyntax.typesAndOps.VarLit
-import dependentChisel.codegen.seqCommands.*
+import dependentChisel.codegen.sequentialCommands.*
 import dependentChisel.staticAnalysis.checkUnInitAnalysis
 
 import com.doofin.stdScalaCross.*
@@ -25,7 +25,7 @@ val initMap: Map[String, Boolean] =
  */
 val pg =
   List(
-    (0, FirStmt(VarLit("x"), ":=", Lit[1](1)), 1),
+    (0, WeakStmt(VarLit("x"), ":=", Lit[1](1)), 1),
     (1, Skip, 3),
     (0, Skip, 2),
     (2, Skip, 4),

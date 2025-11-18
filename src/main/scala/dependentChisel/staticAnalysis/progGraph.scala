@@ -2,7 +2,7 @@ package dependentChisel.staticAnalysis
 
 import com.doofin.stdScala.mainRunnable
 
-import dependentChisel.codegen.seqCommands.*
+import dependentChisel.codegen.sequentialCommands.*
 import dependentChisel.algo.seqCmd2tree.AST
 import dependentChisel.typesAndSyntax.typesAndOps.*
 

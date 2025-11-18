@@ -5,7 +5,7 @@ import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 
-import dependentChisel.codegen.seqCommands.*
+import dependentChisel.codegen.sequentialCommands.*
 
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.syntax.naming
@@ -50,7 +50,7 @@ object varDecls {
 
     val genName = naming.genNameForVar(givenName, tp)
     val r = VarTyped[w](
-      mli.thisInstanceName + "." + genName,
+      mli.instanceName + "." + genName,
       tp
     )
     val width = constValueOpt[w].getOrElse(valueOf[w]) // .orElse(widthOpt)
@@ -68,7 +68,7 @@ object varDecls {
     val r = VarDymTyped(
       width,
       tp,
-      mli.thisInstanceName + "." + genName
+      mli.instanceName + "." + genName
     ) // when refered in expr , use this name
 
     mli.typeMap.addOne(r, width)

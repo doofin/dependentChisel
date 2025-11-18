@@ -9,7 +9,7 @@ import com.doofin.stdScalaJvm.*
 import dependentChisel.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 import typesAndOps.*
-import dependentChisel.codegen.seqCommands.*
+import dependentChisel.codegen.sequentialCommands.*
 import codegen.firrtlTypes.*
 import dependentChisel.syntax.naming
 import dependentChisel.misc.macros
@@ -32,7 +32,7 @@ object statements {
       // dbg(v)
       // dbg(oth)
       // mli.typeMap.addOne(v, constValueOpt[w].get)
-      mli.commands += FirStmt(v, ":=", oth)
+      mli.commands += WeakStmt(v, ":=", oth)
     }
 
   }
@@ -43,7 +43,7 @@ object statements {
       val name = v.getname
       mli.typeMap.addOne(v, v.width)
 
-      mli.commands += FirStmt(v, ":=", oth)
+      mli.commands += WeakStmt(v, ":=", oth)
     }
   }
 }

@@ -8,8 +8,8 @@ import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.control.*
 
 import dependentChisel.codegen.firrtlTypes.*
-import dependentChisel.codegen.seqCommands.*
-import dependentChisel.codegen.seqCommands
+import dependentChisel.codegen.sequentialCommands.*
+import dependentChisel.codegen.sequentialCommands
 
 import scala.reflect.ClassTag
 import dependentChisel.global.getUid
@@ -22,45 +22,53 @@ import scala.util.Try
 import scala.util.Failure
 import scala.util.Success
 
-/** imperative style for chisel ,record info in mutable vars inside class chiselModules
+/** IR for current implementation
+  *
+  * imperative chisel like DSL, which records info in mutable vars inside class chiselModules during
+  * construction
   */
 object chiselModules {
-  /** global info
-    * 
-    */ 
+
+  /** global info like list of all module
+    *
+    * @param names
+    * @param modules
+    */
   case class GlobalInfo(
       names: ArrayBuffer[String] = ArrayBuffer(),
       modules: ArrayBuffer[UserModule] = ArrayBuffer()
   )
-  /**
-    * represent info for each module instance
+
+  /** AST(Abstract Syntax Tree) for each module, contains all info about a module
+    *
+    * @param commands:
+    *   list of statements, to represent the circuits
     */
   case class ModuleData(
       className: String,
-      thisInstanceName: String,
+      instanceName: String,
       io: ArrayBuffer[IOdef] = ArrayBuffer(),
-      commands: ArrayBuffer[Cmds] = ArrayBuffer(), // list of seq cmds
+      commands: ArrayBuffer[Cmds] = ArrayBuffer(), // list of statements
       typeMap: mutable.Map[Expr[?] | Var[?], Int] = mutable.Map() // list of seq cmds
   )
 
-  // trait Module {}
-
   /* function style UserModule ,for example: when {} else {} */
   trait UserModule(using parent: GlobalInfo) extends UserModuleOps, UserModuleDecls {
+    val classSimpleName = this.getClass.getCanonicalName.split('.').last.mkString
+
     val thisClassName =
-      (Try(
-        this.getClass.getCanonicalName.split('.').last.mkString
-      ) match
+      (Try(classSimpleName) match {
         case Failure(exception) => "noName"
         case Success(value)     => value
-      ) + naming.getIdWithDash
+      }) + naming.getIdWithDash
 
     /** Name for this Instance after new class.. */
     val thisInstanceName = naming.mkUidFrom(thisClassName)
-    if (global.debugVerbose) println(s"new inst $thisInstanceName for $thisClassName")
+    if (global.debugVerbose)
+      println(s"new inst $thisInstanceName for $thisClassName")
 
     given modLocalInfo: ModuleData =
-      ModuleData(className = thisClassName, thisInstanceName = thisInstanceName)
+      ModuleData(className = thisClassName, instanceName = thisInstanceName)
     // def name = this.getClass.getCanonicalName.split('.').last
     val globalInfo = parent
 
@@ -70,9 +78,9 @@ object chiselModules {
 
     def pushBlk(ctr: Ctrl)(block: => Any) = {
       val uid = naming.getIntId
-      pushCmd(seqCommands.Start(ctr, uid))
+      pushCmd(sequentialCommands.Start(ctr, uid))
       block
-      pushCmd(seqCommands.End(ctr, uid))
+      pushCmd(sequentialCommands.End(ctr, uid))
     }
 
     add2parent(parent, this)

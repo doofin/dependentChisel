@@ -5,7 +5,7 @@ import scala.collection.mutable
 import com.doofin.stdScalaJvm.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.typesAndSyntax.typesAndOps.*
-import dependentChisel.codegen.seqCommands.*
+import dependentChisel.codegen.sequentialCommands.*
 
 /** various checks like checking width */
 object typeCheck {
@@ -42,7 +42,7 @@ object typeCheck {
       /* 1.add width field in FirStmt
         2. add width in lhs var and rhs expr
         3. use a map to store width of var and expr */
-      case FirStmt(lhs, op, rhs, prefix) =>
+      case WeakStmt(lhs, op, rhs, prefix) =>
         val lr = (getExprWidth(typeMap, lhs), getExprWidth(typeMap, rhs)) match {
           // only check if both result are numbers
           case lrWidth @ (i, j) =>

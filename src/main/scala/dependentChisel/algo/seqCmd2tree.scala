@@ -5,11 +5,11 @@ import scala.util.*
 import Tree.*
 import com.doofin.stdScalaCross.*
 
-import dependentChisel.codegen.seqCommands.*
+import dependentChisel.codegen.sequentialCommands.*
 
 /** algorithm to convert sequential commands to AST */
 object seqCmd2tree {
-  type AST = TreeNode[NewInstStmt | FirStmt | Ctrl | VarDecls]
+  type AST = TreeNode[NewInstance | WeakStmt | Ctrl | VarDecls]
 
   /** convert sequential commands to AST. multiple stmt is appended as multiple nodes
     */
@@ -33,7 +33,7 @@ object seqCmd2tree {
           // end of block, pop out one parent
           parents.pop()
         // for other stmt,just append
-        case stmt: (FirStmt | NewInstStmt | VarDecls) =>
+        case stmt: (WeakStmt | NewInstance | VarDecls) =>
           val newNd: AST = TreeNode(stmt)
           parents.top.cld += newNd
         case _ =>
