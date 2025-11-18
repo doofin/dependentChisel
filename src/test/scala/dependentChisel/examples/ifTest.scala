@@ -13,7 +13,7 @@ import dependentChisel.typesAndSyntax.chiselModules.*
 
 import dependentChisel.codegen.compiler.*
 
-import algo.seqCmd2tree.*
+import algo.stackList2tree.*
 
 object ifTest extends mainRunnable {
   override def main(args: Array[String] = Array()): Unit = run

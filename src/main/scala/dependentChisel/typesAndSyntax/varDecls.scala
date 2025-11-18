@@ -5,7 +5,7 @@ import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 
-import dependentChisel.codegen.seqCommands.*
+import dependentChisel.codegen.sequentialCommands.*
 
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.syntax.naming
@@ -41,7 +41,7 @@ object varDecls {
 
   /** allow to be called outside module */
   inline def newIO[w <: Int: ValueOf](using
-      mli: ModLocalInfo
+      mli: ModuleData
   )(
       tp: VarType.Input.type | VarType.Output.type,
       // widthOpt: Option[Int] = None,
@@ -50,7 +50,7 @@ object varDecls {
 
     val genName = naming.genNameForVar(givenName, tp)
     val r = VarTyped[w](
-      mli.thisInstanceName + "." + genName,
+      mli.instanceName + "." + genName,
       tp
     )
     val width = constValueOpt[w].getOrElse(valueOf[w]) // .orElse(widthOpt)
@@ -61,14 +61,14 @@ object varDecls {
   }
 
   def newIODym[w <: Int](using
-      mli: ModLocalInfo
+      mli: ModuleData
   )(width: Int, tp: VarType.Input.type | VarType.Output.type, givenName: String = "") = {
 
     val genName = naming.genNameForVar(givenName, tp)
     val r = VarDymTyped(
       width,
       tp,
-      mli.thisInstanceName + "." + genName
+      mli.instanceName + "." + genName
     ) // when refered in expr , use this name
 
     mli.typeMap.addOne(r, width)
@@ -89,8 +89,8 @@ object varDecls {
       )
 
       val width = constValueOpt[w].getOrElse(valueOf[w]) // .orElse(widthOpt)
-      modLocalInfo.typeMap.addOne(r, width)
-      modLocalInfo.commands.append(VarDecls(r.toDym(width)))
+      moduleData.typeMap.addOne(r, width)
+      moduleData.commands.append(VarDecls(r.toDym(width)))
       r
     }
 
@@ -98,8 +98,8 @@ object varDecls {
       // need to push this cmd for varDecl
       val genName = naming.genNameForVar(givenName, VarType.Reg)
       val r = VarDymTyped(width, VarType.Reg, genName)
-      modLocalInfo.typeMap.addOne(r, width)
-      modLocalInfo.commands.append(VarDecls(r))
+      moduleData.typeMap.addOne(r, width)
+      moduleData.commands.append(VarDecls(r))
       r
     }
 
@@ -108,8 +108,8 @@ object varDecls {
       val width = init.width
       val genName = naming.genNameForVar(givenName, VarType.Reg)
       val r = VarDymTyped(width, VarType.RegInit(init), genName)
-      modLocalInfo.typeMap.addOne(r, width)
-      modLocalInfo.commands.append(VarDecls(r))
+      moduleData.typeMap.addOne(r, width)
+      moduleData.commands.append(VarDecls(r))
       r
     }
 

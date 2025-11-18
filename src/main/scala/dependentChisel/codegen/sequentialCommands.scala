@@ -5,8 +5,12 @@ import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
 
-/** sequential commands used in chisel UserModule to build circuit */
-object seqCommands {
+/** sequential commands used in chisel UserModule to build circuit
+  *
+  * nested control structures are implemented using start/end commands which is implicitly a stack,
+  * so we can later convert it to a tree with seqCmd2tree
+  */
+object sequentialCommands {
   type Uid = Int
 
   /** control structures like if */
@@ -17,8 +21,15 @@ object seqCommands {
     case Top()
   }
 
-  /** all sorts of sequential commands */
+  /** all sorts of sequential commands
+    */
   sealed trait Cmds
+
+  /** represent start/end of control block
+    *
+    * @param ctrl
+    * @param uid
+    */
   case class Start[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds // uid is not used
   case class End[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
 
@@ -26,11 +37,11 @@ object seqCommands {
   sealed trait AtomicCmds extends Cmds
 
   /** for new mod */
-  case class NewInstStmt(instNm: String, modNm: String) extends AtomicCmds
+  case class NewInstance(instNm: String, modNm: String) extends AtomicCmds
 
   /** firrtl statements: weakly typed which doesn't require width of lhs = wid of rhs.
     */
-  case class FirStmt(
+  case class WeakStmt(
       lhs: Var[?],
       op: String,
       rhs: Expr[?],

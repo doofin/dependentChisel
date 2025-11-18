@@ -2,8 +2,8 @@ package dependentChisel.staticAnalysis
 
 import com.doofin.stdScala.mainRunnable
 
-import dependentChisel.codegen.seqCommands.*
-import dependentChisel.algo.seqCmd2tree.AST
+import dependentChisel.codegen.sequentialCommands.*
+import dependentChisel.algo.stackList2tree.AST
 import dependentChisel.typesAndSyntax.typesAndOps.*
 
 import dependentChisel.*
@@ -18,7 +18,7 @@ import dependentChisel.typesAndSyntax.control.*
 
 import dependentChisel.codegen.compiler.*
 
-import algo.seqCmd2tree.*
+import algo.stackList2tree.*
 
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.codegen.firrtlTypes.FirrtlCircuit
@@ -79,10 +79,10 @@ object progGraph extends mainRunnable {
       case x: Ctrl =>
         x match {
           case Ctrl.Top() =>
-            val r = ast.cld.zipWithIndex flatMap ((x, i) => ast2progGraph(q + i, x))
+            val r = ast.children.zipWithIndex flatMap ((x, i) => ast2progGraph(q + i, x))
             List((p, Skip, q)) ++ r.toList
           case _ =>
-            val r = ast.cld.zipWithIndex flatMap ((x, i) => ast2progGraph(q + i, x))
+            val r = ast.children.zipWithIndex flatMap ((x, i) => ast2progGraph(q + i, x))
             List((p, Skip, q)) ++ r.toList
         }
 

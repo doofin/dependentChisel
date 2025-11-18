@@ -5,7 +5,7 @@ import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 
-import dependentChisel.codegen.seqCommands.*
+import dependentChisel.codegen.sequentialCommands.*
 
 import dependentChisel.typesAndSyntax.chiselModules.*
 import dependentChisel.syntax.naming
@@ -31,7 +31,7 @@ object control {
     def newMod[M <: UserModule](newMod: M) = {
       /*     m1.clock <= clock
     m1.reset <= reset */
-      pushCmd(NewInstStmt(newMod.thisInstanceName, newMod.thisClassName))
+      pushCmd(NewInstance(newMod.thisInstanceName, newMod.thisClassName))
       newMod
     }
 

@@ -9,7 +9,7 @@ import com.doofin.stdScalaJvm.*
 import dependentChisel.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 import typesAndOps.*
-import dependentChisel.codegen.seqCommands.*
+import dependentChisel.codegen.sequentialCommands.*
 import codegen.firrtlTypes.*
 import dependentChisel.syntax.naming
 import dependentChisel.misc.macros
@@ -21,7 +21,7 @@ object statements {
   /** typed API for assign */
   extension [w <: Int, V <: Var[w]](v: V) {
 
-    inline def :=(using mli: ModLocalInfo)(oth: Expr[w]) = {
+    inline def :=(using md: ModuleData)(oth: Expr[w]) = {
       val name = v.getname
 
       /* v match {
@@ -32,18 +32,18 @@ object statements {
       // dbg(v)
       // dbg(oth)
       // mli.typeMap.addOne(v, constValueOpt[w].get)
-      mli.commands += FirStmt(v, ":=", oth)
+      md.commands += WeakStmt(v, ":=", oth)
     }
 
   }
 
   /** untyped API for assign */
   extension (v: VarDymTyped) {
-    inline def :=(using mli: ModLocalInfo)(oth: Expr[?]) = {
+    inline def :=(using md: ModuleData)(oth: Expr[?]) = {
       val name = v.getname
-      mli.typeMap.addOne(v, v.width)
+      md.typeMap.addOne(v, v.width)
 
-      mli.commands += FirStmt(v, ":=", oth)
+      md.commands += WeakStmt(v, ":=", oth)
     }
   }
 }

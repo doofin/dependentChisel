@@ -9,9 +9,9 @@ import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
 
 import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.algo.seqCmd2tree.*
+import dependentChisel.algo.stackList2tree.*
 
-import seqCommands.*
+import sequentialCommands.*
 import firrtlTypes.*
 
 import scala.util.*
@@ -39,11 +39,11 @@ object compiler {
 
   /** chisel ModLocalInfo to FirrtlModule(IO bundle,AST for the circuit) */
   def chiselMod2firrtlCircuits(chiselMod: UserModule, printCmdList: Boolean = false) = {
-    val modInfo: ModLocalInfo = chiselMod.modLocalInfo
+    val modInfo: ModuleData = chiselMod.moduleData
     val allMods: List[UserModule] = chiselMod.globalInfo.modules.toList
 
     val typeMap =
-      allMods.map(_.modLocalInfo.typeMap) reduce (_ ++ _)
+      allMods.map(_.moduleData.typeMap) reduce (_ ++ _)
 
     val mainModuleName = modInfo.className
 
@@ -72,7 +72,7 @@ object compiler {
       typeMap: mutable.Map[Expr[?], Int],
       printCmdList: Boolean
   )(chiselMod: UserModule): FirrtlModule = {
-    val modInfo: ModLocalInfo = chiselMod.modLocalInfo
+    val modInfo: ModuleData = chiselMod.moduleData
     // pp(modInfo.typeMap)
     val cmdList = modInfo.commands.toList
     if printCmdList then pp(modInfo.commands.toList)
@@ -81,7 +81,7 @@ object compiler {
 
     val cmds_ANF: List[Cmds] = expandCmdList(cmds_widthChk)
     // dbg(cmds_ANF)
-    val ioNameChanged: List[Cmds] = cmdsTransform(modInfo.thisInstanceName, cmds_ANF)
+    val ioNameChanged: List[Cmds] = cmdsTransform(modInfo.instanceName, cmds_ANF)
     // dbg(ioNameChanged)
     val tree: AST = list2tree(ioNameChanged)
     FirrtlModule(modInfo, modInfo.io.toList, tree)
@@ -103,10 +103,9 @@ object compiler {
     val circuitStr = tree2firrtlStr(fMod.ast, indent) + skip
     // println("circuitStr.isEmpty:" + circuitStr.trim().isEmpty())
     // pp(circuitStr)
-    val instName: String = fMod.modInfo.thisInstanceName // name changes for io
+    val instName: String = fMod.modInfo.instanceName // name changes for io
     val ioInfoStr = fMod.io.reverse // looks better
       .map { (x: IOdef) =>
-
         val prefix = x.tpe match {
           case VarType.Input  => "flip"
           case VarType.Output => ""
@@ -137,19 +136,17 @@ object compiler {
   /** can insert more commands */
   def expandCmdList(cmdList: List[Cmds]): List[Cmds] = {
     cmdList flatMap {
-      case x: FirStmt =>
+      case x: WeakStmt =>
         val fir = stmtToSingleAssign(x)
         // dbg(fir)
         fir
       case orig @ Start(ctrl: Ctrl, uid) =>
         ctrl match {
           case ctrlIf @ Ctrl.If(bool) =>
-            val anf_stmts: List[FirStmt] =
+            val anf_stmts: List[WeakStmt] =
               stmtToSingleAssign(expr2stmtBind(bool))
             val anf_res =
-              anf_stmts :+ orig.copy(ctrl =
-                ctrlIf.copy(cond = anf_stmts.last.lhs.asTypedUnsafe[1])
-              )
+              anf_stmts :+ orig.copy(ctrl = ctrlIf.copy(cond = anf_stmts.last.lhs.asTypedUnsafe[1]))
             // dbg(anf_res)
             anf_res
           case _ => List(orig) // bug! will eat "else"
@@ -167,13 +164,13 @@ object compiler {
           case Ctrl.Else() => "else :"
           case Ctrl.Top()  => ""
         })
-      case stmt: FirStmt     => indent + stmt2firrtlStr(stmt)
-      case stmt: NewInstStmt => newInstStmt2firrtlStr(indent, stmt) + "\n"
+      case stmt: WeakStmt    => indent + stmt2firrtlStr(stmt)
+      case stmt: NewInstance => newInstStmt2firrtlStr(indent, stmt) + "\n"
       case stmt: VarDecls =>
         indent + varDecl2firrtlStr(indent, stmt)
     }
 
-    nodeStr + (tr.cld map (cld => "\n" + tree2firrtlStr(cld, indent + "  "))).mkString
+    nodeStr + (tr.children map (cld => "\n" + tree2firrtlStr(cld, indent + "  "))).mkString
   }
 
   /** rm module or instance names from io name, for usage in gen firrtl io section
@@ -188,11 +185,11 @@ object compiler {
     else fullName
      */
 
-    if fullName.contains(".") then
+    if fullName.contains(".") then {
       val (instNameSplit, name) = splitName(fullName)
       if instNameSplit == instName then "io." + name
       else fullName
-    else fullName
+    } else fullName
   }
 
   def expr2firrtlStr(expr: Expr[?]): String = {
@@ -216,13 +213,13 @@ object compiler {
     }
   }
 
-  /** Compute the log2 of a Scala integer, rounded up. Useful for getting the number of
-    * bits needed to represent some number of states (in - 1). To get the number of bits
-    * needed to represent some number n, use log2Ceil(n + 1). Note: can return zero, and
-    * should not be used in cases where it may generate unsupported zero-width wires.
+  /** Compute the log2 of a Scala integer, rounded up. Useful for getting the number of bits needed
+    * to represent some number of states (in - 1). To get the number of bits needed to represent
+    * some number n, use log2Ceil(n + 1). Note: can return zero, and should not be used in cases
+    * where it may generate unsupported zero-width wires.
     * @example
-    *   {{{ log2Ceil(1) // returns 0 log2Ceil(2) // returns 1 log2Ceil(3) // returns 2
-    *   log2Ceil(4) // returns 2 }}}
+    *   {{{ log2Ceil(1) // returns 0 log2Ceil(2) // returns 1 log2Ceil(3) // returns 2 log2Ceil(4)
+    *   // returns 2 }}}
     */
   object log2Ceil {
     // (0 until n).map(_.U((1.max(log2Ceil(n))).W))
@@ -243,13 +240,13 @@ object compiler {
     }
   }
 
-  def stmt2firrtlStr(stmt: FirStmt) = {
-    val FirStmt(lhs, op, rhs, prefix) = stmt
+  def stmt2firrtlStr(stmt: WeakStmt) = {
+    val WeakStmt(lhs, op, rhs, prefix) = stmt
     val opName = firrtlOpMap.find(_._1 == op).map(_._2).getOrElse(op)
     prefix + expr2firrtlStr(lhs) + s" $opName ${expr2firrtlStr(rhs)}"
   }
 
-  def newInstStmt2firrtlStr(indent: String, stmt: NewInstStmt) = {
+  def newInstStmt2firrtlStr(indent: String, stmt: NewInstance) = {
     /*     m1.clock <= clock
     m1.reset <= reset */
     Seq(
@@ -291,7 +288,7 @@ object compiler {
   /** convert expr to stmt bind: turn a+b into gen_ = a+b */
   def expr2stmtBind(a: Expr[?]) = {
     val newValue = "g_" + global.getUid
-    FirStmt(VarLit(newValue), ":=", a, prefix = "node ")
+    WeakStmt(VarLit(newValue), ":=", a, prefix = "node ")
   }
   /* to A-normal form
   https://en.wikipedia.org/wiki/A-normal_form
@@ -303,10 +300,10 @@ object compiler {
   stmt-> list stmt
    */
   def stmtToSingleAssign(
-      stmt: FirStmt,
-      resList: List[FirStmt] = List()
-  ): List[FirStmt] = {
-    val FirStmt(stmtLhs, op, stmtRhs, _) = stmt
+      stmt: WeakStmt,
+      resList: List[WeakStmt] = List()
+  ): List[WeakStmt] = {
+    val WeakStmt(stmtLhs, op, stmtRhs, _) = stmt
 
     stmtRhs match {
       // fresh stmt for the first 2 case
@@ -315,7 +312,7 @@ object compiler {
         stmtToSingleAssign(
           genStmt,
           List(
-            FirStmt(
+            WeakStmt(
               stmt.lhs,
               ":=",
               bop.copy(a = VarLit(genStmt.lhs.getname)),
@@ -332,7 +329,7 @@ object compiler {
        */
       case uop @ UniOp(a, nm) =>
         val genStmt = expr2stmtBind(a)
-        val stmtNew = FirStmt(
+        val stmtNew = WeakStmt(
           stmtLhs,
           ":=",
           genStmt.lhs
@@ -349,10 +346,10 @@ object compiler {
     }
   }
 
-  /** if lhs is IO,change := to <= and make new conn io.y:=a+b becomes y0=a+b;io.y<=y0 new
-    * : don't do above
+  /** if lhs is IO,change := to <= and make new conn io.y:=a+b becomes y0=a+b;io.y<=y0 new : don't
+    * do above
     */
-  def IOassignTransform(stmt: FirStmt): List[FirStmt] = {
+  def IOassignTransform(stmt: WeakStmt): List[WeakStmt] = {
     stmt.lhs match {
       /* if lhs is IO,change := to <= and make new conn
         io.y:=a+b becomes y0=a+b;io.y<=y0
@@ -400,8 +397,8 @@ object compiler {
     }
   }
 
-  /** modify names for io: check if instantiated instance have same name, if so refer to
-    * it by io.a, otherwise add inst name as prefix
+  /** modify names for io: check if instantiated instance have same name, if so refer to it by io.a,
+    * otherwise add inst name as prefix
     */
   def ioNameTransform(thisInstName: String, ioFullName: String) = {
     val instName :: name :: Nil = ioFullName.split('.').toList: @unchecked
@@ -432,7 +429,7 @@ object compiler {
     */
   def cmdsTransform(thisInstName: String, cmdList: List[Cmds]): List[Cmds] = {
     cmdList map {
-      case x @ FirStmt(lhs, op, rhs, prefix) =>
+      case x @ WeakStmt(lhs, op, rhs, prefix) =>
         val newStmt = x.copy(
           lhs = varNameTransform(thisInstName, lhs),
           rhs = exprTransform(thisInstName, rhs)

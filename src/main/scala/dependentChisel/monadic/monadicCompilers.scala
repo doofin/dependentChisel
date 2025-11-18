@@ -76,14 +76,14 @@ object monadicCompilers {
          then push new node into parent stack as new top elem*/
           val newParNode: AST = TreeNode(ctrl) // new parent node
           // add this newParNode as child
-          parents.top.cld += newParNode
+          parents.top.children += newParNode
           parents push newParNode
         case End(ctrl) =>
           // end of block, pop out one parent
           parents.pop()
         // for other stmt,just append
         case stmt =>
-          parents.top.cld += TreeNode(stmt)
+          parents.top.children += TreeNode(stmt)
       }
 
     }

@@ -1,10 +1,24 @@
 # dependentChisel
-This is the impl for Master thesis : Dependent Chisel: Statically-checked hardware designs based on Chisel and Scala 3, by Yuchen du
+This is an ongoing research project to bring dependent type features to hardware design in Chisel-like syntax, as an embedded DSL(eDSL) in Scala 3.
+
+It originally started as Master thesis "Dependent Chisel: Statically-checked hardware designs based on Chisel and Scala 3", by Yuchen du in 2023
 https://github.com/doofin/dependentChisel/blob/master/Msc_Thesis_yuchen.pdf
 
-It uses partial dependent types in Scala 3 to provide early error message for Chisel, a hardware description language embedded in Scala.
-This allows you to identify bitwidth mismatch at compile time where IDE can show errors instantly in the editor.
 
+## Design
+The main philosophy is to make it clean and simple, and avoid complex language features. The core intermediate representation is an algebraic AST, which is easy to analyze and transform.
+
+**algebraic AST**
+
+The layer of DSL translation:
+
+Chisel-like syntax -> list of commands as stack data structure -> Algebraic AST (FIRRTL like IR in Scala ADT) 
+
+when we have the algebraic AST, it's convenient to do various analysis, transformation and finally code generation to FIRRTL. This algebraic AST is similar to FIRRTL IR in Chisel, but Chisel seems to discourage direct manipulation of FIRRTL IR AST, while we embrace it.
+
+**dependent types**
+
+It uses partial dependent types in Scala 3 to provide early error message, which can be directly shown in IDE when writing code, allowing you to catch bitwidth mismatch at compile time.
 ## examples
 examples like adder, etc. can be found in src/test/scala/dependentChisel/
 
@@ -55,13 +69,12 @@ Instantiate those modules :
 
 
 ## Interop with chisel
-The current implementation is based on Chisel 3.5.1, which is used internally. There's no direct interop with the original Chisel, but you can probably use the generated FIRRTL for that.
+The current implementation is based on Chisel 3.5.1, which is used internally. There's no direct interop with the original Chisel, but you can probably use the generated FIRRTL for interop.
 
 
-Although scala 3 can invoke scala 2.13 libraries,chisel uses scala 2 macros different from scala 3 ,making it partially incompatible.
+Although scala 3 can invoke scala 2.13 libraries,chisel uses scala 2 macros  which is different from scala 3 ,making it incompatible.
 
 To fix the mismatch, there are several possible ways:
-
 - Rewrite all macros and make everything compatible.
 - Rewrite some macros and extend some base class.
 - Write a new frontend and emit FIRRTL.
@@ -78,13 +91,16 @@ many tests under src/test can be run by
     
 ### IDE support
 
+recommended  IDEs:
 [Metals](https://scalameta.org/metals/) with vscode 
-
-[IntelliJ](https://blog.jetbrains.com/scala/)
 
 ## theories and related work
 related work : https://github.com/doofin/dependentChisel/blob/master/resources.md
 
+similar projects:
+- [zaozi] : https://github.com/sequencer/zaozi
+
+and more are listed in the thesis pdf.
 
 ## misc
 
@@ -92,4 +108,4 @@ with
   
     git ls-files | grep '\.scala$' | xargs wc -l
 
-chisel has  60927 total loc
+chisel has  60927 total loc, while dependentChisel only has 3765 total loc, so it's a good idea to understand dependentChisel before diving into chisel codebase.
