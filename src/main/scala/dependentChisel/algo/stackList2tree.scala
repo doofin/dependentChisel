@@ -9,13 +9,15 @@ import dependentChisel.codegen.sequentialCommands.*
 
 /** algorithm to convert sequential commands to AST in tree structure
   */
-object seqCmd2tree {
+object stackList2tree {
   type AST = TreeNode[NewInstance | WeakStmt | Ctrl | VarDecls]
 
-  /** convert sequential commands to AST. multiple stmt is appended as multiple nodes
+  /** convert sequential commands to AST.
     *
     * @param cmdList
     *   list of sequential commands which implicitly has stack structure
+    * @return
+    *   AST tree structure where parent node has multiple children nodes
     */
   def list2tree(cmdList: List[Cmds]): AST = {
     import scala.collection.mutable.Stack

@@ -1,6 +1,6 @@
 package dependentChisel.codegen
 
-import dependentChisel.algo.seqCmd2tree.AST
+import dependentChisel.algo.stackList2tree.AST
 import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.chiselModules.ModuleData
 import dependentChisel.typesAndSyntax.typesAndOps.VarType

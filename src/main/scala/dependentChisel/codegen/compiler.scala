@@ -9,7 +9,7 @@ import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
 
 import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.algo.seqCmd2tree.*
+import dependentChisel.algo.stackList2tree.*
 
 import sequentialCommands.*
 import firrtlTypes.*
