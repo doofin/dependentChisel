@@ -69,13 +69,12 @@ Instantiate those modules :
 
 
 ## Interop with chisel
-The current implementation is based on Chisel 3.5.1, which is used internally. There's no direct interop with the original Chisel, but you can probably use the generated FIRRTL for that.
+The current implementation is based on Chisel 3.5.1, which is used internally. There's no direct interop with the original Chisel, but you can probably use the generated FIRRTL for interop.
 
 
-Although scala 3 can invoke scala 2.13 libraries,chisel uses scala 2 macros different from scala 3 ,making it partially incompatible.
+Although scala 3 can invoke scala 2.13 libraries,chisel uses scala 2 macros  which is different from scala 3 ,making it incompatible.
 
 To fix the mismatch, there are several possible ways:
-
 - Rewrite all macros and make everything compatible.
 - Rewrite some macros and extend some base class.
 - Write a new frontend and emit FIRRTL.
@@ -92,9 +91,8 @@ many tests under src/test can be run by
     
 ### IDE support
 
+recommended  IDEs:
 [Metals](https://scalameta.org/metals/) with vscode 
-
-[IntelliJ](https://blog.jetbrains.com/scala/)
 
 ## theories and related work
 related work : https://github.com/doofin/dependentChisel/blob/master/resources.md
@@ -102,6 +100,7 @@ related work : https://github.com/doofin/dependentChisel/blob/master/resources.m
 similar projects:
 - [zaozi] : https://github.com/sequencer/zaozi
 
+and more are listed in the thesis pdf.
 
 ## misc
 
@@ -109,4 +108,4 @@ with
   
     git ls-files | grep '\.scala$' | xargs wc -l
 
-chisel has  60927 total loc
+chisel has  60927 total loc, while dependentChisel only has 3765 total loc, so it's a good idea to understand dependentChisel before diving into chisel codebase.
