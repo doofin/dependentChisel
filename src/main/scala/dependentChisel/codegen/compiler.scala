@@ -106,7 +106,6 @@ object compiler {
     val instName: String = fMod.modInfo.instanceName // name changes for io
     val ioInfoStr = fMod.io.reverse // looks better
       .map { (x: IOdef) =>
-
         val prefix = x.tpe match {
           case VarType.Input  => "flip"
           case VarType.Output => ""
@@ -147,9 +146,7 @@ object compiler {
             val anf_stmts: List[WeakStmt] =
               stmtToSingleAssign(expr2stmtBind(bool))
             val anf_res =
-              anf_stmts :+ orig.copy(ctrl =
-                ctrlIf.copy(cond = anf_stmts.last.lhs.asTypedUnsafe[1])
-              )
+              anf_stmts :+ orig.copy(ctrl = ctrlIf.copy(cond = anf_stmts.last.lhs.asTypedUnsafe[1]))
             // dbg(anf_res)
             anf_res
           case _ => List(orig) // bug! will eat "else"
@@ -167,7 +164,7 @@ object compiler {
           case Ctrl.Else() => "else :"
           case Ctrl.Top()  => ""
         })
-      case stmt: WeakStmt     => indent + stmt2firrtlStr(stmt)
+      case stmt: WeakStmt    => indent + stmt2firrtlStr(stmt)
       case stmt: NewInstance => newInstStmt2firrtlStr(indent, stmt) + "\n"
       case stmt: VarDecls =>
         indent + varDecl2firrtlStr(indent, stmt)
@@ -188,11 +185,11 @@ object compiler {
     else fullName
      */
 
-    if fullName.contains(".") then
+    if fullName.contains(".") then {
       val (instNameSplit, name) = splitName(fullName)
       if instNameSplit == instName then "io." + name
       else fullName
-    else fullName
+    } else fullName
   }
 
   def expr2firrtlStr(expr: Expr[?]): String = {
@@ -216,13 +213,13 @@ object compiler {
     }
   }
 
-  /** Compute the log2 of a Scala integer, rounded up. Useful for getting the number of
-    * bits needed to represent some number of states (in - 1). To get the number of bits
-    * needed to represent some number n, use log2Ceil(n + 1). Note: can return zero, and
-    * should not be used in cases where it may generate unsupported zero-width wires.
+  /** Compute the log2 of a Scala integer, rounded up. Useful for getting the number of bits needed
+    * to represent some number of states (in - 1). To get the number of bits needed to represent
+    * some number n, use log2Ceil(n + 1). Note: can return zero, and should not be used in cases
+    * where it may generate unsupported zero-width wires.
     * @example
-    *   {{{ log2Ceil(1) // returns 0 log2Ceil(2) // returns 1 log2Ceil(3) // returns 2
-    *   log2Ceil(4) // returns 2 }}}
+    *   {{{ log2Ceil(1) // returns 0 log2Ceil(2) // returns 1 log2Ceil(3) // returns 2 log2Ceil(4)
+    *   // returns 2 }}}
     */
   object log2Ceil {
     // (0 until n).map(_.U((1.max(log2Ceil(n))).W))
@@ -349,8 +346,8 @@ object compiler {
     }
   }
 
-  /** if lhs is IO,change := to <= and make new conn io.y:=a+b becomes y0=a+b;io.y<=y0 new
-    * : don't do above
+  /** if lhs is IO,change := to <= and make new conn io.y:=a+b becomes y0=a+b;io.y<=y0 new : don't
+    * do above
     */
   def IOassignTransform(stmt: WeakStmt): List[WeakStmt] = {
     stmt.lhs match {
@@ -400,8 +397,8 @@ object compiler {
     }
   }
 
-  /** modify names for io: check if instantiated instance have same name, if so refer to
-    * it by io.a, otherwise add inst name as prefix
+  /** modify names for io: check if instantiated instance have same name, if so refer to it by io.a,
+    * otherwise add inst name as prefix
     */
   def ioNameTransform(thisInstName: String, ioFullName: String) = {
     val instName :: name :: Nil = ioFullName.split('.').toList: @unchecked
