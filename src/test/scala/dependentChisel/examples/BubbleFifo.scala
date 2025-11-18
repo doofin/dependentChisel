@@ -20,6 +20,7 @@ object BubbleFifo extends mainRunnable {
     val mod = makeModule { implicit p =>
       new BubbleFifo(2, 3) // ok
     }
+    pprint.pprintln(chiselMod2firrtlCircuits(mod))
     chiselMod2verilog(mod)
   }
 
@@ -83,8 +84,14 @@ object BubbleFifo extends mainRunnable {
     deq.dout := dataReg
   }
 
-  class BubbleFifo(using GlobalInfo)(size: Int :| Positive, depth: Int)
-      extends UserModule {
+  /** an typed bubble fifo example
+    *
+    * @param x
+    * @param size
+    *   guaranteed to be positive
+    * @param depth
+    */
+  class BubbleFifo(using GlobalInfo)(size: Int :| Positive, depth: Int) extends UserModule {
     val enq = new WriterIO(size)
     val deq = new ReaderIO(size)
 

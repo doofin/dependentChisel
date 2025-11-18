@@ -39,11 +39,11 @@ object compiler {
 
   /** chisel ModLocalInfo to FirrtlModule(IO bundle,AST for the circuit) */
   def chiselMod2firrtlCircuits(chiselMod: UserModule, printCmdList: Boolean = false) = {
-    val modInfo: ModuleData = chiselMod.modLocalInfo
+    val modInfo: ModuleData = chiselMod.moduleData
     val allMods: List[UserModule] = chiselMod.globalInfo.modules.toList
 
     val typeMap =
-      allMods.map(_.modLocalInfo.typeMap) reduce (_ ++ _)
+      allMods.map(_.moduleData.typeMap) reduce (_ ++ _)
 
     val mainModuleName = modInfo.className
 
@@ -72,7 +72,7 @@ object compiler {
       typeMap: mutable.Map[Expr[?], Int],
       printCmdList: Boolean
   )(chiselMod: UserModule): FirrtlModule = {
-    val modInfo: ModuleData = chiselMod.modLocalInfo
+    val modInfo: ModuleData = chiselMod.moduleData
     // pp(modInfo.typeMap)
     val cmdList = modInfo.commands.toList
     if printCmdList then pp(modInfo.commands.toList)
@@ -173,7 +173,7 @@ object compiler {
         indent + varDecl2firrtlStr(indent, stmt)
     }
 
-    nodeStr + (tr.cld map (cld => "\n" + tree2firrtlStr(cld, indent + "  "))).mkString
+    nodeStr + (tr.children map (cld => "\n" + tree2firrtlStr(cld, indent + "  "))).mkString
   }
 
   /** rm module or instance names from io name, for usage in gen firrtl io section

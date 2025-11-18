@@ -5,7 +5,11 @@ import com.doofin.stdScalaCross.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.global
 
-/** sequential commands used in chisel UserModule to build circuit */
+/** sequential commands used in chisel UserModule to build circuit
+  *
+  * nested control structures are implemented using start/end commands which is implicitly a stack,
+  * so we can later convert it to a tree with seqCmd2tree
+  */
 object sequentialCommands {
   type Uid = Int
 

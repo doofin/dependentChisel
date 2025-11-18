@@ -67,13 +67,13 @@ object chiselModules {
     if (global.debugVerbose)
       println(s"new inst $thisInstanceName for $thisClassName")
 
-    given modLocalInfo: ModuleData =
+    given moduleData: ModuleData =
       ModuleData(className = thisClassName, instanceName = thisInstanceName)
     // def name = this.getClass.getCanonicalName.split('.').last
     val globalInfo = parent
 
     def pushCmd(cmd: Cmds) = {
-      modLocalInfo.commands.append(cmd)
+      moduleData.commands.append(cmd)
     }
 
     def pushBlk(ctr: Ctrl)(block: => Any) = {

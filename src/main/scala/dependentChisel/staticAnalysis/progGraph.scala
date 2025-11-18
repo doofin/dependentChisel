@@ -79,10 +79,10 @@ object progGraph extends mainRunnable {
       case x: Ctrl =>
         x match {
           case Ctrl.Top() =>
-            val r = ast.cld.zipWithIndex flatMap ((x, i) => ast2progGraph(q + i, x))
+            val r = ast.children.zipWithIndex flatMap ((x, i) => ast2progGraph(q + i, x))
             List((p, Skip, q)) ++ r.toList
           case _ =>
-            val r = ast.cld.zipWithIndex flatMap ((x, i) => ast2progGraph(q + i, x))
+            val r = ast.children.zipWithIndex flatMap ((x, i) => ast2progGraph(q + i, x))
             List((p, Skip, q)) ++ r.toList
         }
 

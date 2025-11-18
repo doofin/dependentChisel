@@ -89,8 +89,8 @@ object varDecls {
       )
 
       val width = constValueOpt[w].getOrElse(valueOf[w]) // .orElse(widthOpt)
-      modLocalInfo.typeMap.addOne(r, width)
-      modLocalInfo.commands.append(VarDecls(r.toDym(width)))
+      moduleData.typeMap.addOne(r, width)
+      moduleData.commands.append(VarDecls(r.toDym(width)))
       r
     }
 
@@ -98,8 +98,8 @@ object varDecls {
       // need to push this cmd for varDecl
       val genName = naming.genNameForVar(givenName, VarType.Reg)
       val r = VarDymTyped(width, VarType.Reg, genName)
-      modLocalInfo.typeMap.addOne(r, width)
-      modLocalInfo.commands.append(VarDecls(r))
+      moduleData.typeMap.addOne(r, width)
+      moduleData.commands.append(VarDecls(r))
       r
     }
 
@@ -108,8 +108,8 @@ object varDecls {
       val width = init.width
       val genName = naming.genNameForVar(givenName, VarType.Reg)
       val r = VarDymTyped(width, VarType.RegInit(init), genName)
-      modLocalInfo.typeMap.addOne(r, width)
-      modLocalInfo.commands.append(VarDecls(r))
+      moduleData.typeMap.addOne(r, width)
+      moduleData.commands.append(VarDecls(r))
       r
     }
 
