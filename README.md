@@ -1,10 +1,24 @@
 # dependentChisel
-This is the impl for Master thesis : Dependent Chisel: Statically-checked hardware designs based on Chisel and Scala 3, by Yuchen du
+This is an ongoing research project to bring dependent type features to hardware design in Chisel-like syntax, as an embedded DSL(eDSL) in Scala 3.
+
+It originally started as Master thesis "Dependent Chisel: Statically-checked hardware designs based on Chisel and Scala 3", by Yuchen du in 2023
 https://github.com/doofin/dependentChisel/blob/master/Msc_Thesis_yuchen.pdf
 
-It uses partial dependent types in Scala 3 to provide early error message for Chisel, a hardware description language embedded in Scala.
-This allows you to identify bitwidth mismatch at compile time where IDE can show errors instantly in the editor.
 
+## Design
+The main philosophy is to make it clean and simple, and avoid complex language features. The core intermediate representation is an algebraic AST, which is easy to analyze and transform.
+
+**algebraic AST**
+
+The layer of DSL translation:
+
+Chisel-like syntax -> list of commands as stack data structure -> Algebraic AST (FIRRTL like IR in Scala ADT) 
+
+when we have the algebraic AST, it's convenient to do various analysis, transformation and finally code generation to FIRRTL. This algebraic AST is similar to FIRRTL IR in Chisel, but Chisel seems to discourage direct manipulation of FIRRTL IR AST, while we embrace it.
+
+**dependent types**
+
+It uses partial dependent types in Scala 3 to provide early error message, which can be directly shown in IDE when writing code, allowing you to catch bitwidth mismatch at compile time.
 ## examples
 examples like adder, etc. can be found in src/test/scala/dependentChisel/
 
@@ -84,6 +98,9 @@ many tests under src/test can be run by
 
 ## theories and related work
 related work : https://github.com/doofin/dependentChisel/blob/master/resources.md
+
+similar projects:
+- [zaozi] : https://github.com/sequencer/zaozi
 
 
 ## misc
