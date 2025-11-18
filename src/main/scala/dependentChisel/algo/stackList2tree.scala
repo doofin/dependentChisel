@@ -1,6 +1,7 @@
 package dependentChisel.algo
 
 import scala.util.*
+import scala.collection.mutable.Stack
 
 import Tree.*
 import com.doofin.stdScalaCross.*
@@ -20,7 +21,6 @@ object stackList2tree {
     *   AST tree structure where parent node has multiple children nodes
     */
   def list2tree(cmdList: List[Cmds]): AST = {
-    import scala.collection.mutable.Stack
     val parents: Stack[AST] = Stack(TreeNode(Ctrl.Top())) // new Stack[AST]
 
     cmdList.foreach { cmd =>
