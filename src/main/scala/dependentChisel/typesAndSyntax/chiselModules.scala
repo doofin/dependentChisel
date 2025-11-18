@@ -25,11 +25,17 @@ import scala.util.Success
 /** imperative style for chisel ,record info in mutable vars inside class chiselModules
   */
 object chiselModules {
+  /** global info
+    * 
+    */ 
   case class GlobalInfo(
       names: ArrayBuffer[String] = ArrayBuffer(),
       modules: ArrayBuffer[UserModule] = ArrayBuffer()
   )
-  case class ModLocalInfo(
+  /**
+    * represent info for each module instance
+    */
+  case class ModuleData(
       className: String,
       thisInstanceName: String,
       io: ArrayBuffer[IOdef] = ArrayBuffer(),
@@ -53,8 +59,8 @@ object chiselModules {
     val thisInstanceName = naming.mkUidFrom(thisClassName)
     if (global.debugVerbose) println(s"new inst $thisInstanceName for $thisClassName")
 
-    given modLocalInfo: ModLocalInfo =
-      ModLocalInfo(className = thisClassName, thisInstanceName = thisInstanceName)
+    given modLocalInfo: ModuleData =
+      ModuleData(className = thisClassName, thisInstanceName = thisInstanceName)
     // def name = this.getClass.getCanonicalName.split('.').last
     val globalInfo = parent
 

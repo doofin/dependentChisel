@@ -39,7 +39,7 @@ object compiler {
 
   /** chisel ModLocalInfo to FirrtlModule(IO bundle,AST for the circuit) */
   def chiselMod2firrtlCircuits(chiselMod: UserModule, printCmdList: Boolean = false) = {
-    val modInfo: ModLocalInfo = chiselMod.modLocalInfo
+    val modInfo: ModuleData = chiselMod.modLocalInfo
     val allMods: List[UserModule] = chiselMod.globalInfo.modules.toList
 
     val typeMap =
@@ -72,7 +72,7 @@ object compiler {
       typeMap: mutable.Map[Expr[?], Int],
       printCmdList: Boolean
   )(chiselMod: UserModule): FirrtlModule = {
-    val modInfo: ModLocalInfo = chiselMod.modLocalInfo
+    val modInfo: ModuleData = chiselMod.modLocalInfo
     // pp(modInfo.typeMap)
     val cmdList = modInfo.commands.toList
     if printCmdList then pp(modInfo.commands.toList)

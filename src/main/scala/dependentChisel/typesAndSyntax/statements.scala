@@ -21,7 +21,7 @@ object statements {
   /** typed API for assign */
   extension [w <: Int, V <: Var[w]](v: V) {
 
-    inline def :=(using mli: ModLocalInfo)(oth: Expr[w]) = {
+    inline def :=(using mli: ModuleData)(oth: Expr[w]) = {
       val name = v.getname
 
       /* v match {
@@ -39,7 +39,7 @@ object statements {
 
   /** untyped API for assign */
   extension (v: VarDymTyped) {
-    inline def :=(using mli: ModLocalInfo)(oth: Expr[?]) = {
+    inline def :=(using mli: ModuleData)(oth: Expr[?]) = {
       val name = v.getname
       mli.typeMap.addOne(v, v.width)
 

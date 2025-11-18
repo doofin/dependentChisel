@@ -20,7 +20,7 @@ object BubbleFifoErr {
     chiselMod2verilog(mod)
   }
 
-  class WriterIO_err(size: Int)(using mli: ModLocalInfo) {
+  class WriterIO_err(size: Int)(using mli: ModuleData) {
 
     /** Input */
     val write = newIO[1](VarType.Input)
@@ -32,7 +32,7 @@ object BubbleFifoErr {
     val din = newIODym(size + 1, VarType.Input) // correct should be just size
   }
 
-  class ReaderIO(size: Int)(using mli: ModLocalInfo) {
+  class ReaderIO(size: Int)(using mli: ModuleData) {
 
     /** Input */
     val read = newIO[1](VarType.Input) // Bool() = UInt<1>

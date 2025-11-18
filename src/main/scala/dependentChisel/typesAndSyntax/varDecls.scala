@@ -41,7 +41,7 @@ object varDecls {
 
   /** allow to be called outside module */
   inline def newIO[w <: Int: ValueOf](using
-      mli: ModLocalInfo
+      mli: ModuleData
   )(
       tp: VarType.Input.type | VarType.Output.type,
       // widthOpt: Option[Int] = None,
@@ -61,7 +61,7 @@ object varDecls {
   }
 
   def newIODym[w <: Int](using
-      mli: ModLocalInfo
+      mli: ModuleData
   )(width: Int, tp: VarType.Input.type | VarType.Output.type, givenName: String = "") = {
 
     val genName = naming.genNameForVar(givenName, tp)
