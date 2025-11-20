@@ -56,4 +56,7 @@ object sequentialCommands {
    1.new super type for Var[w]
    */
 
+  /** formal verification commands */
+  case class BoolProp(name: String, prop: Bool) extends AtomicCmds
+
 }
