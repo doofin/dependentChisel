@@ -118,6 +118,6 @@ object adder extends mainRunnable {
     val y = newIO[2](VarType.Output)
 
     y := a + b
-    BoolProp("assert", y === a + b)
+    BoolProp("assert", y === a + b).here
   }
 }

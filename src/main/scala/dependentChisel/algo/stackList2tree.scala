@@ -11,6 +11,7 @@ import dependentChisel.codegen.sequentialCommands.*
 /** algorithm to convert sequential commands to AST in tree structure
   */
 object stackList2tree {
+  // node can be control structure like if, or simple commands like assign
   type AST = TreeNode[Ctrl | Cmds]
 
   /** convert sequential commands to AST.
@@ -37,7 +38,7 @@ object stackList2tree {
           // end of block, pop out one parent
           parents.pop()
         // for other stmt,just append
-        case stmt: (WeakStmt | NewInstance | VarDecls) =>
+        case stmt: (WeakStmt | NewInstance | VarDecls | BoolProp) =>
           val newNd: AST = TreeNode(stmt)
           parents.top.children += newNd
         case _ =>

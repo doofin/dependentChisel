@@ -18,6 +18,23 @@ import dependentChisel.misc.depTypes
 /** assignments */
 object statements {
 
+  def appendCmdToModule(using md: ModuleData)(stmt: Cmds): Unit = {
+    md.commands += stmt
+  }
+
+  extension (stmt: Cmds) {
+
+    /** this adds the statement to current module's command list
+      *
+      * if not using this, the statement will not be in the module IR
+      *
+      * @param md
+      */
+    def here(using md: ModuleData): Unit = {
+      appendCmdToModule(stmt)
+    }
+  }
+
   /** typed API for assign */
   extension [w <: Int, V <: Var[w]](v: V) {
 
@@ -32,7 +49,7 @@ object statements {
       // dbg(v)
       // dbg(oth)
       // mli.typeMap.addOne(v, constValueOpt[w].get)
-      md.commands += WeakStmt(v, ":=", oth)
+      appendCmdToModule(WeakStmt(v, ":=", oth))
     }
 
   }
@@ -43,7 +60,7 @@ object statements {
       val name = v.getname
       md.typeMap.addOne(v, v.width)
 
-      md.commands += WeakStmt(v, ":=", oth)
+      appendCmdToModule(WeakStmt(v, ":=", oth))
     }
   }
 }
