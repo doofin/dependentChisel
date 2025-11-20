@@ -25,6 +25,7 @@ import dependentChisel.codegen.sequentialCommands.WeakStmt
 import dependentChisel.codegen.sequentialCommands.VarDecls
 import dependentChisel.codegen.sequentialCommands.Skip
 import dependentChisel.codegen.sequentialCommands.BoolProp
+import dependentChisel.global.mPPrint
 
 /* more tests for parameterized mod*/
 class astTransformSuite extends AnyFunSuite {
@@ -33,7 +34,7 @@ class astTransformSuite extends AnyFunSuite {
       new adder.Adder1prop
     })
 
-    pprint.pprintln(m.moduleData.commandAsTree())
+    mPPrint(m.moduleData.commandAsTree())
     val newAst =
       m.moduleData.transformTree { (ast: TreeNode[Ctrl | Cmds]) =>
         val predicate: Ctrl | Cmds => Boolean = {
@@ -44,7 +45,8 @@ class astTransformSuite extends AnyFunSuite {
         treeTraverse.filterTop(predicate, ast)
       }
 
-    pprint.pprintln(newAst)
+    mPPrint(newAst)
+    assert(newAst.children.length == 1, "filtered AST should have only 1 assertion")
   }
 
 }
