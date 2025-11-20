@@ -21,6 +21,9 @@ import dependentChisel.global
 import scala.util.Try
 import scala.util.Failure
 import scala.util.Success
+import dependentChisel.algo.stackList2tree
+import dependentChisel.algo.Tree.TreeNode
+import dependentChisel.algo.stackList2tree.AST
 
 /** IR for current implementation
   *
@@ -50,7 +53,18 @@ object chiselModules {
       io: ArrayBuffer[IOdef] = ArrayBuffer(),
       commands: ArrayBuffer[Cmds] = ArrayBuffer(), // list of statements
       typeMap: mutable.Map[Expr[?] | Var[?], Int] = mutable.Map() // list of seq cmds
-  )
+  ) {
+    def commandAsTree(): AST = {
+      stackList2tree.list2tree(commands.toList)
+    }
+
+    def transformTree(
+        f: AST => AST
+    ): AST = {
+      val tree = commandAsTree()
+      f(tree)
+    }
+  }
 
   /* function style UserModule ,for example: when {} else {} */
   trait UserModule(using parent: GlobalInfo) extends UserModuleOps, UserModuleDecls {

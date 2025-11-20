@@ -11,7 +11,7 @@ import dependentChisel.codegen.sequentialCommands.*
 /** algorithm to convert sequential commands to AST in tree structure
   */
 object stackList2tree {
-  type AST = TreeNode[NewInstance | WeakStmt | Ctrl | VarDecls]
+  type AST = TreeNode[Ctrl | Cmds]
 
   /** convert sequential commands to AST.
     *
