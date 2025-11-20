@@ -10,10 +10,10 @@ import dependentChisel.*
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.typesAndSyntax.varDecls.newIO
+import dependentChisel.typesAndSyntax.circuitDecls.newIO
 import dependentChisel.codegen.compiler.*
 
-import dependentChisel.typesAndSyntax.varDecls.newIODym
+import dependentChisel.typesAndSyntax.circuitDecls.newIODym
 import dependentChisel.codegen.sequentialCommands.BoolProp
 
 object adder extends mainRunnable {

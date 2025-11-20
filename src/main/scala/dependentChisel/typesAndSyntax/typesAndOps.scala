@@ -13,7 +13,7 @@ import dependentChisel.misc.macros
 /*
 https://github.com/MaximeKjaer/tf-dotty/blob/master/modules/compiletime/src/main/scala/io/kjaer/compiletime/Shape.scala
  */
-object typesAndOps extends exprOperators {
+object typesAndOps extends exprOp {
 
   /* Chisel provides three data types to describe connections, combinational logic, and
 registers: Bits, UInt, and SInt. UInt and SInt extend Bits, and all three types

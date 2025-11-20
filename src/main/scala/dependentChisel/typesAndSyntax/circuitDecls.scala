@@ -18,10 +18,10 @@ import dependentChisel.codegen.compiler
 /* decls for variables like Wire, Reg, and IO
  type info is converted to value by constValueOpt
  */
-object varDecls {
+object circuitDecls {
 
-  /** use width in type param first,then try with width: Option[Int] in param. if both are
-    * not provided then auto infer the width
+  /** use width in type param first,then try with width: Option[Int] in param. if both are not
+    * provided then auto infer the width
     */
   inline def newLit[w <: Int](v: Int, width: Option[Int] = None) = {
     /* example : 199 is UInt<8>("hc7")

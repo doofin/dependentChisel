@@ -16,7 +16,7 @@ import dependentChisel.global.getUid
 import dependentChisel.syntax.naming
 
 import dependentChisel.typesAndSyntax.control
-import dependentChisel.typesAndSyntax.varDecls.UserModuleDecls
+import dependentChisel.typesAndSyntax.circuitDecls.UserModuleDecls
 import dependentChisel.global
 import scala.util.Try
 import scala.util.Failure

@@ -12,7 +12,7 @@ import dependentChisel.typesAndSyntax.control.*
 import dependentChisel.typesAndSyntax.chiselModules.*
 
 import dependentChisel.typesAndSyntax.control
-import dependentChisel.typesAndSyntax.varDecls.*
+import dependentChisel.typesAndSyntax.circuitDecls.*
 import dependentChisel.codegen.compiler.*
 
 object gcd extends mainRunnable {
