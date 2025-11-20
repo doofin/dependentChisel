@@ -258,7 +258,7 @@ object compiler {
   }
 
   def varDecl2firrtlStr(indent: String = "", stmt: VarDecls) = {
-    val VarDymTyped(width: Int, tp: VarType, name: String) = stmt.v
+    val VarDynamic(width: Int, tp: VarType, name: String) = stmt.v
     tp match {
       case VarType.Reg => // reg without init
         /* reg mReg : UInt<16>, clock with :
@@ -355,7 +355,7 @@ object compiler {
         io.y:=a+b becomes y0=a+b;io.y<=y0
         new : don't do above
        */
-      case x: (VarTyped[?] | VarDymTyped) =>
+      case x: (VarTyped[?] | VarDynamic) =>
         val genStmt = expr2stmtBind(stmt.rhs)
         List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
       // List(stmt.copy(op = "<="))
@@ -382,7 +382,7 @@ object compiler {
   def varNameTransform(thisInstName: String, v: Var[?]): Var[?] = {
     v match {
       case x @ VarLit(name) => x
-      case x @ VarDymTyped(width, tp, name) =>
+      case x @ VarDynamic(width, tp, name) =>
         tp match {
           case VarType.Input | VarType.Output =>
             x.copy(name = ioNameTransform(thisInstName, name))

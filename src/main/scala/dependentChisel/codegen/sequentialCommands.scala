@@ -49,7 +49,7 @@ object sequentialCommands {
   ) extends AtomicCmds
 
   /** for Wire, Reg, and IO */
-  case class VarDecls(v: VarDymTyped) extends AtomicCmds
+  case class VarDecls(v: VarDynamic) extends AtomicCmds
   case object Skip extends AtomicCmds
   /* TODO:also allow dym check which rm type sig of var[t] ,etc. cases
    * of (lhs,rhs) are (dym,stat),(dym,dym)....

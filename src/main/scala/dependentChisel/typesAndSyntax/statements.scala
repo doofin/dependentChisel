@@ -38,7 +38,7 @@ object statements {
   }
 
   /** untyped API for assign */
-  extension (v: VarDymTyped) {
+  extension (v: VarDynamic) {
     inline def :=(using md: ModuleData)(oth: Expr[?]) = {
       val name = v.getname
       md.typeMap.addOne(v, v.width)

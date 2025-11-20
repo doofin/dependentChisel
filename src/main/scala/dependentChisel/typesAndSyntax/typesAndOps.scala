@@ -67,7 +67,7 @@ represent a vector of bits */
   // new ExprC[1, VarDeclTp.Reg.type] {} + new ExprC[1, VarDeclTp.Wire.type] {} //ok ,will fail
 
   /** untyped API for Wire, Reg, and IO */
-  case class VarDymTyped(width: Int, tp: VarType, name: String)
+  case class VarDynamic(width: Int, tp: VarType, name: String)
       extends Var[Nothing](name) {
 
     /** dym check for type cast */
@@ -93,7 +93,7 @@ represent a vector of bits */
   case class VarTyped[w <: Int](name: String, tp: VarType) extends Var[w](name) {
 
     /** a dirty hack */
-    def toDym(width: Int) = VarDymTyped(width, tp, name)
+    def toDym(width: Int) = VarDynamic(width, tp, name)
   }
 
   // case class Input[w <: Int](name: String) extends Var[w](name)

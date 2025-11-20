@@ -65,7 +65,7 @@ object varDecls {
   )(width: Int, tp: VarType.Input.type | VarType.Output.type, givenName: String = "") = {
 
     val genName = naming.genNameForVar(givenName, tp)
-    val r = VarDymTyped(
+    val r = VarDynamic(
       width,
       tp,
       mli.instanceName + "." + genName
@@ -97,7 +97,7 @@ object varDecls {
     def newRegDym(width: Int, givenName: String = "") = {
       // need to push this cmd for varDecl
       val genName = naming.genNameForVar(givenName, VarType.Reg)
-      val r = VarDymTyped(width, VarType.Reg, genName)
+      val r = VarDynamic(width, VarType.Reg, genName)
       moduleData.typeMap.addOne(r, width)
       moduleData.commands.append(VarDecls(r))
       r
@@ -107,7 +107,7 @@ object varDecls {
       // need to push this cmd for varDecl
       val width = init.width
       val genName = naming.genNameForVar(givenName, VarType.Reg)
-      val r = VarDymTyped(width, VarType.RegInit(init), genName)
+      val r = VarDynamic(width, VarType.RegInit(init), genName)
       moduleData.typeMap.addOne(r, width)
       moduleData.commands.append(VarDecls(r))
       r
