@@ -5,11 +5,13 @@ package dependentChisel.monadic
 import cats.data.*
 import cats.implicits.*
 import cats.free.Free.*
+
 import com.doofin.stdScalaJvm.*
 import com.doofin.stdScala.mainRunnable
 
 import monadicCompilers.*
-import monadicAST.*
+import monadicSyntax.*
+
 object monadicTest extends mainRunnable {
 
   override def main(args: Array[String] = Array()): Unit = {

@@ -1,21 +1,25 @@
 package dependentChisel.staticAnalysis
 
-/** lift domain to domainMap where both are lattices. domain ->> var->domain ->> prog
-  * point ->var->domain
+/** lift domain to domainMap where both are lattices. domain ->> var->domain ->> prog point
+  * ->var->domain
   */
 object MonotoneFramework {
   type VarName = String
   type domainMapT = [domain] =>> Map[VarName, domain]
 
-  /** usage : give initMap: domainMapT[domain] and baseLattice, then override
-    * transferF(transfer function) .
+  /** enrich the lattice to support monotone framework
     *
-    * Recommend : create two file named xxAnalysis impl this trait, and xxLattice impl
-    * just lattice
+    * tips : create two file named xxAnalysis to implement this trait, and xxLattice to implement
+    * the lattice separately.
     * @tparam domain
     *   domain lattice which satisify acc
     * @tparam stmtT
     *   type of statement
+    *
+    * @param initMap
+    *   initial mapping from var to domain value
+    * @param baseLattice
+    *   lattice for domain
     */
   trait MonoFrameworkT[domain, stmtT](
       val initMap: domainMapT[domain],
@@ -53,8 +57,7 @@ object MonotoneFramework {
               lattice.smallerThan(i1o, i2o)
             }
         }
-        override val lub
-            : (domainMapT[domain], domainMapT[domain]) => domainMapT[domain] = {
+        override val lub: (domainMapT[domain], domainMapT[domain]) => domainMapT[domain] = {
           (m1, m2) =>
             val newmap =
               (m1.keys ++ m2.keys).toSet map { k =>

@@ -4,7 +4,7 @@ package dependentChisel.monadic
 import cats.{Id, ~>}
 import cats.data.State
 
-import monadicAST.*
+import monadicSyntax.*
 import simpleAST.*
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
