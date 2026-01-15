@@ -26,6 +26,15 @@ object worklistAlgo {
     override def isEmpty: Boolean = as.isEmpty
   }
 
+  /** worklist algorithm for monotone framework
+    * @param mf
+    *   monotone framework
+    * @param progGraph
+    *   program graph as list of (src point,stmt,tgt point)
+    *
+    * @return
+    *   mapping from program point to domainMap at that point
+    */
   def wlAlgoMonotone[domainT, stmtT](
       mf: MonoFrameworkT[domainT, stmtT],
       progGraph: List[(Int, stmtT, Int)]
@@ -41,6 +50,8 @@ object worklistAlgo {
     )
   }
 
+  /** worklist algorithm implementation for program graph
+    */
   private def wlAlgoProgGraphP[domainT, stmtT](
       progGraph: List[(Int, stmtT, Int)],
       transferF: ((Int, stmtT, Int), domainT) => domainT,
@@ -54,10 +65,9 @@ object worklistAlgo {
     val mutList: Worklist[Int] = new WlStack()
 
     pp(progGraph)
-//    get program points from edges,ignore stmt in (Int, Stmt, Int)
+    //    get program points
     val progPoints = progGraph.flatMap(x => List(x._1, x._3)).distinct
 
-//    initialise work list
     mutList.insertAll(progPoints)
 
     val resMapMut: mutable.Map[Int, domainT] = mutable.Map()
@@ -67,8 +77,8 @@ object worklistAlgo {
       resMapMut(q) = if (q == 0) initD else bottomD
     }
 
-//    pp(resMapMut.toMap, "init resMap : ")
-    // second loop,keep applying transferF to program graph until the node value is stable
+    // keep applying transferF to program graph until the node value is stable
+    // according to the ascending order property, this will terminate
     var steps = 0
     while (!mutList.isEmpty) {
       steps += 1

@@ -19,7 +19,7 @@ val initMap: Map[String, Boolean] =
       .toList*
   )
 
-/*
+/* a program graph
 0 -> x:=.. ->1 -> 3 -> 5
 0 ->   2   -> 4
  */

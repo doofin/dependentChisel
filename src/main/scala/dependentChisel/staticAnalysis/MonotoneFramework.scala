@@ -5,9 +5,10 @@ package dependentChisel.staticAnalysis
   */
 object MonotoneFramework {
   type VarName = String
+  // type level lambda from domain to Map[VarName, domain]
   type domainMapT = [domain] =>> Map[VarName, domain]
 
-  /** enrich the lattice to support monotone framework
+  /** enrich the lattice with transfer function and initial mapping
     *
     * tips : create two file named xxAnalysis to implement this trait, and xxLattice to implement
     * the lattice separately.
@@ -22,15 +23,12 @@ object MonotoneFramework {
     *   lattice for domain
     */
   trait MonoFrameworkT[domain, stmtT](
+      val transferF: ((Int, stmtT, Int), domainMapT[domain]) => domainMapT[domain],
+      val init: domain,
       val initMap: domainMapT[domain],
       baseLattice: semiLattice[domain]
   ) extends semiLattice[domainMapT[domain]] {
     // type domainMap = Map[String, domain] // var name to domain
-
-    /** src point,stmt,tgt point,prevMap=>newMap */
-    // val baseLattice: semiLattice[domain]
-    val transferF: ((Int, stmtT, Int), domainMapT[domain]) => domainMapT[domain]
-    val init: domain
 
     /** lift from semiLattice[domain] to semiLattice[domainMapT[domain]] */
     val liftedLattice = baseLattice.liftWithMap(initMap)
@@ -44,8 +42,12 @@ object MonotoneFramework {
       worklistAlgo.wlAlgoMonotone(this, progGraph)
   }
 
-  extension [domain](lattice: semiLattice[domain]) {
-    def liftWithMap(initMap: domainMapT[domain]) =
+  /** lift semiLattice[t] to semiLattice[Map[String,t]]
+    *
+    * that is, for t:SemiLattice, the function space String->t is also a SemiLattice
+    */
+  extension [domain](base: semiLattice[domain]) {
+    def liftWithMap(initMap: domainMapT[domain]): semiLattice[domainMapT[domain]] =
       new semiLattice[domainMapT[domain]] {
         override val smallerThan: (domainMapT[domain], domainMapT[domain]) => Boolean = {
           (m1, m2) =>
@@ -54,23 +56,25 @@ object MonotoneFramework {
               val i1o = k1._2
               val i2o = m2(k1._1)
 
-              lattice.smallerThan(i1o, i2o)
+              base.smallerThan(i1o, i2o)
             }
         }
+        /*  for lub, take union of keys, for each key do lub on values
+         */
         override val lub: (domainMapT[domain], domainMapT[domain]) => domainMapT[domain] = {
           (m1, m2) =>
             val newmap =
               (m1.keys ++ m2.keys).toSet map { k =>
                 val i1o = m1(k)
                 val i2o = m2(k)
-                val rr = lattice.lub(i1o, i2o)
+                val rr = base.lub(i1o, i2o)
                 (k, rr)
               }
             Map(newmap.toSeq*)
         }
 
         override val bottom: domainMapT[domain] =
-          initMap.map(s => (s._1, lattice.bottom))
+          initMap.map(s => (s._1, base.bottom))
       }
   }
 }
