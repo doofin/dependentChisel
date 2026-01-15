@@ -12,13 +12,17 @@ import dependentChisel.codegen.sequentialCommands.VarDecls
 /** check if vars have an value
   */
 object checkUnInitAnalysis {
-  type mDomain = checkUnInitLattice.domain
-  type mStmt = AtomicCmds // assign,var decls etc
+  type mDomain = checkUnInitLattice.domain // which is Boolean
+  type mStmt = AtomicCmds // statements
 
+  // val init: mDomain = false
+
+  // for each stmt, how it mutate the map var->domain
   val transferF: ((Int, mStmt, Int), domainMapT[mDomain]) => domainMapT[mDomain] = {
     case ((q0, cmd, q1), varmap) =>
       cmd match {
         case WeakStmt(lhs, op, rhs, prefix) =>
+          // any assignment makes var initialized
           if op == ":=" then varmap.updated(lhs.getname, true) else varmap
         // case NewInstStmt(instNm, modNm)    =>
         // case VarDecls(v)                   =>
@@ -26,13 +30,10 @@ object checkUnInitAnalysis {
       }
   }
 
-  val init: mDomain = false
-
   case class MonoFramework(
       mInitMap: domainMapT[mDomain]
   ) extends MonoFrameworkT[mDomain, mStmt](
         transferF,
-        init,
         mInitMap,
         checkUnInitLattice.lattice
       ) {
