@@ -45,7 +45,7 @@ object worklistAlgo {
       mf.transferF,
       mf.smallerThan,
       mf.lub,
-      mf.initMap,
+      mf.botMap,
       mf.bottom
     )
   }

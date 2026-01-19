@@ -31,10 +31,10 @@ object checkUnInitAnalysis {
   }
 
   case class MonoFramework(
-      mInitMap: domainMapT[mDomain]
+      mBotMap: domainMapT[mDomain]
   ) extends MonoFrameworkT[mDomain, mStmt](
         transferF,
-        mInitMap,
+        mBotMap,
         checkUnInitLattice.lattice
       ) {
 

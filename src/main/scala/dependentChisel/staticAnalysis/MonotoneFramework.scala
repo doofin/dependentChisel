@@ -24,13 +24,13 @@ object MonotoneFramework {
     */
   trait MonoFrameworkT[domain, stmtT](
       val transferF: ((Int, stmtT, Int), domainMapT[domain]) => domainMapT[domain],
-      val initMap: domainMapT[domain],
+      val botMap: domainMapT[domain],
       baseLattice: semiLattice[domain]
   ) extends semiLattice[domainMapT[domain]] {
     // type domainMap = Map[String, domain] // var name to domain
 
     // lift domain to domainMap[domain] lattice
-    val liftedLattice = baseLattice.liftWithMap(initMap)
+    val liftedLattice = baseLattice.liftWithMap(botMap)
     override val bottom: domainMapT[domain] = liftedLattice.bottom
     override val lub = liftedLattice.lub
     override val smallerThan = liftedLattice.smallerThan
