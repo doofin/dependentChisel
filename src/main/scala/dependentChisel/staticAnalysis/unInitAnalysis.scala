@@ -1,50 +1,40 @@
 package dependentChisel.staticAnalysis
 
-import dependentChisel.codegen.sequentialCommands.AtomicCmds
-import dependentChisel.staticAnalysis.MonotoneFramework.VarMap
-
 import dependentChisel.staticAnalysis.MonotoneFramework.*
-import dependentChisel.codegen.sequentialCommands.NewInstance
-import dependentChisel.codegen.sequentialCommands.WeakStmt
-import dependentChisel.codegen.sequentialCommands.VarDecls
-import dependentChisel.typesAndSyntax.typesAndOps.VarLit
-import dependentChisel.typesAndSyntax.typesAndOps.BinOp
-import dependentChisel.typesAndSyntax.typesAndOps.MulOp
-import dependentChisel.typesAndSyntax.typesAndOps.AddOp
-import dependentChisel.typesAndSyntax.typesAndOps.UniOp
-import dependentChisel.typesAndSyntax.typesAndOps.VarDynamic
-import dependentChisel.typesAndSyntax.typesAndOps.VarTyped
-import dependentChisel.typesAndSyntax.typesAndOps.Lit
-import dependentChisel.typesAndSyntax.typesAndOps.LitDym
+import dependentChisel.codegen.sequentialCommands.*
+import dependentChisel.typesAndSyntax.typesAndOps.*
 
 /** check if vars have an value
   */
 object unInitAnalysis {
-  type mDomain = checkUnInitLattice.mDomain // which is Boolean
-  type mStmt = AtomicCmds // statements
+  type Domain = VarMap[Boolean]
+  type Stmt = AtomicCmds // statements
 
-  val transferF: ((Int, mStmt, Int), VarMap[mDomain]) => VarMap[mDomain] = {
-    case ((q0, cmd, q1), varmap) =>
-      cmd match {
-        case WeakStmt(lhs, op, rhs, prefix) =>
-          rhs match
-            case VarLit(name)                =>
-            case BinOp(a, b, nm)             =>
-            case MulOp(a, b, nm)             =>
-            case AddOp(a, b, nm)             =>
-            case UniOp(a, nm)                =>
-            case VarDynamic(width, tp, name) =>
-            case VarTyped(name, tp)          =>
-            case Lit(i)                      =>
-            case LitDym(i, width)            =>
+  val transferF: ((Int, Stmt, Int), Domain) => Domain = { case ((q0, cmd, q1), varmap) =>
+    cmd match {
+      case WeakStmt(lhs, op, rhs, prefix) =>
+        rhs match
+          case VarLit(name)                =>
+          case BinOp(a, b, nm)             =>
+          case MulOp(a, b, nm)             =>
+          case AddOp(a, b, nm)             =>
+          case UniOp(a, nm)                =>
+          case VarDynamic(width, tp, name) =>
+          case VarTyped(name, tp)          =>
+          case Lit(i)                      =>
+          case LitDym(i, width)            =>
 
-          // any assignment makes var initialized
-          if op == ":=" then varmap.updated(lhs.getname, true) else varmap
-        case _ => varmap
-      }
+        // any assignment makes var initialized
+        if op == ":=" then varmap.updated(lhs.getname, true) else varmap
+      case _ => varmap
+    }
   }
 
-  object checkUnInitLattice extends semiLattice[Boolean] {
+  /** lattice for uninitialized analysis is Var->Boolean where false means uninitialized
+    *
+    * we first define a simple boolean lattice and later lift it to Var->Boolean lattice
+    */
+  object unInitAnalysis extends semiLattice[Boolean] {
 
     override val leq = {
       case (_, true)      => true
@@ -61,10 +51,11 @@ object unInitAnalysis {
   }
 
   def mMonoFramework(
-      mBotMap: VarMap[mDomain]
+      mBotMap: Domain
   ) = {
-    val lifted =
-      checkUnInitLattice.liftWithMap(mBotMap)
+    // lift the boolean lattice to Var->Boolean lattice
+    val lifted: semiLattice[VarMap[Boolean]] =
+      unInitAnalysis.liftWithMap(mBotMap)
 
     MonoFrameworkT(
       transferF = transferF,

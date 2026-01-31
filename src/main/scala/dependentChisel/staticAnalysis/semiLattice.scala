@@ -14,7 +14,6 @@ package dependentChisel.staticAnalysis
   *   acc(ascending chain condition)
   */
 trait semiLattice[t] {
-  type mDomain = t
   val leq: (t, t) => Boolean // partial ordering
   val lub: (t, t) => t // least upper bound
   val bottom: t
