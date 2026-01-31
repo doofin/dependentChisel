@@ -33,11 +33,7 @@ class liveVarAnalysisSuite extends munit.FunSuite {
 
   }
 
-  test("live variable analysis full test with worklist algo") {
-
-    // each var is uninitialized at the beginning
-    val initMap =
-      Set.empty[String]
+  test("live variable analysis full test") {
 
     val pg =
       List(
@@ -45,14 +41,20 @@ class liveVarAnalysisSuite extends munit.FunSuite {
         (1, Skip, 3),
         (0, WeakStmt(VarLit("y"), ":=", Lit[1](1)), 2),
         (2, Skip, 4),
-        (3, WeakStmt(VarLit("z"), ":=", VarLit("x") + Lit[1](1)), 5)
+        (3, WeakStmt(VarLit("z"), ":=", VarLit("x") + Lit[1](1)), 5),
+        (4, Skip, 5)
       )
 
+    // each var is uninitialized at the beginning
+    val initMap =
+      Set.empty[String]
+
+    val entryExitPoint = (0, 5)
     /*
     ASCII visualization:
 
-             0
-             / \
+                0
+             /    \
           (x:=1)   (y:=1)
            |       \
            v        v
@@ -63,13 +65,17 @@ class liveVarAnalysisSuite extends munit.FunSuite {
            |
           (z:=x+1)
            |
-           v
+           v   /
            5
      */
     val monoF = liveVarAnalysis.monoFramework(initMap)
 
     // live variable analysis is a backward analysis
-    val res = monoF.runWithProgGraph(pg, isForward = false)
+    val res = monoF.runWithProgGraph(
+      pg, //
+      isForward = false,
+      entryExitPoint
+    )
 
     pp(res)
 

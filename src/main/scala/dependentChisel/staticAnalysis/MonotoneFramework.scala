@@ -45,7 +45,8 @@ object MonotoneFramework {
       */
     def runWithProgGraph(
         progGraph: List[(Int, stmtT, Int)],
-        isForward: Boolean = true
+        isForward: Boolean = true,
+        entryExitPoint: (Int, Int) = (0, 0)
     ) = {
       val mf = this
 
@@ -56,6 +57,7 @@ object MonotoneFramework {
         mf.lub,
         mf.bottom,
         mf.bottom,
+        entryExitPoint = entryExitPoint,
         isForward = isForward
       )
     }

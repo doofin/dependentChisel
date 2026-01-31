@@ -4,6 +4,7 @@ import com.doofin.stdScalaJvm.*
 import scala.collection.{immutable, mutable}
 
 import MonotoneFramework.*
+import chisel3.util.is
 
 object worklistAlgo {
   trait Worklist[t] {
@@ -26,7 +27,22 @@ object worklistAlgo {
     override def isEmpty: Boolean = as.isEmpty
   }
 
-  /** worklist algorithm implementation for program graph
+  /** worklist algorithm on program graph
+    *
+    * @param progGraph_
+    * @param transferF
+    * @param smallerThan
+    * @param lubOp
+    * @param initD
+    *   for program point 0 if it's forward analysis, or exiting point if backward analysis
+    * @param bottomD
+    *   for other program points
+    * @param entryExitPoint
+    *   the (entry, exit) program points. forward analysis only use entry point, backward analysis
+    *   only use exit
+    * @param isForward
+    *   true for forward analysis,false for backward analysis
+    * @return
     */
   def wlAlgoProgGraphP[domainT, stmtT](
       progGraph_ : List[(Int, stmtT, Int)],
@@ -35,6 +51,7 @@ object worklistAlgo {
       lubOp: (domainT, domainT) => domainT,
       initD: domainT,
       bottomD: domainT,
+      entryExitPoint: (Int, Int),
       isForward: Boolean = true
   ): Map[Int, domainT] = {
 
@@ -54,7 +71,14 @@ object worklistAlgo {
 
 //    initialize at each program points,set to init for point 0 (first loop)
     progPoints foreach { q =>
-      resMapMut(q) = if (q == 0) initD else bottomD
+      val (entryPoint, exitPoint) = entryExitPoint
+      if isForward then //
+        resMapMut(q) = if (q == entryPoint) then initD else bottomD
+      else
+        resMapMut(q) = if (q == exitPoint) then initD else bottomD
+
+        //
+        // resMapMut(q) = if (q == 0) then initD else bottomD
     }
 
     // keep applying transferF to program graph until the node value is stable
