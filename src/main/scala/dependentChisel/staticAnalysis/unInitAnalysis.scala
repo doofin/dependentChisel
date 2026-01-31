@@ -3,7 +3,7 @@ package dependentChisel.staticAnalysis
 import dependentChisel.codegen.sequentialCommands.AtomicCmds
 import dependentChisel.staticAnalysis.MonotoneFramework.VarMap
 
-import dependentChisel.staticAnalysis.MonotoneFramework.MonoFrameworkT
+import dependentChisel.staticAnalysis.MonotoneFramework.*
 import dependentChisel.codegen.sequentialCommands.NewInstance
 import dependentChisel.codegen.sequentialCommands.WeakStmt
 import dependentChisel.codegen.sequentialCommands.VarDecls
@@ -28,16 +28,16 @@ object unInitAnalysis {
       cmd match {
         case WeakStmt(lhs, op, rhs, prefix) =>
           rhs match
-            case VarLit(name) => 
-            case BinOp(a, b, nm) =>
-            case MulOp(a, b, nm) =>
-            case AddOp(a, b, nm) =>
-            case UniOp(a, nm) =>
+            case VarLit(name)                =>
+            case BinOp(a, b, nm)             =>
+            case MulOp(a, b, nm)             =>
+            case AddOp(a, b, nm)             =>
+            case UniOp(a, nm)                =>
             case VarDynamic(width, tp, name) =>
-            case VarTyped(name, tp) =>
-            case Lit(i) =>
-            case LitDym(i, width) =>
-          
+            case VarTyped(name, tp)          =>
+            case Lit(i)                      =>
+            case LitDym(i, width)            =>
+
           // any assignment makes var initialized
           if op == ":=" then varmap.updated(lhs.getname, true) else varmap
         case _ => varmap
@@ -62,9 +62,13 @@ object unInitAnalysis {
 
   def mMonoFramework(
       mBotMap: VarMap[mDomain]
-  ) = new MonoFrameworkT[mDomain, mStmt](
-    transferF,
-    mBotMap,
-    checkUnInitLattice
-  ) {}
+  ) = {
+    val lifted =
+      checkUnInitLattice.liftWithMap(mBotMap)
+
+    MonoFrameworkT(
+      transferF = transferF,
+      baseLattice = lifted
+    )
+  }
 }

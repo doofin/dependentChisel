@@ -22,19 +22,23 @@ object MonotoneFramework {
     * @param baseLattice
     *   lattice for domain
     */
-  trait MonoFrameworkT[T, stmtT](
-      val transferF: ((Int, stmtT, Int), VarMap[T]) => VarMap[T],
-      val botMap: VarMap[T],
+  case class MonoFrameworkT[T, stmtT](
+      val transferF: ((Int, stmtT, Int), T) => T,
+      // val botMap: VarMap[T],
       baseLattice: semiLattice[T]
-  ) extends semiLattice[VarMap[T]] {
-    val liftedLattice = baseLattice.liftWithMap(botMap)
-    override val bottom: VarMap[T] = liftedLattice.bottom
-    override val lub = liftedLattice.lub
-    override val leq = liftedLattice.leq
+  ) extends semiLattice[T] {
+    // val liftedLattice = baseLattice.liftWithMap(botMap)
+    // override val bottom: VarMap[T] = liftedLattice.bottom
+    // override val lub = liftedLattice.lub
+    // override val leq = liftedLattice.leq
+
+    override val bottom: T = baseLattice.bottom
+    override val lub = baseLattice.lub
+    override val leq = baseLattice.leq
 
     def runWithProgGraph(
         progGraph: List[(Int, stmtT, Int)]
-    ): Map[Int, VarMap[T]] =
+    ) =
       worklistAlgo.wlAlgoMonotone(this, progGraph)
   }
 

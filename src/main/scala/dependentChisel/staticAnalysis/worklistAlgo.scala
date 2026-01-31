@@ -40,12 +40,12 @@ object worklistAlgo {
       progGraph: List[(Int, stmtT, Int)]
   ) = {
 
-    wlAlgoProgGraphP[VarMap[domainT], stmtT](
+    wlAlgoProgGraphP[domainT, stmtT](
       progGraph,
       mf.transferF,
       mf.leq,
       mf.lub,
-      mf.botMap,
+      mf.bottom,
       mf.bottom
     )
   }
