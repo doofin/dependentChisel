@@ -19,28 +19,32 @@ object typesAndOps extends exprOp {
 registers: Bits, UInt, and SInt. UInt and SInt extend Bits, and all three types
 represent a vector of bits */
 
-  /* mutable vars which can be mutated in lhs, incl input,output */
-  sealed trait Var[w <: Int](name: String) extends Expr[w] {
-    def getname = name
-    // def getIsIO = isIO
-  }
-
-  case class VarLit[w <: Int](name: String) extends Var[w](name)
-
   sealed trait Expr[w <: Int] {
     def asUnTyped = this.asInstanceOf[Expr[Nothing]]
     inline def asTypedUnsafe[w <: Int] = {
       this.asInstanceOf[Expr[w]]
     }
   }
+
+  /* mutable vars which can be mutated in lhs, incl input,output */
+  sealed trait Var[w <: Int](name: String) extends Expr[w] {
+    def getName = name
+    // def getIsIO = isIO
+  }
+
+  /** declare a variable like: WeakStmt(VarLit(newValue), ":=", a)
+    *
+    * @param name
+    */
+  case class VarLit[w <: Int](name: String) extends Var[w](name)
+
+  // binary op like add,sub,and,or
   case class BinOp[w <: Int](a: Expr[w], b: Expr[w], nm: String) extends Expr[w]
 
   // to prevent overflow like AFix in spinalHDL
-  case class MulOp[w <: Int](a: Expr[w], b: Expr[w], nm: String = "mul")
-      extends Expr[2 * w]
+  case class MulOp[w <: Int](a: Expr[w], b: Expr[w], nm: String = "mul") extends Expr[2 * w]
 
-  case class AddOp[w <: Int](a: Expr[w], b: Expr[w], nm: String = "mul")
-      extends Expr[w + 1]
+  case class AddOp[w <: Int](a: Expr[w], b: Expr[w], nm: String = "mul") extends Expr[w + 1]
 
   /** uniary op like negate */
   case class UniOp[w <: Int](a: Expr[w], nm: String) extends Expr[w]
@@ -67,8 +71,7 @@ represent a vector of bits */
   // new ExprC[1, VarDeclTp.Reg.type] {} + new ExprC[1, VarDeclTp.Wire.type] {} //ok ,will fail
 
   /** untyped API for Wire, Reg, and IO */
-  case class VarDynamic(width: Int, tp: VarType, name: String)
-      extends Var[Nothing](name) {
+  case class VarDynamic(width: Int, tp: VarType, name: String) extends Var[Nothing](name) {
 
     /** dym check for type cast */
     inline def asTyped[w <: Int] = {
@@ -103,7 +106,7 @@ represent a vector of bits */
   // for future use
 
 // case class Lit[w <: Int](i: w, name: String) extends Expr[w] {}
-  type sml[w <: Int] <: w ^ 2
+  // type sml[w <: Int] <: w ^ 2
   case class Lit[w <: Int](i: w) extends Expr[w] {}
   case class LitDym(i: Int, width: Int) extends Expr[Nothing]
   /*

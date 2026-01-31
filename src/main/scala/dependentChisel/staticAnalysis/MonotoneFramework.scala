@@ -23,7 +23,7 @@ object MonotoneFramework {
     *   lattice for domain
     */
   case class MonoFrameworkT[T, stmtT](
-      val transferF: ((Int, stmtT, Int), T) => T,
+      val transferFn: ((Int, stmtT, Int), T) => T,
       // val botMap: VarMap[T],
       baseLattice: semiLattice[T]
   ) extends semiLattice[T] {
@@ -36,27 +36,48 @@ object MonotoneFramework {
     override val lub = baseLattice.lub
     override val leq = baseLattice.leq
 
-    def runWithProgGraph(
-        progGraph: List[(Int, stmtT, Int)]
-    ) =
-      worklistAlgo.wlAlgoMonotone(this, progGraph)
-  }
-
-  /** lift any t to string->t semiLattice
-    *
-    * that is, for t:SemiLattice, the function space String->t is also a SemiLattice
-    */
-  extension [domain](base: semiLattice[domain]) {
-
-    /** lift the t:lattice to string->t lattice (function space)
+    /** run the monotone framework on a program graph
       *
-      * @param botMap
-      *   the bottom element mapping, since we need to know var names
+      * @param progGraph
+      * @param isForward
+      *   true for forward analysis,false for backward analysis
       * @return
       */
-    def liftWithMap(botMap: VarMap[domain]): semiLattice[VarMap[domain]] =
-      new semiLattice[VarMap[domain]] {
-        override val leq: (VarMap[domain], VarMap[domain]) => Boolean = { (m1, m2) =>
+    def runWithProgGraph(
+        progGraph: List[(Int, stmtT, Int)],
+        isForward: Boolean = true
+    ) = {
+      val mf = this
+
+      worklistAlgo.wlAlgoProgGraphP(
+        progGraph,
+        mf.transferFn,
+        mf.leq,
+        mf.lub,
+        mf.bottom,
+        mf.bottom,
+        isForward = isForward
+      )
+    }
+  }
+
+  /** lift semiLattice[t] to semiLattice[VarMap[t]]
+    *
+    * useful for some static analysis like interval analysis, sign analysis
+    */
+  extension [t](base: semiLattice[t]) {
+
+    /** lift semiLattice[t] to semiLattice[VarMap[t]]
+      *
+      * where VarMap[t] represents VarName->t
+      *
+      * @param botMap
+      *   all variable names as bottom element
+      * @return
+      */
+    def liftToVarMap(botMap: VarMap[t]): semiLattice[VarMap[t]] =
+      new semiLattice[VarMap[t]] {
+        override val leq: (VarMap[t], VarMap[t]) => Boolean = { (m1, m2) =>
           m1 forall { k1 =>
             // im1 is subset of im2
             val i1o = k1._2
@@ -67,7 +88,7 @@ object MonotoneFramework {
         }
         /*  for lub, take union of keys, for each key do lub on values
          */
-        override val lub: (VarMap[domain], VarMap[domain]) => VarMap[domain] = { (m1, m2) =>
+        override val lub: (VarMap[t], VarMap[t]) => VarMap[t] = { (m1, m2) =>
           val newmap =
             (m1.keys ++ m2.keys).toSet map { k =>
               val i1o = m1(k)
@@ -78,7 +99,7 @@ object MonotoneFramework {
           Map(newmap.toSeq*)
         }
 
-        override val bottom: VarMap[domain] =
+        override val bottom: VarMap[t] =
           botMap.map(s => (s._1, base.bottom))
       }
   }

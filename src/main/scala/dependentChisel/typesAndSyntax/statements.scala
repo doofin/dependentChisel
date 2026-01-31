@@ -39,7 +39,7 @@ object statements {
   extension [w <: Int, V <: Var[w]](v: V) {
 
     inline def :=(using md: ModuleData)(oth: Expr[w]) = {
-      val name = v.getname
+      val name = v.getName
 
       /* v match {
         case VarLit(name) =>
@@ -57,7 +57,7 @@ object statements {
   /** untyped API for assign */
   extension (v: VarDynamic) {
     inline def :=(using md: ModuleData)(oth: Expr[?]) = {
-      val name = v.getname
+      val name = v.getName
       md.typeMap.addOne(v, v.width)
 
       appendCmdToModule(WeakStmt(v, ":=", oth))

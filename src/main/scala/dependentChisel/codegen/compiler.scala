@@ -166,7 +166,7 @@ object compiler {
         })
       case stmt: WeakStmt    => indent + stmt2firrtlStr(stmt)
       case stmt: NewInstance => newInstStmt2firrtlStr(indent, stmt) + "\n"
-      case stmt: VarDecls =>
+      case stmt: VarDecls    =>
         indent + varDecl2firrtlStr(indent, stmt)
     }
 
@@ -201,7 +201,7 @@ object compiler {
         s"$opName(${expr2firrtlStr(a)})"
       case x: Var[?] =>
         // dbg(x)
-        x.getname
+        x.getName
       case Lit(w) =>
         // h0 means HexLit of 0
         s"""UInt<${w}>("$w")"""
@@ -315,7 +315,7 @@ object compiler {
             WeakStmt(
               stmt.lhs,
               ":=",
-              bop.copy(a = VarLit(genStmt.lhs.getname)),
+              bop.copy(a = VarLit(genStmt.lhs.getName)),
               prefix = "node "
             )
           ) ++ resList
@@ -381,7 +381,7 @@ object compiler {
     */
   def varNameTransform(thisInstName: String, v: Var[?]): Var[?] = {
     v match {
-      case x @ VarLit(name) => x
+      case x @ VarLit(name)                => x
       case x @ VarDynamic(width, tp, name) =>
         tp match {
           case VarType.Input | VarType.Output =>
@@ -411,7 +411,7 @@ object compiler {
   /** recursively apply expr to expr Transform like varNameTransform */
   def exprTransform(thisInstName: String, e: Expr[?]): Expr[?] = {
     e match {
-      case v: Var[?] => varNameTransform(thisInstName, v)
+      case v: Var[?]   => varNameTransform(thisInstName, v)
       case x: BinOp[w] =>
         BinOp(
           exprTransform(thisInstName, x.a).asInstanceOf[Expr[Nothing]],

@@ -26,45 +26,25 @@ object worklistAlgo {
     override def isEmpty: Boolean = as.isEmpty
   }
 
-  /** worklist algorithm for monotone framework
-    * @param mf
-    *   monotone framework
-    * @param progGraph
-    *   program graph as list of (src point,stmt,tgt point)
-    *
-    * @return
-    *   mapping from program point to domainMap at that point
-    */
-  def wlAlgoMonotone[domainT, stmtT](
-      mf: MonoFrameworkT[domainT, stmtT],
-      progGraph: List[(Int, stmtT, Int)]
-  ) = {
-
-    wlAlgoProgGraphP[domainT, stmtT](
-      progGraph,
-      mf.transferF,
-      mf.leq,
-      mf.lub,
-      mf.bottom,
-      mf.bottom
-    )
-  }
-
   /** worklist algorithm implementation for program graph
     */
-  private def wlAlgoProgGraphP[domainT, stmtT](
-      progGraph: List[(Int, stmtT, Int)],
+  def wlAlgoProgGraphP[domainT, stmtT](
+      progGraph_ : List[(Int, stmtT, Int)],
       transferF: ((Int, stmtT, Int), domainT) => domainT,
       smallerThan: (domainT, domainT) => Boolean,
       lubOp: (domainT, domainT) => domainT,
       initD: domainT,
       bottomD: domainT,
-      isReverse: Boolean = false
+      isForward: Boolean = true
   ): Map[Int, domainT] = {
 
     val mutList: Worklist[Int] = new WlStack()
 
-    pp(progGraph)
+    val progGraph =
+      if isForward then progGraph_
+      else progGraph_.map { case (a, st, c) => (c, st, a) }
+
+    // pp(progGraph)
     //    get program points
     val progPoints = progGraph.flatMap(x => List(x._1, x._3)).distinct
 

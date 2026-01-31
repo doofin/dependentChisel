@@ -13,19 +13,8 @@ object unInitAnalysis {
   val transferF: ((Int, Stmt, Int), Domain) => Domain = { case ((q0, cmd, q1), varmap) =>
     cmd match {
       case WeakStmt(lhs, op, rhs, prefix) =>
-        rhs match
-          case VarLit(name)                =>
-          case BinOp(a, b, nm)             =>
-          case MulOp(a, b, nm)             =>
-          case AddOp(a, b, nm)             =>
-          case UniOp(a, nm)                =>
-          case VarDynamic(width, tp, name) =>
-          case VarTyped(name, tp)          =>
-          case Lit(i)                      =>
-          case LitDym(i, width)            =>
-
         // any assignment makes var initialized
-        if op == ":=" then varmap.updated(lhs.getname, true) else varmap
+        if op == ":=" then varmap.updated(lhs.getName, true) else varmap
       case _ => varmap
     }
   }
@@ -34,7 +23,7 @@ object unInitAnalysis {
     *
     * we first define a simple boolean lattice and later lift it to Var->Boolean lattice
     */
-  object unInitAnalysis extends semiLattice[Boolean] {
+  object unInitLattice extends semiLattice[Boolean] {
 
     override val leq = {
       case (_, true)      => true
@@ -50,15 +39,15 @@ object unInitAnalysis {
 
   }
 
-  def mMonoFramework(
+  def monoFramework(
       mBotMap: Domain
   ) = {
     // lift the boolean lattice to Var->Boolean lattice
     val lifted: semiLattice[VarMap[Boolean]] =
-      unInitAnalysis.liftWithMap(mBotMap)
+      unInitLattice.liftToVarMap(mBotMap)
 
     MonoFrameworkT(
-      transferF = transferF,
+      transferFn = transferF,
       baseLattice = lifted
     )
   }
