@@ -10,12 +10,12 @@ package dependentChisel.staticAnalysis
   *
   * The set Q of all rational numbers, with the usual linear order, is an infinite distributive
   * lattice which is not complete.
-  * @tparam domain
-  *   satisify acc
+  * @tparam t
+  *   acc(ascending chain condition)
   */
-trait semiLattice[domain] {
-  type mDomain = domain
-  val smallerThan: (domain, domain) => Boolean // partial ordering
-  val lub: (domain, domain) => domain // least upper bound
-  val bottom: domain
+trait semiLattice[t] {
+  type mDomain = t
+  val leq: (t, t) => Boolean // partial ordering
+  val lub: (t, t) => t // least upper bound
+  val bottom: t
 }

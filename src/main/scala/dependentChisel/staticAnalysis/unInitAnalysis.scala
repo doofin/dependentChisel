@@ -1,7 +1,7 @@
 package dependentChisel.staticAnalysis
 
 import dependentChisel.codegen.sequentialCommands.AtomicCmds
-import dependentChisel.staticAnalysis.MonotoneFramework.domainMapT
+import dependentChisel.staticAnalysis.MonotoneFramework.VarMap
 
 import dependentChisel.staticAnalysis.MonotoneFramework.MonoFrameworkT
 import dependentChisel.codegen.sequentialCommands.NewInstance
@@ -23,7 +23,7 @@ object unInitAnalysis {
   type mDomain = checkUnInitLattice.mDomain // which is Boolean
   type mStmt = AtomicCmds // statements
 
-  val transferF: ((Int, mStmt, Int), domainMapT[mDomain]) => domainMapT[mDomain] = {
+  val transferF: ((Int, mStmt, Int), VarMap[mDomain]) => VarMap[mDomain] = {
     case ((q0, cmd, q1), varmap) =>
       cmd match {
         case WeakStmt(lhs, op, rhs, prefix) =>
@@ -46,7 +46,7 @@ object unInitAnalysis {
 
   object checkUnInitLattice extends semiLattice[Boolean] {
 
-    override val smallerThan = {
+    override val leq = {
       case (_, true)      => true
       case (false, false) => true
       case _              => false
@@ -61,7 +61,7 @@ object unInitAnalysis {
   }
 
   def mMonoFramework(
-      mBotMap: domainMapT[mDomain]
+      mBotMap: VarMap[mDomain]
   ) = new MonoFrameworkT[mDomain, mStmt](
     transferF,
     mBotMap,

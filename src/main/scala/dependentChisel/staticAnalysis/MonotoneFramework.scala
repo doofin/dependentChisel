@@ -6,7 +6,7 @@ package dependentChisel.staticAnalysis
 object MonotoneFramework {
   type VarName = String
   // type level lambda from domain to Map[VarName, domain]
-  type domainMapT[domain] = Map[VarName, domain]
+  type VarMap[domain] = Map[VarName, domain]
 
   /** enrich the lattice with transfer function and initial mapping
     *
@@ -22,22 +22,19 @@ object MonotoneFramework {
     * @param baseLattice
     *   lattice for domain
     */
-  trait MonoFrameworkT[domain, stmtT](
-      val transferF: ((Int, stmtT, Int), domainMapT[domain]) => domainMapT[domain],
-      val botMap: domainMapT[domain],
-      baseLattice: semiLattice[domain]
-  ) extends semiLattice[domainMapT[domain]] {
-    // type domainMap = Map[String, domain] // var name to domain
-
-    // lift domain to domainMap[domain] lattice
+  trait MonoFrameworkT[T, stmtT](
+      val transferF: ((Int, stmtT, Int), VarMap[T]) => VarMap[T],
+      val botMap: VarMap[T],
+      baseLattice: semiLattice[T]
+  ) extends semiLattice[VarMap[T]] {
     val liftedLattice = baseLattice.liftWithMap(botMap)
-    override val bottom: domainMapT[domain] = liftedLattice.bottom
+    override val bottom: VarMap[T] = liftedLattice.bottom
     override val lub = liftedLattice.lub
-    override val smallerThan = liftedLattice.smallerThan
+    override val leq = liftedLattice.leq
 
     def runWithProgGraph(
         progGraph: List[(Int, stmtT, Int)]
-    ): Map[Int, domainMapT[domain]] =
+    ): Map[Int, VarMap[T]] =
       worklistAlgo.wlAlgoMonotone(this, progGraph)
   }
 
@@ -53,33 +50,31 @@ object MonotoneFramework {
       *   the bottom element mapping, since we need to know var names
       * @return
       */
-    def liftWithMap(botMap: domainMapT[domain]): semiLattice[domainMapT[domain]] =
-      new semiLattice[domainMapT[domain]] {
-        override val smallerThan: (domainMapT[domain], domainMapT[domain]) => Boolean = {
-          (m1, m2) =>
-            m1 forall { k1 =>
-              // im1 is subset of im2
-              val i1o = k1._2
-              val i2o = m2(k1._1)
+    def liftWithMap(botMap: VarMap[domain]): semiLattice[VarMap[domain]] =
+      new semiLattice[VarMap[domain]] {
+        override val leq: (VarMap[domain], VarMap[domain]) => Boolean = { (m1, m2) =>
+          m1 forall { k1 =>
+            // im1 is subset of im2
+            val i1o = k1._2
+            val i2o = m2(k1._1)
 
-              base.smallerThan(i1o, i2o)
-            }
+            base.leq(i1o, i2o)
+          }
         }
         /*  for lub, take union of keys, for each key do lub on values
          */
-        override val lub: (domainMapT[domain], domainMapT[domain]) => domainMapT[domain] = {
-          (m1, m2) =>
-            val newmap =
-              (m1.keys ++ m2.keys).toSet map { k =>
-                val i1o = m1(k)
-                val i2o = m2(k)
-                val rr = base.lub(i1o, i2o)
-                (k, rr)
-              }
-            Map(newmap.toSeq*)
+        override val lub: (VarMap[domain], VarMap[domain]) => VarMap[domain] = { (m1, m2) =>
+          val newmap =
+            (m1.keys ++ m2.keys).toSet map { k =>
+              val i1o = m1(k)
+              val i2o = m2(k)
+              val rr = base.lub(i1o, i2o)
+              (k, rr)
+            }
+          Map(newmap.toSeq*)
         }
 
-        override val bottom: domainMapT[domain] =
+        override val bottom: VarMap[domain] =
           botMap.map(s => (s._1, base.bottom))
       }
   }
