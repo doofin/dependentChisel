@@ -68,7 +68,7 @@ class liveVarAnalysisSuite extends munit.FunSuite {
            v   /
            5
      */
-    val monoF = liveVarAnalysis.monoFramework(initMap)
+    val monoF = liveVarAnalysis.monoFramework()
 
     // live variable analysis is a backward analysis
     val res = monoF.runWithProgGraph(

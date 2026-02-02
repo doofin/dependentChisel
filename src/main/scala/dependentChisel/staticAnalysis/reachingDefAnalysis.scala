@@ -6,6 +6,7 @@ import dependentChisel.typesAndSyntax.typesAndOps.*
 
 /** reaching definitions as a mapping Var -> PowerSet( Q? * Q ) */
 object reachingDefAnalysis {
+  // (x, p, q) means variable x is modified by the edge p->q. (x,?,qi) means x is not modified before initial point qi. Here we don't use ? for simplicity
   type Domain = Set[(VarName, Int, Int)] // PowerSet( Q? * Q )
   type Stmt = AtomicCmds // statements
 
@@ -43,7 +44,6 @@ object reachingDefAnalysis {
   }
 
   def monoFramework(
-      mBotMap: Domain
   ) = {
 
     MonoFrameworkT(

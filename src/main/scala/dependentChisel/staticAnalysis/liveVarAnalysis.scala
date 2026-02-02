@@ -61,9 +61,7 @@ object liveVarAnalysis {
 
   }
 
-  def monoFramework(
-      mBotMap: Domain
-  ) = {
+  def monoFramework() = {
 
     MonoFrameworkT(
       transferFn = transferLV,

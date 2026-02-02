@@ -44,16 +44,14 @@ object worklistAlgo {
     *   true for forward analysis,false for backward analysis
     * @return
     */
-  def wlAlgoProgGraphP[domainT, stmtT](
+  def onProgGraph[T, stmtT](
       progGraph_ : List[(Int, stmtT, Int)],
-      transferF: ((Int, stmtT, Int), domainT) => domainT,
-      smallerThan: (domainT, domainT) => Boolean,
-      lubOp: (domainT, domainT) => domainT,
-      initD: domainT,
-      bottomD: domainT,
+      transferFn: ((Int, stmtT, Int), T) => T,
+      lattice: semiLattice[T],
+      initD: T,
       entryExitPoint: (Int, Int),
       isForward: Boolean = true
-  ): Map[Int, domainT] = {
+  ): Map[Int, T] = {
 
     val mutList: Worklist[Int] = new WlStack()
 
@@ -71,11 +69,11 @@ object worklistAlgo {
 
     mutList.insertAll(progPoints)
 
-    val resMapMut: mutable.Map[Int, domainT] = mutable.Map()
+    val resMapMut: mutable.Map[Int, T] = mutable.Map()
 
 //    initialize at each program points,set to init for point 0 (first loop)
     progPoints foreach { q =>
-      resMapMut(q) = if (q == 0) then initD else bottomD
+      resMapMut(q) = if (q == 0) then initD else lattice.bottom
     }
 
     // keep applying transferF to program graph until the node value is stable
@@ -93,11 +91,11 @@ object worklistAlgo {
       progGraphTups foreach { case tup @ (pre, stmtT, post) =>
         val preMap = resMapMut(pre)
         val postMap = resMapMut(post) // AA(q dot)
-        val preMapTransfered = transferF(tup, preMap)
+        val preMapTransfered = transferFn(tup, preMap)
 
 //          update if preMapAnalysised >=  postMap (not <=)
 //        println("doUpdate:", subOrderOp, preMapTransfered, postMap) // subOrderOp can be null
-        val doUpdate = !smallerThan(preMapTransfered, postMap)
+        val doUpdate = !lattice.leq(preMapTransfered, postMap)
 
 //        println(s"doUpdate if presetF ${pre} notSubOrder postset ${post}:: at ${post}", doUpdate)
 //          pp(preMapTransfered, s"preSetF f(${pre}):")
@@ -105,7 +103,7 @@ object worklistAlgo {
 
         if (doUpdate) {
 
-          val lubR = lubOp(postMap, preMapTransfered)
+          val lubR = lattice.lub(postMap, preMapTransfered)
 //            pp(lubR, "lub : ")
           resMapMut(post) = lubR
 //            wlMut += post
@@ -115,7 +113,7 @@ object worklistAlgo {
         }
       }
     }
-    println(s"iter step : ${steps}")
+    println(s"worklist algo finished in $steps steps")
     resMapMut.toMap
   }
 }

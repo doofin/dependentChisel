@@ -8,7 +8,7 @@ import dependentChisel.staticAnalysis.reachingDefAnalysis
 
 class reachingDefAnalysisSuite extends munit.FunSuite {
 
-  // program graph in PA appetizer,p17
+  // program graph in PA appetizer,p17 and example 2.2 at p18
   val pg1 =
     List(
       (0, WeakStmt(VarLit("y"), ":=", Lit[1](1)), 1),
@@ -17,14 +17,12 @@ class reachingDefAnalysisSuite extends munit.FunSuite {
       (3, WeakStmt(VarLit("x"), ":=", VarLit("x") - Lit[1](1)), 1),
       (1, Skip, 4)
     )
-  test("reaching definition transfer function test") {
+  test("reaching definition full test") {
     val initMap: reachingDefAnalysis.Domain = Set.empty
     val t1 = reachingDefAnalysis.transferFn(pg1(0), initMap)
 
-    val mono = reachingDefAnalysis.monoFramework(initMap)
+    val mono = reachingDefAnalysis.monoFramework()
     val res = mono.runWithProgGraph(pg1, isForward = true, entryExitPoint = (0, 4))
-
-    pp(res)
 
     val expected = Map(
       0 -> Set(),

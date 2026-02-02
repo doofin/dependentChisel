@@ -50,13 +50,11 @@ object MonotoneFramework {
     ) = {
       val mf = this
 
-      worklistAlgo.wlAlgoProgGraphP(
+      worklistAlgo.onProgGraph(
         progGraph,
         mf.transferFn,
-        mf.leq,
-        mf.lub,
-        mf.bottom,
-        mf.bottom,
+        lattice = baseLattice,
+        initD = mf.bottom,
         entryExitPoint = entryExitPoint,
         isForward = isForward
       )
