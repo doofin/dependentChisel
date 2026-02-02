@@ -57,9 +57,13 @@ object worklistAlgo {
 
     val mutList: Worklist[Int] = new WlStack()
 
+    //  for backward analysis just reverse the edges and swap entry exit (or init final)
     val progGraph =
       if isForward then progGraph_
       else progGraph_.map { case (a, st, c) => (c, st, a) }
+
+    val (entryPoint, exitPoint) =
+      if isForward then entryExitPoint else (entryExitPoint._2, entryExitPoint._1)
 
     // pp(progGraph)
     //    get program points
@@ -71,14 +75,7 @@ object worklistAlgo {
 
 //    initialize at each program points,set to init for point 0 (first loop)
     progPoints foreach { q =>
-      val (entryPoint, exitPoint) = entryExitPoint
-      if isForward then //
-        resMapMut(q) = if (q == entryPoint) then initD else bottomD
-      else
-        resMapMut(q) = if (q == exitPoint) then initD else bottomD
-
-        //
-        // resMapMut(q) = if (q == 0) then initD else bottomD
+      resMapMut(q) = if (q == 0) then initD else bottomD
     }
 
     // keep applying transferF to program graph until the node value is stable
