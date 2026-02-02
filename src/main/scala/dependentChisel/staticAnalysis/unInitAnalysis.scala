@@ -48,7 +48,7 @@ object unInitAnalysis {
 
     MonoFrameworkT(
       transferFn = transferF,
-      baseLattice = lifted
+      lattice = lifted
     )
   }
 }

@@ -42,8 +42,8 @@ object liveVarAnalysis {
     */
   def transferLV(ppoint: (Int, Stmt, Int), l: Domain): Domain = {
     val stmt = ppoint._2
-    val ks = killSetLV(stmt).toSet
-    val gs = genSetLV(stmt).toSet
+    val ks = killSetLV(stmt)
+    val gs = genSetLV(stmt)
     val res = (l -- ks) union gs
     println(s"tran for $ppoint : in = $l , kill = $ks , gen = $gs , out = $res")
     res
@@ -65,7 +65,7 @@ object liveVarAnalysis {
 
     MonoFrameworkT(
       transferFn = transferLV,
-      baseLattice = liveVarLattice
+      lattice = liveVarLattice
     )
   }
 }

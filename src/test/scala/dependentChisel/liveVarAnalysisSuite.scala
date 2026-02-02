@@ -7,7 +7,7 @@ import dependentChisel.codegen.sequentialCommands.*
 import dependentChisel.staticAnalysis.liveVarAnalysis
 
 class liveVarAnalysisSuite extends munit.FunSuite {
-  test("test free variable function".ignore) {
+  test("test free variable function") {
     val expr = VarLit("x") + VarLit("y") + Lit[8](8)
     val expr2 = UniOp(expr + VarLit("z"), "neg")
 
@@ -18,8 +18,9 @@ class liveVarAnalysisSuite extends munit.FunSuite {
 
   test("live variable transfer function test") {
 
+    // r:= r - y
     val stmt1 = (0, WeakStmt(VarLit("r"), ":=", VarLit("r") - VarLit("y")), 1)
-
+    // {}-{r}+{r,y} = {r,y} for l-kill + gen
     val t1 = liveVarAnalysis.transferLV(stmt1, Set())
     assertEquals(t1, Set("r", "y"), "after r:=r - y , r and y should be live ")
 
@@ -40,14 +41,10 @@ class liveVarAnalysisSuite extends munit.FunSuite {
         (0, WeakStmt(VarLit("x"), ":=", Lit[1](1)), 1),
         (1, Skip, 3),
         (0, WeakStmt(VarLit("y"), ":=", Lit[1](1)), 2),
-        (2, Skip, 4),
-        (3, WeakStmt(VarLit("z"), ":=", VarLit("x") + Lit[1](1)), 5),
+        (2, WeakStmt(VarLit("y"), ":=", VarLit("y") + Lit[1](1)), 4),
+        (3, WeakStmt(VarLit("z"), ":=", VarLit("x") + VarLit("y") + Lit[1](1)), 5),
         (4, Skip, 5)
       )
-
-    // each var is uninitialized at the beginning
-    val initMap =
-      Set.empty[String]
 
     val entryExitPoint = (0, 5)
     /*
@@ -56,16 +53,17 @@ class liveVarAnalysisSuite extends munit.FunSuite {
                 0
              /    \
           (x:=1)   (y:=1)
-           |       \
-           v        v
-           1        2
-           |        |
-           v        v
-           3        4
+           |         \
+           v          v
+           1          2
+           |          | (y:=y+1)
+           v          v
+           3          4
            |
-          (z:=x+1)
-           |
-           v   /
+      (z:=x+y+1)   /
+           |      /
+           v     /
+          
            5
      */
     val monoF = liveVarAnalysis.monoFramework()
@@ -77,7 +75,15 @@ class liveVarAnalysisSuite extends munit.FunSuite {
       entryExitPoint
     )
 
-    pp(res)
+    val expected = Map(
+      0 -> Set("y"),
+      5 -> Set(),
+      1 -> Set("x", "y"),
+      2 -> Set("y"),
+      3 -> Set("x", "y"),
+      4 -> Set()
+    )
+    assertEquals(res, expected)
 
   }
 }

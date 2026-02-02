@@ -24,6 +24,7 @@ class reachingDefAnalysisSuite extends munit.FunSuite {
     val mono = reachingDefAnalysis.monoFramework()
     val res = mono.runWithProgGraph(pg1, isForward = true, entryExitPoint = (0, 4))
 
+    // from 2.12 p21, the result of Example 2.2
     val expected = Map(
       0 -> Set(),
       1 -> Set(("y", 0, 1), ("y", 2, 3), ("x", 3, 1)),

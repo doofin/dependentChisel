@@ -12,29 +12,20 @@ object MonotoneFramework {
     *
     * tips : create two file named xxAnalysis to implement this trait, and xxLattice to implement
     * the lattice separately.
-    * @tparam domain
-    *   domain lattice which satisify acc
+    * @tparam T
+    *   lattice type
     * @tparam stmtT
-    *   type of statement
-    *
-    * @param initMap
-    *   initial mapping from var to domain value
-    * @param baseLattice
-    *   lattice for domain
+    *   statement type
+    * @param transferFn
+    *   transfer function
+    * @param lattice
+    *   lattice over T for the analysis
     */
   case class MonoFrameworkT[T, stmtT](
       val transferFn: ((Int, stmtT, Int), T) => T,
       // val botMap: VarMap[T],
-      baseLattice: semiLattice[T]
-  ) extends semiLattice[T] {
-    // val liftedLattice = baseLattice.liftWithMap(botMap)
-    // override val bottom: VarMap[T] = liftedLattice.bottom
-    // override val lub = liftedLattice.lub
-    // override val leq = liftedLattice.leq
-
-    override val bottom: T = baseLattice.bottom
-    override val lub = baseLattice.lub
-    override val leq = baseLattice.leq
+      lattice: semiLattice[T]
+  ) {
 
     /** run the monotone framework on a program graph
       *
@@ -48,13 +39,12 @@ object MonotoneFramework {
         isForward: Boolean = true,
         entryExitPoint: (Int, Int)
     ) = {
-      val mf = this
 
       worklistAlgo.onProgGraph(
         progGraph,
-        mf.transferFn,
-        lattice = baseLattice,
-        initD = mf.bottom,
+        transferFn,
+        lattice = lattice,
+        initD = lattice.bottom,
         entryExitPoint = entryExitPoint,
         isForward = isForward
       )

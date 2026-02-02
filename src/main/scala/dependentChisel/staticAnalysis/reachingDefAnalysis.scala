@@ -48,7 +48,7 @@ object reachingDefAnalysis {
 
     MonoFrameworkT(
       transferFn = transferFn,
-      baseLattice = RDLattice
+      lattice = RDLattice
     )
   }
 }
