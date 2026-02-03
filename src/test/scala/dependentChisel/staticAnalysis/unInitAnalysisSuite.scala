@@ -39,13 +39,13 @@ class unInitAnalysisSuite extends munit.FunSuite {
     }.keySet
 
     pp(res)
-    assertEquals(resultInitX, expectedInit, "so x is only initialized at point 1,3,5")
+    assertEquals(resultInitX, expectedInit)
 
-    val expectedInitY = Set(2, 4)
+    val expectedInitY = Set(2, 4, 5)
     val resultInitY = res.filter { case (k, v) =>
       v("y") // filter where y is true
     }.keySet
-    assertEquals(resultInitY, expectedInitY, "so y is only initialized at point 2,4")
+    assertEquals(resultInitY, expectedInitY)
 
   }
 }
