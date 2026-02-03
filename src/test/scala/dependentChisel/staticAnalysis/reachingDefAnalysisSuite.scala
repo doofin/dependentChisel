@@ -1,4 +1,4 @@
-package dependentChisel
+package dependentChisel.staticAnalysis
 
 import com.doofin.stdScalaCross.*
 

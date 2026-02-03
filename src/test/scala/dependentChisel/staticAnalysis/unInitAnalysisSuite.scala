@@ -1,4 +1,4 @@
-package dependentChisel
+package dependentChisel.staticAnalysis
 
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.codegen.sequentialCommands.*

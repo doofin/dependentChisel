@@ -44,11 +44,9 @@ object reachingDefAnalysis {
   }
 
   def monoFramework(
-  ) = {
-
+  ) =
     MonoFrameworkT(
       transferFn = transferFn,
       lattice = RDLattice
     )
-  }
 }
