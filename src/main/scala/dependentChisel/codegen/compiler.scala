@@ -166,7 +166,7 @@ object compiler {
         })
       case stmt: WeakStmt    => indent + stmt2firrtlStr(stmt)
       case stmt: NewInstance => newInstStmt2firrtlStr(indent, stmt) + "\n"
-      case stmt: VarDecls =>
+      case stmt: VarDecls    =>
         indent + varDecl2firrtlStr(indent, stmt)
     }
 
@@ -201,7 +201,7 @@ object compiler {
         s"$opName(${expr2firrtlStr(a)})"
       case x: Var[?] =>
         // dbg(x)
-        x.getname
+        x.getName
       case Lit(w) =>
         // h0 means HexLit of 0
         s"""UInt<${w}>("$w")"""
@@ -258,7 +258,7 @@ object compiler {
   }
 
   def varDecl2firrtlStr(indent: String = "", stmt: VarDecls) = {
-    val VarDymTyped(width: Int, tp: VarType, name: String) = stmt.v
+    val VarDynamic(width: Int, tp: VarType, name: String) = stmt.v
     tp match {
       case VarType.Reg => // reg without init
         /* reg mReg : UInt<16>, clock with :
@@ -315,7 +315,7 @@ object compiler {
             WeakStmt(
               stmt.lhs,
               ":=",
-              bop.copy(a = VarLit(genStmt.lhs.getname)),
+              bop.copy(a = VarLit(genStmt.lhs.getName)),
               prefix = "node "
             )
           ) ++ resList
@@ -355,7 +355,7 @@ object compiler {
         io.y:=a+b becomes y0=a+b;io.y<=y0
         new : don't do above
        */
-      case x: (VarTyped[?] | VarDymTyped) =>
+      case x: (VarTyped[?] | VarDynamic) =>
         val genStmt = expr2stmtBind(stmt.rhs)
         List(genStmt, stmt.copy(op = "<=", rhs = genStmt.lhs))
       // List(stmt.copy(op = "<="))
@@ -381,8 +381,8 @@ object compiler {
     */
   def varNameTransform(thisInstName: String, v: Var[?]): Var[?] = {
     v match {
-      case x @ VarLit(name) => x
-      case x @ VarDymTyped(width, tp, name) =>
+      case x @ VarLit(name)                => x
+      case x @ VarDynamic(width, tp, name) =>
         tp match {
           case VarType.Input | VarType.Output =>
             x.copy(name = ioNameTransform(thisInstName, name))
@@ -411,7 +411,7 @@ object compiler {
   /** recursively apply expr to expr Transform like varNameTransform */
   def exprTransform(thisInstName: String, e: Expr[?]): Expr[?] = {
     e match {
-      case v: Var[?] => varNameTransform(thisInstName, v)
+      case v: Var[?]   => varNameTransform(thisInstName, v)
       case x: BinOp[w] =>
         BinOp(
           exprTransform(thisInstName, x.a).asInstanceOf[Expr[Nothing]],

@@ -8,7 +8,7 @@ import com.doofin.stdScala.mainRunnable
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.typesAndSyntax.varDecls.*
+import dependentChisel.typesAndSyntax.circuitDecls.*
 import dependentChisel.codegen.compiler.*
 import dependentChisel.examples.adder
 

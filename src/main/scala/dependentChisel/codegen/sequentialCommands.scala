@@ -18,12 +18,15 @@ object sequentialCommands {
     case If(cond: Bool)
     // case IfElse[w <: Int](b: Bool[w])
     case Else[w <: Int]()
-    case Top()
+    case Top() // represents top level
   }
 
   /** all sorts of sequential commands
     */
   sealed trait Cmds
+
+  /** atomic commands like decl,assign,etc */
+  sealed trait AtomicCmds extends Cmds
 
   /** represent start/end of control block
     *
@@ -34,9 +37,8 @@ object sequentialCommands {
   case class End[CT <: Ctrl](ctrl: CT, uid: Uid) extends Cmds
 
   /** atomic commands like decl,assign,etc */
-  sealed trait AtomicCmds extends Cmds
 
-  /** for new mod */
+  /** new inst for a module */
   case class NewInstance(instNm: String, modNm: String) extends AtomicCmds
 
   /** firrtl statements: weakly typed which doesn't require width of lhs = wid of rhs.
@@ -49,11 +51,14 @@ object sequentialCommands {
   ) extends AtomicCmds
 
   /** for Wire, Reg, and IO */
-  case class VarDecls(v: VarDymTyped) extends AtomicCmds
+  case class VarDecls(v: VarDynamic) extends AtomicCmds
   case object Skip extends AtomicCmds
   /* TODO:also allow dym check which rm type sig of var[t] ,etc. cases
    * of (lhs,rhs) are (dym,stat),(dym,dym)....
    1.new super type for Var[w]
    */
+
+  /** formal verification commands */
+  case class BoolProp(name: String, prop: Bool) extends AtomicCmds
 
 }

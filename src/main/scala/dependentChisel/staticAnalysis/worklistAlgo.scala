@@ -4,6 +4,7 @@ import com.doofin.stdScalaJvm.*
 import scala.collection.{immutable, mutable}
 
 import MonotoneFramework.*
+import chisel3.util.is
 
 object worklistAlgo {
   trait Worklist[t] {
@@ -26,49 +27,57 @@ object worklistAlgo {
     override def isEmpty: Boolean = as.isEmpty
   }
 
-  def wlAlgoMonotone[domainT, stmtT](
-      mf: MonoFrameworkT[domainT, stmtT],
-      progGraph: List[(Int, stmtT, Int)]
-  ) = {
-
-    wlAlgoProgGraphP[domainMapT[domainT], stmtT](
-      progGraph,
-      mf.transferF,
-      mf.smallerThan,
-      mf.lub,
-      mf.initMap,
-      mf.bottom
-    )
-  }
-
-  private def wlAlgoProgGraphP[domainT, stmtT](
-      progGraph: List[(Int, stmtT, Int)],
-      transferF: ((Int, stmtT, Int), domainT) => domainT,
-      smallerThan: (domainT, domainT) => Boolean,
-      lubOp: (domainT, domainT) => domainT,
-      initD: domainT,
-      bottomD: domainT,
-      isReverse: Boolean = false
-  ): Map[Int, domainT] = {
+  /** worklist algorithm on program graph
+    *
+    * @param progGraph_
+    * @param transferF
+    * @param smallerThan
+    * @param lubOp
+    * @param initD
+    *   for program point 0 if it's forward analysis, or exiting point if backward analysis
+    * @param bottomD
+    *   for other program points
+    * @param entryExitPoint
+    *   the (entry, exit) program points. forward analysis only use entry point, backward analysis
+    *   only use exit
+    * @param isForward
+    *   true for forward analysis,false for backward analysis
+    * @return
+    */
+  def onProgGraph[T, stmtT](
+      progGraph_ : List[(Int, stmtT, Int)],
+      transferFn: ((Int, stmtT, Int), T) => T,
+      lattice: semiLattice[T],
+      initD: T,
+      entryExitPoint: (Int, Int),
+      isForward: Boolean = true
+  ): Map[Int, T] = {
 
     val mutList: Worklist[Int] = new WlStack()
 
-    pp(progGraph)
-//    get program points from edges,ignore stmt in (Int, Stmt, Int)
+    //  for backward analysis just reverse the edges and swap entry exit (or init final)
+    val progGraph =
+      if isForward then progGraph_
+      else progGraph_.map { case (a, st, c) => (c, st, a) }
+
+    val (entryPoint, exitPoint) =
+      if isForward then entryExitPoint else (entryExitPoint._2, entryExitPoint._1)
+
+    // pp(progGraph)
+    //    get program points
     val progPoints = progGraph.flatMap(x => List(x._1, x._3)).distinct
 
-//    initialise work list
     mutList.insertAll(progPoints)
 
-    val resMapMut: mutable.Map[Int, domainT] = mutable.Map()
+    val resMapMut: mutable.Map[Int, T] = mutable.Map()
 
 //    initialize at each program points,set to init for point 0 (first loop)
     progPoints foreach { q =>
-      resMapMut(q) = if (q == 0) initD else bottomD
+      resMapMut(q) = if (q == 0) then initD else lattice.bottom
     }
 
-//    pp(resMapMut.toMap, "init resMap : ")
-    // second loop,keep applying transferF to program graph until the node value is stable
+    // keep applying transferF to program graph until the node value is stable
+    // according to the ascending order property, this will terminate
     var steps = 0
     while (!mutList.isEmpty) {
       steps += 1
@@ -82,11 +91,11 @@ object worklistAlgo {
       progGraphTups foreach { case tup @ (pre, stmtT, post) =>
         val preMap = resMapMut(pre)
         val postMap = resMapMut(post) // AA(q dot)
-        val preMapTransfered = transferF(tup, preMap)
+        val preMapTransfered = transferFn(tup, preMap)
 
 //          update if preMapAnalysised >=  postMap (not <=)
 //        println("doUpdate:", subOrderOp, preMapTransfered, postMap) // subOrderOp can be null
-        val doUpdate = !smallerThan(preMapTransfered, postMap)
+        val doUpdate = !lattice.leq(preMapTransfered, postMap)
 
 //        println(s"doUpdate if presetF ${pre} notSubOrder postset ${post}:: at ${post}", doUpdate)
 //          pp(preMapTransfered, s"preSetF f(${pre}):")
@@ -94,7 +103,7 @@ object worklistAlgo {
 
         if (doUpdate) {
 
-          val lubR = lubOp(postMap, preMapTransfered)
+          val lubR = lattice.lub(postMap, preMapTransfered)
 //            pp(lubR, "lub : ")
           resMapMut(post) = lubR
 //            wlMut += post
@@ -104,7 +113,7 @@ object worklistAlgo {
         }
       }
     }
-    println(s"iter step : ${steps}")
+    println(s"worklist algo finished in $steps steps")
     resMapMut.toMap
   }
 }

@@ -53,7 +53,7 @@ object typeCheck {
             val isWidthOk = isWidthEqu // | lhsGeqRhs
             val msg =
               "[error]".toRed() +
-                s" width mismatch in statement:\n${showPair(lhs.getname, i)}\n " +
+                s" width mismatch in statement:\n${showPair(lhs.getName, i)}\n " +
                 s"$op \n" +
                 s"${showPair(rhs.toString(), j)} "
 

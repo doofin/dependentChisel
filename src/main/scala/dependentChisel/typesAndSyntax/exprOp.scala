@@ -6,7 +6,7 @@ import dependentChisel.typesAndSyntax.typesAndOps.UniOp
 import scala.compiletime.ops.int.*
 import scala.compiletime.*
 
-trait exprOperators {
+trait exprOp {
   // int ops
   extension [w <: Int](x: Expr[w]) {
     def +(oth: Expr[w]): BinOp[w] = BinOp(x, oth, "+")

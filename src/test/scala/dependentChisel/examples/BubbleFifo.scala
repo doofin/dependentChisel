@@ -1,7 +1,7 @@
 package dependentChisel.examples
 
 import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.typesAndSyntax.varDecls.*
+import dependentChisel.typesAndSyntax.circuitDecls.*
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.codegen.compiler.*

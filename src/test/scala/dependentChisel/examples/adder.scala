@@ -10,11 +10,11 @@ import dependentChisel.*
 import dependentChisel.typesAndSyntax.typesAndOps.*
 import dependentChisel.typesAndSyntax.statements.*
 import dependentChisel.typesAndSyntax.chiselModules.*
-import dependentChisel.typesAndSyntax.varDecls.newIO
+import dependentChisel.typesAndSyntax.circuitDecls.newIO
 import dependentChisel.codegen.compiler.*
 
-
-import dependentChisel.typesAndSyntax.varDecls.newIODym
+import dependentChisel.typesAndSyntax.circuitDecls.newIODym
+import dependentChisel.codegen.sequentialCommands.BoolProp
 
 object adder extends mainRunnable {
 
@@ -108,5 +108,16 @@ object adder extends mainRunnable {
     m1.a := a
     m1.b := b
     y := m1.y
+  }
+
+  /** adder with formal verification properties
+    */
+  class Adder1prop(using GlobalInfo) extends UserModule {
+    val a = newIO[2](VarType.Input)
+    val b = newIO[2](VarType.Input)
+    val y = newIO[2](VarType.Output)
+
+    y := a + b
+    BoolProp("assert", y === a + b).here
   }
 }

@@ -1,6 +1,6 @@
 package dependentChisel.monadic
 
-import dependentChisel.monadic.monadicAST.BoolExpr
+import dependentChisel.monadic.monadicSyntax.BoolExpr
 
 object simpleAST {
   enum Stmt {

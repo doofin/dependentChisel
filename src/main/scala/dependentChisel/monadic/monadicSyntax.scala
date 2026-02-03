@@ -1,4 +1,3 @@
-// package precondition.syntax
 package dependentChisel.monadic
 
 import scala.compiletime.*
@@ -11,7 +10,7 @@ import cats.free.Free
 import dependentChisel.syntax.naming.*
 import dependentChisel.syntax.naming
 
-object monadicAST {
+object monadicSyntax {
 
   sealed trait DslStoreA[A]
 
@@ -30,7 +29,8 @@ object monadicAST {
 
   case class NewVar(name: String = "") extends DslStoreA[Var] // DslStoreA[Var]
   // case class NewWire[t](name: String = "") extends DslStoreA[Var] // DslStoreA[Var]
-  case class NewWire[n <: Int]() extends DslStoreA[NewWire[n]] { // support both dynamic and static check
+  case class NewWire[n <: Int]()
+      extends DslStoreA[NewWire[n]] { // support both dynamic and static check
     inline def getVal = constValueOpt[n]
   }
 
@@ -69,8 +69,7 @@ object monadicAST {
   ): NewWire[n + m] = {
     NewWire[n + m]()
   }
-  case class IfElse(cond: BoolExpr, s1: DslStore[Unit], s2: DslStore[Unit])
-      extends DslStoreA[Unit]
+  case class IfElse(cond: BoolExpr, s1: DslStore[Unit], s2: DslStore[Unit]) extends DslStoreA[Unit]
   case class If(cond: BoolExpr, s1: DslStore[Unit]) extends DslStoreA[Unit]
   case class While(
       cond: DslStore[Boolean],
